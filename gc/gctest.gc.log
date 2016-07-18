@@ -1,0 +1,9 @@
+Completed 6 tests
+Allocated 3437682 collectable objects
+Allocated 1212 uncollectable objects
+Allocated 7252659 atomic objects
+Allocated 137744 stubborn objects
+Finalized 13354/13360 objects - finalization is probably ok
+Total number of bytes allocated is 568179926
+Final heap size is 8982528 bytes
+Collector appears to work

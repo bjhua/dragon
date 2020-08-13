@@ -1,7 +1,9 @@
-int dragon ()
-{
-  int a; 
-  a = 1;
+int dragon() {
+    int a;
+    a = 1;
 
-  return 0;
+    printi(a);
+    return 0;
 }
+
+

@@ -7,12 +7,9 @@
 #include "../lib/int.h"
 #include "control.h"
 
-String_t Control_asmDirectory = 
-  "c:\\program files\\dragon\\temp\\";
-String_t Control_libDirectory = 
-  "c:\\program files\\dragon\\lib\\";
-String_t Control_headerDirectory = 
-  "c:\\program files\\dragon\\lib\\include";
+String_t Control_asmDirectory = "./";
+String_t Control_libDirectory = "./";
+String_t Control_headerDirectory = "./";
 
 typedef struct Flag_t *Flag_t;
 struct Flag_t

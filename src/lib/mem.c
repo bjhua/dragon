@@ -9,14 +9,15 @@ int Mem_initFlag = 0;
 /* the accumulated time should include GC time */
 static clock_t totalClocks = 0;
 
-void Mem_init ()
-{
-  GC_INIT ();
+void Mem_init(){
+  //GC_INIT();
   totalClocks = 0;
 }
 
-void *Mem_alloc (unsigned int size)
-{
+#undef GC_MALLOC
+#define GC_MALLOC malloc
+
+void *Mem_alloc(unsigned int size){
   void *p;
   clock_t start, finish;
 
@@ -48,10 +49,10 @@ clock_t Mem_getClock ()
 #define ONEM (1024*1024)
 void Mem_status ()
 {
-  unsigned long int total, sinceLast;
+  unsigned long int total = 0, sinceLast = 0;
   
-  total = GC_get_total_bytes();
-  sinceLast = GC_get_bytes_since_gc();
+  //total = GC_get_total_bytes();
+  //sinceLast = GC_get_bytes_since_gc();
   printf ("Heap status:\n"
           "  Total allocation        : %lu bytes (~%ldM)\n"
           "  Allocation since last GC: %ld bytes (~%ldM)\n", 

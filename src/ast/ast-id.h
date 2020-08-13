@@ -12,8 +12,8 @@ typedef struct T *T;
 
 T AstId_fromString (String_t s, Region_t r);
 T AstId_bogus ();
-int AstId_equals (T id1, T id2);
-int AstId_hashCode (T);
+bool AstId_equals(T id1, T id2);
+long AstId_hashCode (T);
 T AstId_newNoName ();
 String_t AstId_toString (T);
 Id_t AstId_toId (T);

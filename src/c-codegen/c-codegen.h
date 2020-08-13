@@ -4,6 +4,6 @@
 #include "../lib/file.h"
 #include "../machine/machine.h"
 
-int C_codegen (File_t file, Machine_Prog_t p);
+int C_codegen(File_t file, Machine_Prog_t p);
 
 #endif

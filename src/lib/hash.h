@@ -14,8 +14,8 @@ typedef struct T *T;
 typedef V (*tyKV)(K);
 typedef void (*tyDup)(K, K);
 
-T Hash_new (int (*hashCode)(K)
-            , int (*equals)(K, K)
+T Hash_new (long (*hashCode)(K)
+            , bool (*equals)(K, K)
             , void (*dup)(K, K));
 /* insert a binding: k |-> v into a hash h,
  * with the equality testing function "equals".

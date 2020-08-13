@@ -19,7 +19,7 @@
        stms2
        jump L3
  */
-// L2 should only have one predessor L1, and L1 has one
+// L2 should only have one predecessor L1, and L1 has one
 // successor L2
 Ssa_Prog_t Ssa_unionBlock (Ssa_Prog_t p);
 

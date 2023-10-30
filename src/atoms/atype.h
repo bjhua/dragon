@@ -8,36 +8,43 @@
 
 typedef struct T *T;
 
-struct T
-{
-  enum{
-    ATYPE_INT,
-    ATYPE_STRING,
-    ATYPE_CLASS,
-    ATYPE_INT_ARRAY,
-    ATYPE_STRING_ARRAY,
-    ATYPE_CLASS_ARRAY,
-    ATYPE_FUN
-  }kind;
-  union{
-    Id_t id;
-    struct{
-      // List<T>
-      List_t from;
-      T to;
-    }fun;
-  }u;
+struct T {
+    enum {
+        ATYPE_INT,
+        ATYPE_STRING,
+        ATYPE_CLASS,
+        ATYPE_INT_ARRAY,
+        ATYPE_STRING_ARRAY,
+        ATYPE_CLASS_ARRAY,
+        ATYPE_FUN
+    } kind;
+    union {
+        Id_t id;
+        struct {
+            // List<T>
+            List_t from;
+            T to;
+        } fun;
+    } u;
 };
 
-T Atype_new_int ();
-T Atype_new_int_array ();
-T Atype_new_string ();
-T Atype_new_string_array ();
-T Atype_new_class (Id_t);
-T Atype_new_class_array (Id_t);
-T Atype_new_fun (List_t from, T to);
-int Atype_maybeGc (T);
-String_t Atype_toString (T);
+T Atype_new_int();
+
+T Atype_new_int_array();
+
+T Atype_new_string(String_t);
+
+T Atype_new_string_array();
+
+T Atype_new_class(Id_t);
+
+T Atype_new_class_array(Id_t);
+
+T Atype_new_fun(List_t from, T to);
+
+int Atype_maybeGc(T);
+
+String_t Atype_toString(T);
 
 #undef T
 

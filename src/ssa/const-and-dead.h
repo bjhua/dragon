@@ -9,6 +9,6 @@
 
 #include "ssa.h"
 
-Ssa_Prog_t Ssa_constAndDead (Ssa_Prog_t p);
+Ssa_Prog_t Ssa_constAndDead(Ssa_Prog_t p);
 
 #endif

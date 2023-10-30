@@ -6,6 +6,6 @@
 #include "../x86/x86.h"
 
 /* a tuple <IR, asm> of the IR and its assembly */
-Tuple_t X86_main (Machine_Prog_t p);
+Tuple_t X86_main(Machine_Prog_t p);
 
 #endif

@@ -5,7 +5,7 @@
 
 typedef char *T;
 
-int String_equals (T x, T y);
+long String_equals (T x, T y);
 T String_new (char *s);
 T String_concat (char *s, ...);
 /*void String_append (T, T);*/

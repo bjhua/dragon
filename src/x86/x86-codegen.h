@@ -4,6 +4,6 @@
 #include "../machine/machine.h"
 #include "x86.h"
 
-X86_Prog_t X86_codegen (Machine_Prog_t p);
+X86_Prog_t X86_codegen(Machine_Prog_t p);
 
 #endif

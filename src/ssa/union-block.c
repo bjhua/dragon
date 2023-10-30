@@ -36,8 +36,8 @@ static void analyzeOneBlock (Ssa_Block_t b)
   case SSA_TRANS_IF:{
     Label_t tt = b->transfer->u.iff.truee;
     Label_t tf = b->transfer->u.iff.falsee;
-    long tn = (int)Property_get (numPreds, tt);
-    long fn = (int)Property_get (numPreds, tf);
+    long tn = (long)Property_get (numPreds, tt);
+    long fn = (long)Property_get (numPreds, tf);
     
     Property_set (numPreds
                   , tt
@@ -49,7 +49,7 @@ static void analyzeOneBlock (Ssa_Block_t b)
   }
   case SSA_TRANS_JUMP:{
     Label_t l = b->transfer->u.jump;
-    long ln = (int)Property_get (numPreds, l);
+    long ln = (long)Property_get (numPreds, l);
     
     Property_set (numPreds
                   , l
@@ -86,7 +86,7 @@ static void markVictim (Ssa_Block_t b)
     return;
   }
   case SSA_TRANS_JUMP:{
-    int n = (int)Property_get (numPreds
+    long n = (long)Property_get (numPreds
                           , b->transfer->u.jump);
     if (n == 1 
         && !Label_equals (b->transfer->u.jump
@@ -118,10 +118,9 @@ static void markVictim (Ssa_Block_t b)
 // store result in "globalBlocks"
 static void transOne (Ssa_Block_t b)
 {
-  int v;
   Assert_ASSERT(b);
   
-  v = (int)Property_get (victim, b->label);
+  long v = (long)Property_get (victim, b->label);
   if (v)
     return;
 
@@ -133,7 +132,7 @@ static void transOne (Ssa_Block_t b)
   case SSA_TRANS_JUMP:{
     Label_t jump = b->transfer->u.jump;
     Label_t label = b->label;    
-    int vj = (int)Property_get (victim, jump);
+    long vj = (long)Property_get (victim, jump);
     Ssa_Block_t newb;
 
     if (vj){

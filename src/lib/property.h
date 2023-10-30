@@ -11,18 +11,23 @@
 #define P Plist_t
 
 typedef struct T *T;
+
 typedef V(*Poly_tyPropInit)(K);
 
-T Property_new (Poly_tyPlist);
+T Property_new(Poly_tyPlist);
 // take an extra "init" argument, which will be called
 // when the search failed on some item "k", and the 
 // generated
 // "V" will be set on that item "k".
-T Property_newInitFun (Poly_tyPlist, V(*init)(K));
-void Property_set (T prop, K k, V v);
-V Property_get (T, K k);
-void Property_clear (T prop);
-String_t Property_status ();
+T Property_newInitFun(Poly_tyPlist, V(*init)(K));
+
+void Property_set(T prop, K k, V v);
+
+V Property_get(T, K k);
+
+void Property_clear(T prop);
+
+String_t Property_status();
 
 #undef T
 #undef K

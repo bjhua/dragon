@@ -24,7 +24,7 @@ struct T {
 
     long (*hashCode)(K);
 
-    int (*equals)(K, K);
+    long (*equals)(K, K);
 
     void (*dup)(K, K);
 
@@ -35,11 +35,11 @@ struct T {
     double load;
 };
 
-T Hash_newRaw(long (*hashCode)(K), int (*equals)(K, K)) {
+T Hash_newRaw(long (*hashCode)(K), long (*equals)(K, K)) {
     return Hash_new(hashCode, equals, 0);
 }
 
-T Hash_new(long (*hashCode)(K), bool (*equals)(K, K), void (*dup)(K, K)) {
+T Hash_new(long (*hashCode)(K), long (*equals)(K, K), void (*dup)(K, K)) {
     int i;
     T h;
 
@@ -131,7 +131,7 @@ void Hash_insert(T h, K k, V v) {
             list = List_getFirst(list);
             while (list) {
                 Triple_t t = (Triple_t) (list->data);
-                long initHc = (int) Triple_second(t);
+                long initHc = (long) Triple_second(t);
 
                 List_insertLast
                         (*(newBuckets + (initHc & h->mask)), t);

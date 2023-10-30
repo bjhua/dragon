@@ -14,7 +14,7 @@ T Id_newNoName ();
 long Id_hashCode (T x);
 void Id_init ();
 String_t Id_toString (T x);
-bool Id_equals (T, T);
+long Id_equals (T, T);
 Plist_t Id_plist (T);
 void Id_print (T);
 

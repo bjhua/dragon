@@ -5,10 +5,9 @@
 
 static List_t allStms = 0;
 
-static void emit (X86_Stm_t s)
-{
-  List_insertLast (allStms, s);
-  return;
+static void emit(X86_Stm_t s) {
+    List_insertLast(allStms, s);
+    return;
 }
 
 #if 0
@@ -541,39 +540,28 @@ static X86_Mask_t Trans_mask (Machine_Mask_t m)
 
 #endif // 0
 
-static X86_Prog_t X86_codegenTraced (Machine_Prog_t p)
-{
-  List_t strs, masks, funcs;
+static X86_Prog_t X86_codegenTraced(Machine_Prog_t p) {
+    List_t strs, masks, funcs;
 
-  Assert_ASSERT(p);
-  strs = List_new ();
-  masks = List_new ();
-  funcs = List_new ();
-  return X86_Prog_new (strs
-                       , masks
-                       , funcs);
+    Assert_ASSERT(p);
+    strs = List_new();
+    masks = List_new();
+    funcs = List_new();
+    return X86_Prog_new(strs, masks, funcs);
 }
 
-static void outArg (Machine_Prog_t p)
-{
-  return;
+static void outArg(Machine_Prog_t p) {
+    return;
 }
 
-static void outResult (X86_Prog_t p)
-{
-  return;
+static void outResult(X86_Prog_t p) {
+    return;
 }
 
 
-X86_Prog_t X86_codegen (Machine_Prog_t p)
-{
-  X86_Prog_t r;
-  
-  Trace_TRACE("x86_codegen"
-              , X86_codegenTraced
-              , (p)
-              , outArg
-              , r
-              , outResult);
-  return r;
+X86_Prog_t X86_codegen(Machine_Prog_t p) {
+    X86_Prog_t r;
+
+    Trace_TRACE("x86_codegen", X86_codegenTraced, (p), outArg, r, outResult);
+    return r;
 }

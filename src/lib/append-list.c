@@ -2,14 +2,12 @@
 
 #define T AppendList_t
 
-struct T
-{
-  int junk;
+struct T {
+    int junk;
 };
 
-T AppendList_new ()
-{
-  return 0;
+T AppendList_new() {
+    return 0;
 }
 
 #undef T

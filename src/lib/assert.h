@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int Assert_flag;
+extern long Assert_flag;
 
 /* it seems that the standard assert does not work,
  * so I had to write my own version.

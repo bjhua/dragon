@@ -83,7 +83,7 @@ static String_t link(List_t files) {
     exeFile = (Control_o) ?
               String_concat(Control_o, ".out", 0) :
               ("a.out");
-    libFile = String_concat(Control_libDirectory, "main.c ../src/runtime/dragon-lib.c", 0);
+    libFile = String_concat(Control_libDirectory, "../src/runtime/main.c ../src/runtime/dragon-lib.c", 0);
     cmd = String_concat("gcc -g -o ", exeFile, 0);
     if (Control_Verb_order
             (VERBOSE_DETAIL, Control_verbose)) {
@@ -91,7 +91,7 @@ static String_t link(List_t files) {
         printf("%s", cmd);
     }
     p = List_getFirst(files);
-    while(p) {
+    while (p) {
         String_t s = (String_t) p->data;
         if (Control_Verb_order(VERBOSE_DETAIL, Control_verbose)) {
             Io_printSpaces(13);

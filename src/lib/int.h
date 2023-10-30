@@ -5,8 +5,9 @@
 
 extern const int Int_zero;
 
-String_t Int_toString (int i);
-int Int_fromString (String_t s, int *result);
+String_t Int_toString(long i);
+
+long Int_fromString(String_t s, long *result);
 
 
 #endif

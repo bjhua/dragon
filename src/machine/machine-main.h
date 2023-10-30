@@ -3,6 +3,6 @@
 
 #include "machine.h"
 
-Machine_Prog_t Machine_main (Machine_Prog_t p);
+Machine_Prog_t Machine_main(Machine_Prog_t p);
 
 #endif

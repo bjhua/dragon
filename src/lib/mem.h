@@ -6,8 +6,8 @@
 /*#include "control.h"*/
 #include "error.h"
 
-extern int Mem_allocated;
-extern int Mem_initFlag;
+extern long Mem_allocated;
+extern long Mem_initFlag;
 
 #define Mem_NEW(p)                              \
   do{                                           \
@@ -21,9 +21,12 @@ extern int Mem_initFlag;
     (p) = Mem_alloc ((n)*sizeof (*(p)));        \
   } while (0)
 
-void *Mem_alloc (unsigned int size);
-clock_t Mem_getClock ();
-void Mem_init ();
-void Mem_status ();
+void *Mem_alloc(unsigned long size);
+
+clock_t Mem_getClock();
+
+void Mem_init();
+
+void Mem_status();
 
 #endif

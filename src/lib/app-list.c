@@ -5,75 +5,69 @@
 
 #define T AppList_t
 
-struct T
-{
-  enum{
-    EMPTY,
-    SINGLE,
-    APP,
-    LIST
-  }kind;
-  union{
-    // List<P>
-    List_t single;
-    struct{
-      T left;
-      T right;
-    }app;
-    // List<T>
-    List_t list;
-  }u;
+struct T {
+    enum {
+        EMPTY,
+        SINGLE,
+        APP,
+        LIST
+    } kind;
+    union {
+        // List<P>
+        List_t single;
+        struct {
+            T left;
+            T right;
+        } app;
+        // List<T>
+        List_t list;
+    } u;
 };
 
 
-T AppList_new_empty ()
-{
-  T t;
-  
-  Mem_NEW(t);
-  t->kind = EMPTY;
-  return t;
+T AppList_new_empty() {
+    T t;
+
+    Mem_NEW(t);
+    t->kind = EMPTY;
+    return t;
 }
 
-T AppList_fromItem (Poly_t x)
-{
-  T t;
-  
-  Mem_NEW(t);
-  t->kind = SINGLE;
-  t->u.list = List_list (x, 0);
-  return t;
+T AppList_fromItem(Poly_t x) {
+    T t;
+
+    Mem_NEW(t);
+    t->kind = SINGLE;
+    t->u.list = List_list(x, 0);
+    return t;
 }
 
-T AppList_new_fromItemList (List_t x)
-{
-  T t;
-  
-  Mem_NEW(t);
-  t->kind = SINGLE;
-  t->u.list = x;
-  return t;
+T AppList_new_fromItemList(List_t x) {
+    T t;
+
+    Mem_NEW(t);
+    t->kind = SINGLE;
+    t->u.list = x;
+    return t;
 }
 
-T AppList_concat (T x, T y)
-{
-  T t;
-  
-  Mem_NEW(t);
-  t->kind = APP;
-  t->u.app.left = x;
-  t->u.app.right = y;
-  return t;
+T AppList_concat(T x, T y) {
+    T t;
+
+    Mem_NEW(t);
+    t->kind = APP;
+    t->u.app.left = x;
+    t->u.app.right = y;
+    return t;
 }
 
-T AppList_new_list (List_t x)
-{
-  T t;
+T AppList_new_list(List_t x) {
+    T t;
 
-  Mem_NEW(t);
-  t->kind = LIST; 
-  t->u.list = x;
-  return t;
+    Mem_NEW(t);
+    t->kind = LIST;
+    t->u.list = x;
+    return t;
 }
 
 /*
@@ -103,42 +97,40 @@ T AppList_new_va (T x, ...)
 
 static List_t theList = 0;
 
-static void toList_doit (T x)
-{
-  switch (x->kind){
-  case EMPTY:
-    break; 
-  case SINGLE:
-    List_append (theList, x->u.single);
-    break;
-  case APP:
-    toList_doit (x->u.app.left);
-    toList_doit (x->u.app.right);
-    break;
-  case LIST:{
-    List_t tmp = List_getFirst (x->u.list);
+static void toList_doit(T x) {
+    switch (x->kind) {
+        case EMPTY:
+            break;
+        case SINGLE:
+            List_append(theList, x->u.single);
+            break;
+        case APP:
+            toList_doit(x->u.app.left);
+            toList_doit(x->u.app.right);
+            break;
+        case LIST: {
+            List_t tmp = List_getFirst(x->u.list);
 
-    while (tmp){
-      T p = (T)tmp->data;
-      toList_doit (p);
-      tmp = tmp->next;
+            while (tmp) {
+                T p = (T) tmp->data;
+                toList_doit(p);
+                tmp = tmp->next;
+            }
+            break;
+        }
+        default:
+            Error_impossible ();
+            return;
     }
-    break;
-  }
-  default:
-    Error_impossible ();
     return;
-  }
-  return;
 }
 
-List_t AppList_toList (T x)
-{
-  Assert_ASSERT(x);
+List_t AppList_toList(T x) {
+    Assert_ASSERT(x);
 
-  theList = List_new ();
-  toList_doit (x);
-  return theList;
+    theList = List_new();
+    toList_doit(x);
+    return theList;
 }
 
 

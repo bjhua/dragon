@@ -4,6 +4,6 @@
 
 #include "machine.h"
 
-Machine_Prog_t Machine_genFrame (Machine_Prog_t p);
+Machine_Prog_t Machine_genFrame(Machine_Prog_t p);
 
 #endif

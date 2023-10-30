@@ -3,6 +3,6 @@
 
 #include "string.h"
 
-String_t Double_toString (double f);
+String_t Double_toString(double f);
 
 #endif

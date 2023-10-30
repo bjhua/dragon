@@ -37,8 +37,9 @@
     *((int *)1) = 0;                                            \
   }while (0)
 
-void Error_error (const char *s);
-void Error_error2 (const char *s1, const char *s2);
+void Error_error(const char *s);
+
+void Error_error2(const char *s1, const char *s2);
 
 #define Error_bomb() *(int*)1=0
 

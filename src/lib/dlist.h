@@ -10,17 +10,16 @@
 typedef struct T *T;
 
 // CDT
-struct T
-{
-  Poly_t data;
-  T next;
-  T prev;
+struct T {
+    Poly_t data;
+    T next;
+    T prev;
 };
 
 
-T Dlist_new ();
-void Dlist_insertLast (T, Poly_t);
+T Dlist_new();
 
+void Dlist_insertLast(T, Poly_t);
 
 
 #undef T

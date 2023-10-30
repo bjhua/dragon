@@ -11,16 +11,17 @@
 
 typedef struct T *T;
 
-struct T
-{
-  Id_t name;
-  // List<Dec_t>
-  List_t decs;
+struct T {
+    Id_t name;
+    // List<Dec_t>
+    List_t decs;
 };
 
-T Class_new (Id_t, List_t);
-String_t Class_toString (T);
-File_t Class_print (File_t file, T);
+T Class_new(Id_t, List_t);
+
+String_t Class_toString(T);
+
+File_t Class_print(File_t file, T);
 
 #undef T
 

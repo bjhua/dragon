@@ -68,7 +68,7 @@ T String_fromArray (int size, char *array[], char *sep)
   return head;
 }
 
-int String_equals (T x, T y)
+long String_equals (T x, T y)
 {
   return (0==strcmp(x, y));
 }

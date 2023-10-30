@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "dragon-lib.h"
 
-int prints(char *s) {
+long prints(char *s) {
     return printf("%s", s);
 }
 
-int printi(int i) {
-    return printf("%d", i);
+long printi(long i) {
+    return printf("%ld", i);
 }

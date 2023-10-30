@@ -3,6 +3,6 @@
 
 #include "ssa.h"
 
-Ssa_Prog_t Ssa_outSsa (Ssa_Prog_t p);
+Ssa_Prog_t Ssa_outSsa(Ssa_Prog_t p);
 
 #endif

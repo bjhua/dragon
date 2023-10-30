@@ -18,272 +18,261 @@
 // This is NOT really a stack...
 static Stack_t stack = 0;
 
-static void push ()
-{
-  ++stack;
+static void push() {
+    ++stack;
 }
 
-static void pop ()
-{
-  --stack;
+static void pop() {
+    --stack;
 }
 
-static int isEmpty ()
-{
-  return 0==stack;
+static int isEmpty() {
+    return 0 == stack;
 }
 
-static void error (String_t msg, Region_t r)
-{
-  ErrorMsg_elabError (msg, r);
+static void error(String_t msg, Region_t r) {
+    ErrorMsg_elabError(msg, r);
 }
 
-static int Check_block (Ast_Block_t);
-static void Check_lval (Ast_Lval_t l);
-static void Check_exp (Ast_Exp_t e);
+static int Check_block(Ast_Block_t);
 
-static void Check_lval (Ast_Lval_t l)
-{
-  Assert_ASSERT(l);
-  switch (l->kind){
-  case AST_LVAL_VAR:{
-    return;
-  }
-  case AST_LVAL_DOT:{
-    Check_lval (l->u.dot.lval);
-    return;
-  }
-  case AST_LVAL_ARRAY:{
-    Check_lval (l->u.array.lval);
-    Check_exp (l->u.array.exp);
-    return;
-  }
-  default:
+static void Check_lval(Ast_Lval_t l);
+
+static void Check_exp(Ast_Exp_t e);
+
+static void Check_lval(Ast_Lval_t l) {
+    Assert_ASSERT(l);
+    switch (l->kind) {
+        case AST_LVAL_VAR: {
+            return;
+        }
+        case AST_LVAL_DOT: {
+            Check_lval(l->u.dot.lval);
+            return;
+        }
+        case AST_LVAL_ARRAY: {
+            Check_lval(l->u.array.lval);
+            Check_exp(l->u.array.exp);
+            return;
+        }
+        default:
+            Error_impossible();
+            return;
+    }
     Error_impossible();
     return;
-  }
-  Error_impossible();
-  return;
 }
 
-static void Check_exp (Ast_Exp_t e)
-{
-  Assert_ASSERT (e);
-  
-  switch (e->kind){
-  case AST_EXP_ASSIGN:{
-    if (AST_EXP_LVAL == e->u.assign.left->kind){
-      Check_lval (e->u.assign.left->u.lval);
+static void Check_exp(Ast_Exp_t e) {
+    Assert_ASSERT (e);
+
+    switch (e->kind) {
+        case AST_EXP_ASSIGN: {
+            if (AST_EXP_LVAL == e->u.assign.left->kind) {
+                Check_lval(e->u.assign.left->u.lval);
+            } else {
+                error(String_concat("left-value expected in"
+                                    " assignment: ",
+                                    0),
+                      e->region);
+            }
+            Check_exp(e->u.assign.right);
+            return;
+        }
+        case AST_EXP_ADD:
+        case AST_EXP_SUB:
+        case AST_EXP_TIMES:
+        case AST_EXP_DIVIDE:
+        case AST_EXP_MODUS:
+        case AST_EXP_OR:
+        case AST_EXP_AND:
+        case AST_EXP_LT:
+        case AST_EXP_LE:
+        case AST_EXP_GT:
+        case AST_EXP_GE:
+        case AST_EXP_EQ:
+        case AST_EXP_NE: {
+            Check_exp(e->u.bop.left);
+            Check_exp(e->u.bop.right);
+            return;
+        }
+        case AST_EXP_NOT:
+        case AST_EXP_NEGATIVE: {
+            Check_exp(e->u.unary.e);
+            return;
+        }
+        case AST_EXP_NULL: {
+            return;
+        }
+        case AST_EXP_INTLIT: {
+            return;
+        }
+        case AST_EXP_STRINGLIT: {
+            return;
+        }
+        case AST_EXP_NEW_CLASS: {
+            List_t args = e->u.newClass.args;
+            List_foreach(args, (Poly_tyVoid) Check_exp);
+            return;
+        }
+        case AST_EXP_NEW_ARRAY: {
+            Check_exp(e->u.newArray.size);
+            return;
+        }
+        case AST_EXP_LVAL: {
+            Check_lval(e->u.lval);
+            return;
+        }
+        case AST_EXP_CALL: {
+            List_t args = e->u.call.args;
+            List_foreach(args, (Poly_tyVoid) Check_exp);
+            return;
+        }
+        default:
+            Error_impossible ();
+            return;
     }
-    else{
-      error (String_concat ("left-value expected in"
-                            " assignment: ",
-                            0),
-             e->region);
-    }
-    Check_exp (e->u.assign.right);
-    return;
-  }
-  case AST_EXP_ADD:
-  case AST_EXP_SUB:
-  case AST_EXP_TIMES:
-  case AST_EXP_DIVIDE:
-  case AST_EXP_MODUS:
-  case AST_EXP_OR:
-  case AST_EXP_AND:
-  case AST_EXP_LT:
-  case AST_EXP_LE:
-  case AST_EXP_GT:
-  case AST_EXP_GE:
-  case AST_EXP_EQ:
-  case AST_EXP_NE:{
-    Check_exp (e->u.bop.left);
-    Check_exp (e->u.bop.right);
-    return;
-  }
-  case AST_EXP_NOT:
-  case AST_EXP_NEGATIVE:{
-    Check_exp (e->u.unary.e);
-    return;
-  }
-  case AST_EXP_NULL:{
-    return;
-  }
-  case AST_EXP_INTLIT:{
-    return;
-  }
-  case AST_EXP_STRINGLIT:{
-    return;
-  }
-  case AST_EXP_NEW_CLASS:{
-    List_t args = e->u.newClass.args;
-    List_foreach (args, (Poly_tyVoid)Check_exp);
-    return;
-  }
-  case AST_EXP_NEW_ARRAY:{
-    Check_exp (e->u.newArray.size);
-    return;
-  }
-  case AST_EXP_LVAL:{
-    Check_lval (e->u.lval);
-    return;
-  }
-  case AST_EXP_CALL:{
-    List_t args = e->u.call.args;
-    List_foreach (args, (Poly_tyVoid)Check_exp);
-    return;
-  }
-  default:
     Error_impossible ();
     return;
-  }
-  Error_impossible ();
-  return;
 }
 
 // If this statement ends with a "return" statement, 
 // return 1;
 // otherwise return 0.
-static int Check_stmOne (Ast_Stm_t s)
-{
-  Assert_ASSERT(s);
+static int Check_stmOne(Ast_Stm_t s) {
+    Assert_ASSERT(s);
 
-  switch (s->kind){
-  case AST_STM_EXP:{
-    Check_exp (s->u.exp);
-    return 0;
-  }
-  case AST_STM_IF:{
-    int r1 = 0, r2 = 0;
+    switch (s->kind) {
+        case AST_STM_EXP: {
+            Check_exp(s->u.exp);
+            return 0;
+        }
+        case AST_STM_IF: {
+            int r1 = 0, r2 = 0;
 
-    Check_exp (s->u.iff.cond);
+            Check_exp(s->u.iff.cond);
 
-    r1 = Check_stmOne (s->u.iff.then);
-    if (s->u.iff.elsee)
-      r2 = Check_stmOne (s->u.iff.elsee);
-    return r1 && r2;
-  }  
-  case AST_STM_WHILE:{
-    Check_exp (s->u.whilee.cond);
-    push ();
-    Check_stmOne (s->u.whilee.body);
-    pop ();
-    return 0;
-  }
-  case AST_STM_DO:{
-    Check_exp (s->u.doo.cond);
-    push ();
-    Check_stmOne (s->u.doo.body);
-    pop ();
-    return 0;
-  }
-  case AST_STM_FOR:{
-    Check_exp (s->u.forr.header);
-    Check_exp (s->u.forr.cond);
-    Check_exp (s->u.forr.tail);
+            r1 = Check_stmOne(s->u.iff.then);
+            if (s->u.iff.elsee)
+                r2 = Check_stmOne(s->u.iff.elsee);
+            return r1 && r2;
+        }
+        case AST_STM_WHILE: {
+            Check_exp(s->u.whilee.cond);
+            push();
+            Check_stmOne(s->u.whilee.body);
+            pop();
+            return 0;
+        }
+        case AST_STM_DO: {
+            Check_exp(s->u.doo.cond);
+            push();
+            Check_stmOne(s->u.doo.body);
+            pop();
+            return 0;
+        }
+        case AST_STM_FOR: {
+            Check_exp(s->u.forr.header);
+            Check_exp(s->u.forr.cond);
+            Check_exp(s->u.forr.tail);
 
-    push ();
-    Check_stmOne (s->u.forr.body);
-    pop ();
-    return 0;
-  }
-  case AST_STM_BREAK:{
-    if (isEmpty ())
-      error ("\"break\" not in some loop",
-             s->region);
-    return 0;
-  }
-  case AST_STM_CONTINUE:{
-    if (isEmpty ())
-      error ("\"continue\" not in some loop",
-             s->region);
-    return 0;
-  }
-  case AST_STM_RETURN:{
-    Check_exp (s->u.returnn);
-    return 1;
-  }
-  case AST_STM_BLOCK:{
-    return Check_block (s->u.block);
-  }
-    // it's OK for "throw" not in any static scope.
-  case AST_STM_THROW:
-    return 0;
-  case AST_STM_TRYCATCH:{
-    int r1 = Check_stmOne (s->u.trycatch.tryy);
-    int r2 = Check_stmOne (s->u.trycatch.catchh);
-    return r1 && r2;
-  }
-  default:
+            push();
+            Check_stmOne(s->u.forr.body);
+            pop();
+            return 0;
+        }
+        case AST_STM_BREAK: {
+            if (isEmpty())
+                error("\"break\" not in some loop",
+                      s->region);
+            return 0;
+        }
+        case AST_STM_CONTINUE: {
+            if (isEmpty())
+                error("\"continue\" not in some loop",
+                      s->region);
+            return 0;
+        }
+        case AST_STM_RETURN: {
+            Check_exp(s->u.returnn);
+            return 1;
+        }
+        case AST_STM_BLOCK: {
+            return Check_block(s->u.block);
+        }
+            // it's OK for "throw" not in any static scope.
+        case AST_STM_THROW:
+            return 0;
+        case AST_STM_TRYCATCH: {
+            int r1 = Check_stmOne(s->u.trycatch.tryy);
+            int r2 = Check_stmOne(s->u.trycatch.catchh);
+            return r1 && r2;
+        }
+        default:
+            Error_impossible ();
+            return 0;
+    }
     Error_impossible ();
     return 0;
-  }
-  Error_impossible ();
-  return 0;
 }
 
-static void Check_dec (Ast_Dec_t d)
-{
-  Assert_ASSERT(d);
+static void Check_dec(Ast_Dec_t d) {
+    Assert_ASSERT(d);
 
-  if (d->init)
-    Check_exp (d->init);
+    if (d->init)
+        Check_exp(d->init);
 }
 
-static int Check_block (Ast_Block_t b)
-{
-  List_t stms = List_getFirst (b->stms);
-  Ast_Stm_t s;
-  int hasReturn = 0;
+static int Check_block(Ast_Block_t b) {
+    List_t stms = List_getFirst(b->stms);
+    Ast_Stm_t s;
+    int hasReturn = 0;
 
-  List_foreach (b->decs, (Poly_tyVoid)Check_dec);
+    List_foreach(b->decs, (Poly_tyVoid) Check_dec);
 
-  while (stms){
-    s = (Ast_Stm_t)stms->data;
-    if (Check_stmOne (s))
-      hasReturn = 1;
-    stms = stms->next;
-  }
-  return hasReturn;
+    while (stms) {
+        s = (Ast_Stm_t) stms->data;
+        if (Check_stmOne(s))
+            hasReturn = 1;
+        stms = stms->next;
+    }
+    return hasReturn;
 }
 
 // Total number of functions in a program named "dragon".
 static int numDragons = 0;
 
-static void Check_funOne (Ast_Fun_t f)
-{
-  if (AstId_equals (AstId_fromString ("dragon", 0),
-                    f->name))
-    numDragons++;
-  if (0 == Check_block (f->block))
-    error (String_concat 
-           ("no explicit return statement in function: ",
-            AstId_toString (f->name),
-            0),
-           f->region);
+static void Check_funOne(Ast_Fun_t f) {
+    if (AstId_equals(AstId_fromString("dragon", 0),
+                     f->name))
+        numDragons++;
+    if (0 == Check_block(f->block))
+        error(String_concat
+                      ("no explicit return statement in function: ",
+                       AstId_toString(f->name),
+                       0),
+              f->region);
 }
 
-static void Check_prog (Ast_Prog_t p)
-{
-  List_foreach (p->funcs, (Poly_tyVoid)Check_funOne);
-  switch (numDragons){
-  case 0:
-    error ("no funcation named \"dragon\" is given",
-           0);
-    break;
-  case 1:
-    break;
-  default:
-    error ("multiple funcations named \"dragon\" "
-           "are given, expects one",
-           0);
-    break;
-  }
-  return;
+static void Check_prog(Ast_Prog_t p) {
+    List_foreach(p->funcs, (Poly_tyVoid) Check_funOne);
+    switch (numDragons) {
+        case 0:
+            error("no funcation named \"dragon\" is given",
+                  0);
+            break;
+        case 1:
+            break;
+        default:
+            error("multiple funcations named \"dragon\" "
+                  "are given, expects one",
+                  0);
+            break;
+    }
+    return;
 }
 
-void Check_ast (Ast_Prog_t p)
-{
-  Check_prog (p);
-  return;
+void Check_ast(Ast_Prog_t p) {
+    Check_prog(p);
+    return;
 }

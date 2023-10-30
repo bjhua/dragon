@@ -3,7 +3,7 @@
 
 #include "x86.h"
 
-X86_Prog_t PeepHole_shrink (X86_Prog_t p);
+X86_Prog_t PeepHole_shrink(X86_Prog_t p);
 
 
 #endif

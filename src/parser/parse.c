@@ -30,7 +30,7 @@ static Ast_Type_t Parse_betaType();
 
 static Ast_Type_t Parse_type();
 
-static Ast_Lval_t Parse_lval();
+static Ast_Lval_t Parse_lval(Token_t first);
 
 static Ast_Exp_t Parse_exp();
 
@@ -249,7 +249,7 @@ static Ast_Exp_t Parse_unary() {
     all = List_getFirst(all);
     while (all) {
         Tuple_t tuple = (Tuple_t) all->data;
-        int kind = (int) Tuple_first(tuple);
+        long kind = (long) Tuple_first(tuple);
         Region_t r = Tuple_second(tuple);
         if (kind == TOKEN_MINUS) {
             e = Ast_Exp_new_unary(AST_EXP_NEGATIVE, e, 0, r);

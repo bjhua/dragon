@@ -3,6 +3,6 @@
 
 #include "../lib/list.h"
 
-List_t Compile_compile (List_t files);
+List_t Compile_compile(List_t files);
 
 #endif

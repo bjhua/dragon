@@ -4,6 +4,6 @@
 #include "ssa.h"
 
 // cutting blocks unreachable from the entry block
-Ssa_Prog_t Ssa_deadBlock (Ssa_Prog_t p);
+Ssa_Prog_t Ssa_deadBlock(Ssa_Prog_t p);
 
 #endif

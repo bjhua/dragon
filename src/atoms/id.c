@@ -76,7 +76,7 @@ void Id_init() {
             , 0);
 }
 
-bool Id_equals(T x, T y) {
+long Id_equals(T x, T y) {
     Assert_ASSERT(x);
     Assert_ASSERT(y);
     return x == y;

@@ -7,15 +7,23 @@
 
 #include "string.h"
 
-void Trace_indent ();
-void Trace_unindent ();
-void Trace_spaces ();
-int Trace_lookup (char *);
-void Trace_insert (char *);
-List_t Trace_allFuncs ();
-void Trace_reset ();
-String_t Trace_junk ();
-String_t Trace_junk2 (void *);
+void Trace_indent();
+
+void Trace_unindent();
+
+void Trace_spaces();
+
+int Trace_lookup(char *);
+
+void Trace_insert(char *);
+
+List_t Trace_allFuncs();
+
+void Trace_reset();
+
+String_t Trace_junk();
+
+String_t Trace_junk2(void *);
 
 #ifndef NDEBUG
 
@@ -49,7 +57,7 @@ String_t Trace_junk2 (void *);
     }                                                           \
   } while (0)
 
-#else 
+#else
 
 #define Trace_TRACE(s, f, x, toStringx, r, toStringr) \
   do {                                                \

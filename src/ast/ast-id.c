@@ -35,7 +35,7 @@ Id_t AstId_toId(T id) {
     return id->id;
 }
 
-bool AstId_equals(T id1, T id2) {
+long AstId_equals(T id1, T id2) {
     Assert_ASSERT(id1);
     Assert_ASSERT(id2);
     return Id_equals(id1->id, id2->id);

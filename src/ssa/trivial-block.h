@@ -9,6 +9,6 @@
         jump L2
  */
 // Then all jumps to L1 can be replaced with a jump to L2
-Ssa_Prog_t Ssa_trivialBlock (Ssa_Prog_t p);
+Ssa_Prog_t Ssa_trivialBlock(Ssa_Prog_t p);
 
 #endif

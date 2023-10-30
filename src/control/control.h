@@ -24,18 +24,18 @@ typedef enum{
   , CODEGEN_X86
 }Codegen_t;
 
-extern int Control_bufferSize;
+extern long Control_bufferSize;
 extern Codegen_t Control_codegen;
 extern Expert_t Control_expert;
-extern int Control_labelInfo;
+extern long Control_labelInfo;
 // show type information in ILs
-extern int Control_showType;
+extern long Control_showType;
 extern List_t Control_trace;
 extern Verbose_t Control_verbose;
 extern String_t Control_o;
 
 // keep jpg, should be a more
-extern int Control_jpg;
+extern long Control_jpg;
 
 /* this is platform dependent, so should be 
  * sent to another place.

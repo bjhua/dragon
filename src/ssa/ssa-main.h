@@ -4,6 +4,6 @@
 #include "ssa.h"
 #include "../machine/machine.h"
 
-Machine_Prog_t Ssa_main (Ssa_Prog_t p);
+Machine_Prog_t Ssa_main(Ssa_Prog_t p);
 
 #endif

@@ -76,8 +76,8 @@ static void outputFrame(Machine_FrameInfo_t p) {
     fprintf(file, "int %s", decOffsets);
     fprintf(file, "_%d[] = {%d ", index, List_size(p->frameOffsetsDec));
     while (tmp) {
-        int off = (int) tmp->data;
-        fprintf(file, ", %d", off);
+        long off = (long) tmp->data;
+        fprintf(file, ", %ld", off);
         tmp = tmp->next;
     }
     fprintf(file, "%s", "};\n\n");
@@ -105,7 +105,7 @@ static void outputLayouts(Machine_ObjInfo_t m) {
     fprintf(file, "%d", List_size(m->offsets));
     p = List_getFirst(m->offsets);
     while (p) {
-        fprintf(file, ", %d", (int) p->data);
+        fprintf(file, ", %ld", (long) p->data);
         p = p->next;
     }
     fprintf(file, "%s", "};\n");
@@ -447,6 +447,8 @@ static Machine_Prog_t C_codegenTraced(Machine_Prog_t p) {
     List_t layouts;
 
     Assert_ASSERT(p);
+    fprintf(file, "%s", COMMENT("header files:\n"));
+    fprintf(file, "%s", "extern long printi(long);\n\n");
 
     fprintf(file, "%s", COMMENT("headers:"));
     outputHeaders();

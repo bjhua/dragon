@@ -250,16 +250,16 @@ void Control_logPass_insert(String_t name) {
 
 /////////////////////////////////////////////////////
 /* o */
-String_t Control_o = 0;
+String_t Control_out_file_name = 0;
 static String_t Control_oDefault = 0;
 
 static Tuple_t Control_oToString() {
-    return Tuple_new((Control_o) ? Control_o : "\"\"",
+    return Tuple_new((Control_out_file_name) ? Control_out_file_name : "\"\"",
                      "\"\"");
 }
 
 static void Control_oReset() {
-    Control_o = Control_oDefault;
+    Control_out_file_name = Control_oDefault;
 }
 
 /////////////////////////////////////////////////////

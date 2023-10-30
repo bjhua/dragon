@@ -5,12 +5,9 @@
 #include "../lib/assert.h"
 #include "../lib/mem.h"
 #include "../lib/list.h"
-#include "../lib/string.h"
-#include "../lib/file.h"
-#include "../lib/mem.h"
 #include "../lib/int.h"
 #include "../lib/io.h"
-#include "../lib/gc.h"
+//#include "../lib/gc.h"
 #include "../lib/hash.h"
 #include "../control/command-line.h"
 #include "../control/pass.h"
@@ -20,7 +17,7 @@
 
 static String_t firstFile = 0;
 
-static void showBanner() {
+static void show_banner() {
     time_t now;
     String_t timex, banner;
 
@@ -29,62 +26,44 @@ static void showBanner() {
     timex[strlen(timex) - 1] = '\0';
     banner = String_concat("dragon ", Version_version, " (built ", timex, ")", 0);
     printf("%s\n", banner);
-    return;
+    //return;
 }
 
-static void deleteFiles(List_t files) {
-    List_t p;
-
-    Assert_ASSERT(files);
-    p = List_getFirst(files);
-    while (p) {
-        String_t cmd, f = (String_t) p->data;
-        p = p->next;
-        cmd = String_concat("rm -f \"", f, "\"", 0);
-        system(cmd);
-    }
-    return;
-}
-
-static List_t objFiles = 0;
-
-static int assembleOne(String_t file) {
-    int i = 0;
-    String_t objFile, cmd1, cmd2;
-
-    objFile = String_concat(Control_asmDirectory, "fileo-", Int_toString(i++), ".o", 0);
-    List_insertLast(objFiles, objFile);
-    cmd1 = String_concat("gcc -c -g ", "-I \"", Control_headerDirectory, "\" -o \"", objFile, "\"", "  \"", file, "\"",
+static String_t assemble_one(String_t file) {
+    static long i = 0;
+    String_t obj_file = String_concat("/tmp/", "file-o-", Int_toString(i++), ".o", 0);
+    String_t cmd = String_concat("gcc -c -g ", "-I \"", Control_headerDirectory, "\" -o \"", obj_file, "\"", "  \"", file, "\"",
                          0);
     if (Control_Verb_order
             (VERBOSE_DETAIL, Control_verbose)) {
         Io_printSpaces(6);
-        printf("%s\n", cmd1);
+        printf("%s\n", cmd);
     }
-    system(cmd1);
-    return 0;
+    system(cmd);
+    return obj_file;
 }
 
 static List_t assemble(List_t files) {
-    List_t tmp;
-
-    objFiles = List_new();
-    List_foreach(files, (Poly_tyVoid) assembleOne);
-    tmp = objFiles;
-    objFiles = 0;
-    return tmp;
+    List_t obj_files = List_new();
+    List_t first = List_getFirst(files);
+    while(first){
+        String_t obj_file = assemble_one(first->data);
+        List_insertLast(obj_files, obj_file);
+        first = first->next;
+    }
+    return obj_files;
 }
 
 static String_t link(List_t files) {
-    String_t exeFile, libFile, cmd;
     List_t p;
 
     Assert_ASSERT(files);
-    exeFile = (Control_o) ?
-              String_concat(Control_o, ".out", 0) :
-              ("a.out");
-    libFile = String_concat(Control_libDirectory, "../src/runtime/main.c ../src/runtime/dragon-lib.c", 0);
-    cmd = String_concat("gcc -g -o ", exeFile, 0);
+    String_t exe_file_name = Control_out_file_name ?
+                             Control_out_file_name : "a.out";
+    String_t lib_files = String_concat(Control_libDirectory,
+                            "../src/runtime/main.c ../src/runtime/dragon-lib.c",
+                            0);
+    String_t cmd = String_concat("gcc -g -o ", exe_file_name, 0);
     if (Control_Verb_order
             (VERBOSE_DETAIL, Control_verbose)) {
         Io_printSpaces(6);
@@ -102,12 +81,12 @@ static String_t link(List_t files) {
     }
     if (Control_Verb_order(VERBOSE_DETAIL, Control_verbose)) {
         Io_printSpaces(13);
-        printf("\"%s\"", libFile);
+        printf("\"%s\"", lib_files);
     }
-    cmd = String_concat(cmd, " ", libFile, 0);
+    cmd = String_concat(cmd, " ", lib_files, 0);
     printf("%s\n", cmd);
     system(cmd);
-    return exeFile;
+    return exe_file_name;
 }
 
 // Compile a file to assembly file, then assemble to 
@@ -115,20 +94,17 @@ static String_t link(List_t files) {
 // libraries to generate final executable.
 static int Main_main0(List_t files) {
     Pass_t compile, assemblePass, linkPass;
-    List_t asmFiles, objFiles;
     File_t exeFile;
 
     compile = Pass_new("compile", VERBOSE_PASS, files, (Poly_tyId) Compile_compile);
-    asmFiles = Pass_doit(&compile);
+    List_t asm_files = Pass_doit(&compile);
 
-    assemblePass = Pass_new("assemble", VERBOSE_PASS, asmFiles, (Poly_tyId) assemble);
-    objFiles = Pass_doit(&assemblePass);
+    assemblePass = Pass_new("assemble", VERBOSE_PASS, asm_files, (Poly_tyId) assemble);
+    List_t obj_files = Pass_doit(&assemblePass);
     //deleteFiles (asmFiles);
 
-    linkPass = Pass_new("link", VERBOSE_PASS, objFiles, (Poly_tyId) link);
-    exeFile = Pass_doit(&linkPass);
-    //deleteFiles (objFiles);
-
+    linkPass = Pass_new("link", VERBOSE_PASS, obj_files, (Poly_tyId) link);
+    Pass_doit(&linkPass);
     return 0;
 }
 
@@ -150,8 +126,8 @@ int Main_main(int argc, char **argv) {
 
     // If only type "dragon", then print some info and exit.
     if (argc < 2) {
-        showBanner();
-        return 0;
+        show_banner();
+        return 1;
     }
     // else cook commandline arguments.
     // Return a list of file names.
@@ -164,13 +140,14 @@ int Main_main(int argc, char **argv) {
     if (List_isEmpty(files))
         return 0;
 
-    firstFile = (String_t) List_nth(files, 0);
+    //firstFile = (String_t) List_nth(files, 0);
 
     mainp = Pass_new("dragon", VERBOSE_PASS, files, (Poly_tyId) Main_main0);
     Pass_doit(&mainp);
 
     if (Control_Verb_order
-            (VERBOSE_DETAIL, Control_verbose)) {
+            (VERBOSE_DETAIL,
+             Control_verbose)) {
         Mem_status();
         Hash_statusAll();
     }

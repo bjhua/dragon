@@ -32,7 +32,7 @@ extern long Control_labelInfo;
 extern long Control_showType;
 extern List_t Control_trace;
 extern Verbose_t Control_verbose;
-extern String_t Control_o;
+extern String_t Control_out_file_name;
 
 // keep jpg, should be a more
 extern long Control_jpg;

@@ -10,7 +10,6 @@
 #include "../lib/trace.h"
 #include "../lib/int.h"
 #include "../control/error-msg.h"
-#include "buffer.h"
 #include "token.h"
 #include "lex.h"
 
@@ -19,15 +18,26 @@
 // data structure for position information.
 struct Pos_t {
     String_t fname;  // file name
+    FILE *fp;        // file pointer to the fname
     int line;        // line number, starting from 1
     int column;      // column number, starting from 0
 };
 
-static struct Pos_t pos = {0, 1, 0};
+static struct Pos_t pos = {0, 0,1, 0};
 
 static CharBuffer_t numBuffer = 0;
 static CharBuffer_t strBuffer = 0;
 static CharBuffer_t idBuffer = 0;
+
+static int get_char(){
+    pos.column++;
+    return getc(pos.fp);
+}
+
+static void unget_char(int c){
+    pos.column--;
+    ungetc(c, pos.fp);
+}
 
 static void cookComment();
 
@@ -61,31 +71,22 @@ static void error2(String_t msg, String_t fname, int line, int column) {
     ErrorMsg_lexError(msg, fname, line, column);
 }
 
-static int Lex_getChar() {
-    pos.column++;
-    return Buffer_getChar();
-}
-
-static void Lex_putChar() {
-    pos.column--;
-    Buffer_putChar();
-}
 
 static int eatBlanks() {
     int cur;
 
-    cur = Lex_getChar();
+    cur = get_char();
     while (Char_isBlank(cur)) {
-        cur = Lex_getChar();
+        cur = get_char();
     }
     return cur;
 }
 
 static void cookComment() {
     int c;
-    c = Lex_getChar();
+    c = get_char();
     while ('\n' != c)
-        c = Lex_getChar();
+        c = get_char();
     pos.line++;
     pos.column = 0;
     return;
@@ -93,12 +94,12 @@ static void cookComment() {
 
 static Token_t cookNum(int c, Coordinate_t leftPos) {
     CharBuffer_append(numBuffer, c);
-    c = Lex_getChar();
+    c = get_char();
     while (Char_isDigit(c)) {
         CharBuffer_append(numBuffer, c);
-        c = Lex_getChar();
+        c = get_char();
     }
-    Lex_putChar();
+    unget_char(c);
     return Token_new(TOKEN_INTLIT, CharBuffer_toStringBeforeClear
             (numBuffer), leftPos, getPos());
 }
@@ -109,15 +110,15 @@ static Token_t cookString(Coordinate_t leftPos) {
     int line = pos.line;
     int column = pos.column;
 
-    c = Lex_getChar();
+    c = get_char();
     while (c != EOF
            && c != '\n'
            && c != '\"') {
         if (c == '\\') {
-            c = Lex_getChar();
+            c = get_char();
             CharBuffer_append(strBuffer, escape(c));
         } else CharBuffer_append(strBuffer, c);
-        c = Lex_getChar();
+        c = get_char();
     }
     if (c == EOF)
         error2("unclosed string", fname, line, column);
@@ -153,12 +154,12 @@ static Token_t cookId(int c, Coordinate_t leftPos) {
     String_t str;
 
     CharBuffer_append(idBuffer, c);
-    c = Lex_getChar();
+    c = get_char();
     while (isAlpha(c) || Char_isDigit(c)) {
         CharBuffer_append(idBuffer, c);
-        c = Lex_getChar();
+        c = get_char();
     }
-    Lex_putChar();
+    unget_char(c);
     str = CharBuffer_toStringBeforeClear(idBuffer);
     kind = isKeyWord(str);
     if (kind > 0)
@@ -208,63 +209,63 @@ Token_t Lex_getTokenTraced() {
     switch (firstChar) {
         case '/': {
             // we should check a character further.
-            int secondChar = Lex_getChar();
+            int secondChar = get_char();
 
             if (secondChar == '/') {
                 cookComment();
                 return Lex_getTokenTraced();
             }
-            Lex_putChar();
+            unget_char(secondChar);
             return Token_new(TOKEN_DIVIDE, 0, leftPos, getPos());
         }
         case '<': {
-            int secondChar = Lex_getChar();
+            int secondChar = get_char();
 
             switch (secondChar) {
                 case '=':
                     return Token_new(TOKEN_LE, 0, leftPos, getPos());
                 default:
-                    Lex_putChar();
+                    unget_char(secondChar);
                     return Token_new(TOKEN_LT, 0, leftPos, getPos());
             }
         }
         case '>': {
-            int secondChar = Lex_getChar();
+            int secondChar = get_char();
 
             switch (secondChar) {
                 case '=':
                     return Token_new(TOKEN_GE, 0, leftPos, getPos());
                 default:
-                    Lex_putChar();
+                    unget_char(secondChar);
                     return Token_new(TOKEN_GT, 0, leftPos, getPos());
             }
         }
         case '-':
             return Token_new(TOKEN_MINUS, 0, leftPos, getPos());
         case '=': {
-            int secondChar = Lex_getChar();
+            int secondChar = get_char();
 
             switch (secondChar) {
                 case '=':
                     return Token_new(TOKEN_EQ, 0, leftPos, getPos());
                 default:
-                    Lex_putChar();
+                    unget_char(secondChar);
                     return Token_new(TOKEN_ASSIGN, 0, leftPos, getPos());
             }
         }
         case '!': {
-            int secondChar = Lex_getChar();
+            int second_char = get_char();
 
-            switch (secondChar) {
+            switch (second_char) {
                 case '=':
                     return Token_new(TOKEN_NEQ, 0, leftPos, getPos());
                 default:
-                    Lex_putChar();
+                    unget_char(second_char);
                     return Token_new(TOKEN_NOT, 0, leftPos, getPos());
             }
         }
         case '|': {
-            int secondChar = Lex_getChar();
+            int secondChar = get_char();
 
             switch (secondChar) {
                 case '|':
@@ -274,7 +275,7 @@ Token_t Lex_getTokenTraced() {
             }
         }
         case '&': {
-            int secondChar = Lex_getChar();
+            int secondChar = get_char();
 
             switch (secondChar) {
                 case '&':
@@ -335,10 +336,12 @@ Token_t Lex_getToken() {
 }
 
 void Lex_init(String_t fname) {
-    Buffer_init(fname);
+    // init file positions
     pos.fname = fname;
+    pos.fp = fopen(fname, "r");
     pos.line = 1;
     pos.column = 0;
+    // init buffers to hold token values
     numBuffer = CharBuffer_new();
     strBuffer = CharBuffer_new();
     idBuffer = CharBuffer_new();

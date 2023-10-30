@@ -144,7 +144,10 @@ String_t Token_toStringWithPos(T t) {
             break;
     }
     return String_concat
-            (Token_Kind_toString(t->kind), extra, " \t\tat: ", Coordinate_toString(Region_from(t->region)),
+            (Token_Kind_toString(t->kind),
+             extra,
+             " \t\tat: ",
+             Coordinate_toString(Region_from(t->region)),
              0);
 }
 

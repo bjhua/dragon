@@ -75,7 +75,7 @@ static void Arg_setLog(String_t s) {
 }
 
 static void Arg_setO(String_t s) {
-    Control_o = s;
+    Control_out_file_name = s;
 }
 
 static void Arg_setS(void *arg) {

@@ -1,8 +1,9 @@
-#include <string.h>
-#include <stdio.h>
-#include "string.h"
-#include "list.h"
 #include "trace.h"
+#include "list.h"
+#include "string.h"
+#include "unused.h"
+#include <stdio.h>
+#include <string.h>
 
 #define STEP 3
 
@@ -53,5 +54,6 @@ String_t Trace_junk() {
 }
 
 String_t Trace_junk2(void *s) {
+    UNUSED(s);
     return "<Trace_junk>";
 }

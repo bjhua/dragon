@@ -1,14 +1,15 @@
-#include "../lib/assert.h"
+#include "x86-codegen.h"
 #include "../lib/error.h"
 #include "../lib/trace.h"
-#include "x86-codegen.h"
+#include "../lib/unused.h"
+#include <assert.h>
 
-static List_t allStms = 0;
+//static List_t allStms = 0;
 
-static void emit(X86_Stm_t s) {
-    List_insertLast(allStms, s);
-    return;
-}
+//static void emit(X86_Stm_t s) {
+//    List_insertLast(allStms, s);
+//    return;
+//}
 
 #if 0
 static List_t getBeforeClearStms ()
@@ -37,7 +38,7 @@ typedef struct
  */
 static X86_Operand_t Trans_operand (Machine_Operand_t o)
 {
-  Assert_ASSERT(o);
+  assert(o);
   switch (o->kind){
   case MACHINE_OP_INT:
     return X86_Operand_new_int (o->u.intlit);
@@ -342,7 +343,7 @@ static void genUop (Machine_Operand_t src,
  */
 static void Trans_stm (Machine_Stm_t s)
 {
-  Assert_ASSERT(s);
+  assert(s);
   switch (s->kind){
   case MACHINE_STM_MOVE:{
     X86_Stm_t s1, s2;
@@ -489,7 +490,7 @@ static void Trans_stm (Machine_Stm_t s)
 static List_t Trans_stms (List_t stms)
 {
   List_t newStms;
-  Assert_ASSERT(stms);
+  assert(stms);
   allStms = List_new ();
   List_foreach (stms,
                       (Poly_tyVoid)Trans_stm);
@@ -499,7 +500,7 @@ static List_t Trans_stms (List_t stms)
 
 static X86_Struct_t Trans_struct (Machine_Struct_t str)
 {
-  Assert_ASSERT(str);
+  assert(str);
   return X86_Struct_new (str->type,
                          str->var);
 }
@@ -508,7 +509,7 @@ static X86_Fun_t Trans_func (Machine_Fun_t f)
 {
   List_t stms;
 
-  Assert_ASSERT(f);
+  assert(f);
   stms = Trans_stms (f->stms);
   return X86_Fun_new 
     (f->type,
@@ -525,25 +526,25 @@ static X86_Fun_t Trans_func (Machine_Fun_t f)
 
 static X86_Str_t Trans_str (Machine_Str_t s)
 {
-  Assert_ASSERT(s);
+  assert(s);
   return X86_Str_new (s->name,
                       s->value);
 }
 
 static X86_Mask_t Trans_mask (Machine_Mask_t m)
 {
-  Assert_ASSERT(m);
+  assert(m);
   return X86_Mask_new (m->name,
                        m->size,
                        m->index);
 }
 
-#endif // 0
+#endif// 0
 
 static X86_Prog_t X86_codegenTraced(Machine_Prog_t p) {
     List_t strs, masks, funcs;
 
-    Assert_ASSERT(p);
+    assert(p);
     strs = List_new();
     masks = List_new();
     funcs = List_new();
@@ -551,11 +552,13 @@ static X86_Prog_t X86_codegenTraced(Machine_Prog_t p) {
 }
 
 static void outArg(Machine_Prog_t p) {
-    return;
+    UNUSED(p);
+    //    return;
 }
 
 static void outResult(X86_Prog_t p) {
-    return;
+    UNUSED(p);
+    //    return;
 }
 
 

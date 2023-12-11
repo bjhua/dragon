@@ -1,11 +1,11 @@
-#include "../lib/assert.h"
+#include "trans-ssa.h"
+#include "../lib/error.h"
 #include "../lib/list.h"
 #include "../lib/property.h"
-#include "../lib/error.h"
 #include "../lib/trace.h"
-#include "trans-ssa.h"
+#include <assert.h>
 
-// 
+//
 /* List <Machine_Str_t> */
 static List_t strings = 0;
 
@@ -26,7 +26,7 @@ static List_t getStrings() {
 /////////////////////////////////////////////////////
 // operands
 static Machine_Operand_t Trans_operand(Ssa_Operand_t o) {
-    Assert_ASSERT(o);
+    assert(o);
     switch (o->kind) {
         case SSA_OP_INT:
             return Machine_Operand_new_int(o->u.intlit);
@@ -37,47 +37,41 @@ static Machine_Operand_t Trans_operand(Ssa_Operand_t o) {
         case SSA_OP_ID:
             return Machine_Operand_new_id(o->u.id);
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 /////////////////////////////////////////////////////
 // memory
 static Machine_Mem_t Trans_mem(Ssa_Mem_t m) {
-    Assert_ASSERT(m);
+    assert(m);
     switch (m->kind) {
         case SSA_MEM_ARRAY:
-            return Machine_Mem_new_array
-                    (m->u.array.name, Trans_operand(m->u.array.index));
+            return Machine_Mem_new_array(m->u.array.name, Trans_operand(m->u.array.index));
         case SSA_MEM_CLASS:
-            return Machine_Mem_new_class
-                    (m->u.class.name, m->u.class.field, -1);
+            return Machine_Mem_new_class(m->u.class.name, m->u.class.field, -1);
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 /////////////////////////////////////////////////////
 // statement
 static Machine_Stm_t Trans_stmEach(Ssa_Stm_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case SSA_STM_MOVE:
-            return
-                    Machine_Stm_new_move
-                            (s->u.move.dest, Trans_operand(s->u.move.src));
+            return Machine_Stm_new_move(s->u.move.dest, Trans_operand(s->u.move.src));
         case SSA_STM_BOP:
-            return Machine_Stm_new_bop
-                    (s->u.bop.dest, Trans_operand(s->u.bop.left), s->u.bop.op, Trans_operand(s->u.bop.right));
+            return Machine_Stm_new_bop(s->u.bop.dest, Trans_operand(s->u.bop.left), s->u.bop.op, Trans_operand(s->u.bop.right));
         case SSA_STM_UOP:
-            return Machine_Stm_new_uop
-                    (s->u.uop.dest, s->u.uop.op, Trans_operand(s->u.uop.src));
+            return Machine_Stm_new_uop(s->u.uop.dest, s->u.uop.op, Trans_operand(s->u.uop.src));
             /*
           case SSA_STM_CALL:
             if (s->u.call.dest)
@@ -94,19 +88,15 @@ static Machine_Stm_t Trans_stmEach(Ssa_Stm_t s) {
                  , s->u.call.inTry);
             */
         case SSA_STM_STORE:
-            return Machine_Stm_new_store
-                    (Trans_mem(s->u.store.m), Trans_operand(s->u.store.src));
+            return Machine_Stm_new_store(Trans_mem(s->u.store.m), Trans_operand(s->u.store.src));
         case SSA_STM_LOAD:
-            return Machine_Stm_new_load
-                    (s->u.load.dest, Trans_mem(s->u.load.m));
+            return Machine_Stm_new_load(s->u.load.dest, Trans_mem(s->u.load.m));
         case SSA_STM_NEW_CLASS:
-            return Machine_Stm_new_newClass
-                    (s->u.newClass.dest, s->u.newClass.cname);
+            return Machine_Stm_new_newClass(s->u.newClass.dest, s->u.newClass.cname);
         case SSA_STM_NEW_ARRAY:
-            return Machine_Stm_new_newArray
-                    (s->u.newArray.dest, s->u.newArray.ty, Trans_operand(s->u.newArray.size));
+            return Machine_Stm_new_newArray(s->u.newArray.dest, s->u.newArray.ty, Trans_operand(s->u.newArray.size));
         case SSA_STM_PHI:
-            Error_impossible ();
+            Error_impossible();
             return 0;
         case SSA_STM_TRY:
             return Machine_Stm_new_try(s->u.try);
@@ -114,10 +104,10 @@ static Machine_Stm_t Trans_stmEach(Ssa_Stm_t s) {
             return Machine_Stm_new_try_end(s->u.tryEnd);
         default:
             fprintf(stderr, "%d", s->kind);
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
@@ -126,28 +116,24 @@ static Machine_Stm_t Trans_stmEach(Ssa_Stm_t s) {
 static Machine_Transfer_t Trans_transfer(Ssa_Transfer_t t) {
     switch (t->kind) {
         case SSA_TRANS_IF:
-            return Machine_Transfer_new_if
-                    (Trans_operand(t->u.iff.cond), t->u.iff.truee, t->u.iff.falsee);
+            return Machine_Transfer_new_if(Trans_operand(t->u.iff.cond), t->u.iff.truee, t->u.iff.falsee);
         case SSA_TRANS_JUMP:
             return Machine_Transfer_new_jump(t->u.jump);
         case SSA_TRANS_RETURN:
-            return Machine_Transfer_new_return
-                    (Trans_operand(t->u.ret));
+            return Machine_Transfer_new_return(Trans_operand(t->u.ret));
         case SSA_TRANS_THROW:
             return Machine_Transfer_new_throw();
-        case SSA_TRANS_CALL: // what about "leave" and "normal"?
+        case SSA_TRANS_CALL:// what about "leave" and "normal"?
             if (t->u.call.dest)
-                return Machine_Transfer_new_call
-                        (t->u.call.dest, t->u.call.name, List_map(t->u.call.args, (Poly_tyId) Trans_operand),
-                         t->u.call.leave, t->u.call.normal);
-            return Machine_Transfer_new_callnoassign
-                    (t->u.call.name, List_map(t->u.call.args, (Poly_tyId) Trans_operand), t->u.call.leave,
-                     t->u.call.normal);
+                return Machine_Transfer_new_call(t->u.call.dest, t->u.call.name, List_map(t->u.call.args, (Poly_tyId) Trans_operand),
+                                                 t->u.call.leave, t->u.call.normal);
+            return Machine_Transfer_new_callnoassign(t->u.call.name, List_map(t->u.call.args, (Poly_tyId) Trans_operand), t->u.call.leave,
+                                                     t->u.call.normal);
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
@@ -170,12 +156,11 @@ static Machine_Block_t Trans_blockEach(Ssa_Block_t b) {
 static Machine_Fun_t Trans_funcEach(Ssa_Fun_t f) {
     List_t newBlocks;
 
-    Assert_ASSERT(f);
+    assert(f);
     newBlocks = List_map(f->blocks,
                          (Poly_tyId) Trans_blockEach);
 
     return Machine_Fun_new(f->type, f->name, f->args, f->decs, newBlocks, f->retId, f->entry, f->exitt, -1);
-
 }
 
 //////////////////////////////////////////////////////
@@ -183,7 +168,7 @@ static Machine_Fun_t Trans_funcEach(Ssa_Fun_t f) {
 static Machine_Prog_t Trans_ssaTraced(Ssa_Prog_t p) {
     List_t funcs;
 
-    Assert_ASSERT(p);
+    assert(p);
 
     // clear string caches
     strings = List_new();
@@ -210,4 +195,3 @@ Machine_Prog_t Trans_ssa(Ssa_Prog_t p) {
     Trace_TRACE("Trans_ssa", Trans_ssaTraced, (p), outArg, r, outResult);
     return r;
 }
-

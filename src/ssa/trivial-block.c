@@ -1,9 +1,9 @@
-#include "../lib/assert.h"
+#include "trivial-block.h"
 #include "../lib/error.h"
 #include "../lib/property.h"
 #include "../lib/trace.h"
 #include "dead-block.h"
-#include "trivial-block.h"
+#include <assert.h>
 
 // on <Label_t>
 static Property_t jumpto = 0;
@@ -12,21 +12,23 @@ static Property_t jumpto = 0;
 // analyze
 
 static void analyzeOneBlock(Ssa_Block_t b) {
-    Assert_ASSERT(b);
-    Assert_ASSERT(b->stms);
-    Assert_ASSERT(b->transfer);
+    assert(b);
+    assert(b->stms);
+    assert(b->transfer);
 
     if (List_isEmpty(b->stms)) {
         if (b->transfer->kind == SSA_TRANS_JUMP)
             Property_set(jumpto, b->label, b->transfer->u.jump);
-        else;
-    } else;
+        else
+            ;
+    } else
+        ;
     return;
 }
 
 //////////////////////////////////////////////////////
 static Ssa_Block_t transOne(Ssa_Block_t b) {
-    Assert_ASSERT(b);
+    assert(b);
 
     switch (b->transfer->kind) {
         case SSA_TRANS_IF: {
@@ -36,15 +38,13 @@ static Ssa_Block_t transOne(Ssa_Block_t b) {
             newf =
                     Property_get(jumpto, b->transfer->u.iff.falsee);
 
-            return Ssa_Block_new(b->label, b->stms, Ssa_Transfer_renameLabels_if
-                    (b->transfer, newt, newf));
+            return Ssa_Block_new(b->label, b->stms, Ssa_Transfer_renameLabels_if(b->transfer, newt, newf));
         }
         case SSA_TRANS_JUMP: {
             Label_t newj = 0;
 
             newj = Property_get(jumpto, b->transfer->u.jump);
-            return Ssa_Block_new(b->label, b->stms, Ssa_Transfer_renameLabels_jump
-                    (b->transfer, newj));
+            return Ssa_Block_new(b->label, b->stms, Ssa_Transfer_renameLabels_jump(b->transfer, newj));
         }
         case SSA_TRANS_RETURN:
             return b;
@@ -53,22 +53,20 @@ static Ssa_Block_t transOne(Ssa_Block_t b) {
         case SSA_TRANS_CALL:
             return b;
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 //////////////////////////////////////////////////////
 // functions
 static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
-    Ssa_Block_t eb;    // entry block
     List_t newBlocks;
-    Graph_t g;
     Label_t newExitt;
 
-    Assert_ASSERT(f);
+    assert(f);
 
     // analyze
     List_foreach(f->blocks, (Poly_tyVoid) analyzeOneBlock);
@@ -92,7 +90,7 @@ static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
 static Ssa_Prog_t Ssa_trivialBlockTraced(Ssa_Prog_t p) {
     List_t newFuncs;
 
-    Assert_ASSERT(p);
+    assert(p);
 
     // init the property
     jumpto = Property_new((Poly_tyPlist) Label_plist);

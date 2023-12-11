@@ -1,21 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include "../lib/assert.h"
-#include "../lib/mem.h"
-#include "../lib/list.h"
-#include "../lib/int.h"
-#include "../lib/io.h"
-//#include "../lib/gc.h"
-#include "../lib/hash.h"
+#include "main-main.h"
 #include "../control/command-line.h"
 #include "../control/pass.h"
 #include "../control/version.h"
+#include "../lib/hash.h"
+#include "../lib/int.h"
+#include "../lib/io.h"
+#include "../lib/mem.h"
 #include "../main/compile.h"
-#include "main-main.h"
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-static String_t firstFile = 0;
+//static String_t firstFile = 0;
 
 static void show_banner() {
     time_t now;
@@ -33,9 +31,8 @@ static String_t assemble_one(String_t file) {
     static long i = 0;
     String_t obj_file = String_concat("/tmp/", "file-o-", Int_toString(i++), ".o", 0);
     String_t cmd = String_concat("gcc -c -g ", "-I \"", Control_headerDirectory, "\" -o \"", obj_file, "\"", "  \"", file, "\"",
-                         0);
-    if (Control_Verb_order
-            (VERBOSE_DETAIL, Control_verbose)) {
+                                 0);
+    if (Control_Verb_order(VERBOSE_DETAIL, Control_verbose)) {
         Io_printSpaces(6);
         printf("%s\n", cmd);
     }
@@ -46,7 +43,7 @@ static String_t assemble_one(String_t file) {
 static List_t assemble(List_t files) {
     List_t obj_files = List_new();
     List_t first = List_getFirst(files);
-    while(first){
+    while (first) {
         String_t obj_file = assemble_one(first->data);
         List_insertLast(obj_files, obj_file);
         first = first->next;
@@ -57,15 +54,13 @@ static List_t assemble(List_t files) {
 static String_t link(List_t files) {
     List_t p;
 
-    Assert_ASSERT(files);
-    String_t exe_file_name = Control_out_file_name ?
-                             Control_out_file_name : "a.out";
+    assert(files);
+    String_t exe_file_name = Control_out_file_name ? Control_out_file_name : "a.out";
     String_t lib_files = String_concat(Control_libDirectory,
-                            "../src/runtime/main.c ../src/runtime/dragon-lib.c",
-                            0);
+                                       "../src/runtime/main.c ../src/runtime/dragon-lib.c",
+                                       0);
     String_t cmd = String_concat("gcc -g -o ", exe_file_name, 0);
-    if (Control_Verb_order
-            (VERBOSE_DETAIL, Control_verbose)) {
+    if (Control_Verb_order(VERBOSE_DETAIL, Control_verbose)) {
         Io_printSpaces(6);
         printf("%s", cmd);
     }
@@ -89,12 +84,11 @@ static String_t link(List_t files) {
     return exe_file_name;
 }
 
-// Compile a file to assembly file, then assemble to 
+// Compile a file to assembly file, then assemble to
 // binary file; finally, link the binary with
 // libraries to generate final executable.
 static int Main_main0(List_t files) {
     Pass_t compile, assemblePass, linkPass;
-    File_t exeFile;
 
     compile = Pass_new("compile", VERBOSE_PASS, files, (Poly_tyId) Compile_compile);
     List_t asm_files = Pass_doit(&compile);
@@ -145,13 +139,10 @@ int Main_main(int argc, char **argv) {
     mainp = Pass_new("dragon", VERBOSE_PASS, files, (Poly_tyId) Main_main0);
     Pass_doit(&mainp);
 
-    if (Control_Verb_order
-            (VERBOSE_DETAIL,
-             Control_verbose)) {
+    if (Control_Verb_order(VERBOSE_DETAIL,
+                           Control_verbose)) {
         Mem_status();
         Hash_statusAll();
     }
     return 0;
 }
-
-

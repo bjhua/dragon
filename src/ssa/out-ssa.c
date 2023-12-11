@@ -1,11 +1,12 @@
-#include "../lib/assert.h"
+#include "out-ssa.h"
+#include "../control/log.h"
 #include "../lib/error.h"
 #include "../lib/list.h"
 #include "../lib/property.h"
 #include "../lib/trace.h"
 #include "../lib/tuple.h"
-#include "../control/log.h"
-#include "out-ssa.h"
+#include "../lib/unused.h"
+#include <assert.h>
 
 /////////////////////////////////////////////////////
 // properties:
@@ -15,6 +16,7 @@
 static Property_t headProp = 0;
 
 static List_t headPropInitFun(Ssa_Block_t b) {
+    UNUSED(b);
     return List_new();
 }
 
@@ -24,6 +26,7 @@ static List_t headPropInitFun(Ssa_Block_t b) {
 static Property_t tailProp = 0;
 
 static List_t tailPropInitFun(Ssa_Block_t b) {
+    UNUSED(b);
     return List_new();
 }
 
@@ -61,13 +64,11 @@ static void analyzeOne(Ssa_Block_t b) {
                 List_t oldtail = Property_get(tailProp, pred);
 
                 List_insertLast(oldtail, Ssa_Stm_new_move(newa, opr));
-                List_insertLast(oldtail, Ssa_Stm_new_move
-                        (newdest, Ssa_Operand_new_id(newa)));
+                List_insertLast(oldtail, Ssa_Stm_new_move(newdest, Ssa_Operand_new_id(newa)));
                 args = args->next;
             }
             oldhead = Property_get(headProp, b);
-            List_insertLast(oldhead, Ssa_Stm_new_move
-                    (dest, Ssa_Operand_new_id(newdest)));
+            List_insertLast(oldhead, Ssa_Stm_new_move(dest, Ssa_Operand_new_id(newdest)));
         }
 
         stms = stms->next;
@@ -161,7 +162,7 @@ static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
     Ssa_Fun_t newf;
     List_t blocks, decs;
 
-    Assert_ASSERT(f);
+    assert(f);
 
     Log_str("analysis starting:");
     analyze(f->blocks);
@@ -182,13 +183,10 @@ static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
 static Ssa_Prog_t Ssa_outSsaTraced(Ssa_Prog_t p) {
     List_t newFuncs;
 
-    Assert_ASSERT(p);
-    headProp
-            = Property_newInitFun((Poly_tyPlist) Ssa_Block_plist, (Poly_tyId) headPropInitFun);
-    tailProp
-            = Property_newInitFun((Poly_tyPlist) Ssa_Block_plist, (Poly_tyId) tailPropInitFun);
-    nameProp
-            = Property_new((Poly_tyPlist) Id_plist);
+    assert(p);
+    headProp = Property_newInitFun((Poly_tyPlist) Ssa_Block_plist, (Poly_tyId) headPropInitFun);
+    tailProp = Property_newInitFun((Poly_tyPlist) Ssa_Block_plist, (Poly_tyId) tailPropInitFun);
+    nameProp = Property_new((Poly_tyPlist) Id_plist);
 
     newFuncs = List_map(p->funcs, (Poly_tyId) transFunEach);
 
@@ -230,4 +228,3 @@ Ssa_Prog_t Ssa_outSsa(Ssa_Prog_t p) {
     Trace_TRACE("Ssa_outSsa", Ssa_outSsaTraced, (p), printArg, r, printResult);
     return r;
 }
-

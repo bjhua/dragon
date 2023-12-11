@@ -1,13 +1,13 @@
-#include <stdarg.h>
-#include "../lib/assert.h"
+#include "log.h"
 #include "../lib/error.h"
 #include "../lib/file.h"
-#include "log.h"
+#include <assert.h>
+#include <stdarg.h>
 
 struct Log_t {
-    int effective;      // whether or not this logger is on
-    String_t name;      // name of the log file
-    File_t file;        // log file pointer
+    int effective;// whether or not this logger is on
+    String_t name;// name of the log file
+    File_t file;  // log file pointer
 };
 
 static struct Log_t log = {0, 0, 0};
@@ -24,7 +24,7 @@ void Log_set(String_t name) {
 
 void Log_reset() {
     if (!log.effective)
-        Error_impossible ();
+        Error_impossible();
 
     log.effective = 0;
     log.name = 0;
@@ -33,7 +33,7 @@ void Log_reset() {
 }
 
 void Log_dot(void (*f)(Poly_t, String_t), Poly_t p, String_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     if (!log.effective)
         return;
 
@@ -42,7 +42,7 @@ void Log_dot(void (*f)(Poly_t, String_t), Poly_t p, String_t s) {
 }
 
 void Log_str(String_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     if (!log.effective)
         return;
 

@@ -1,7 +1,7 @@
-#include "../lib/trace.h"
-#include "../lib/list.h"
-#include "../control/log.h"
 #include "const-fold.h"
+#include "../control/log.h"
+#include "../lib/list.h"
+#include "../lib/trace.h"
 
 // this module has been incoporated into the const
 // propogation pass and thus obsolete.
@@ -31,16 +31,11 @@ static void analyzeStm(Ssa_Stm_t s) {
             Ssa_Operand_t right = s->u.bop.right;
 
             //
-            if (left->kind == SSA_OP_INT
-                && right->kind == SSA_OP_INT) {
-                int r;
-
+            if (left->kind == SSA_OP_INT && right->kind == SSA_OP_INT) {
                 mark();
                 Log_str("found one const-fold candidate: ");
                 Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
-
-                r = Operator_binary(left->u.intlit, s->u.bop.op, right->u.intlit);
-
+                long r = Operator_binary(left->u.intlit, s->u.bop.op, right->u.intlit);
                 Property_set(constProp, dest, Ssa_Operand_new_int(r));
             }
             return;
@@ -50,13 +45,10 @@ static void analyzeStm(Ssa_Stm_t s) {
             Ssa_Operand_t src = s->u.uop.src;
 
             if (src->kind == SSA_OP_INT) {
-                int r;
-
                 mark();
                 Log_str("found one const-fold candidate: ");
                 Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
-
-                r = Operator_unary(s->u.uop.op, src->u.intlit);
+                long r = Operator_unary(s->u.uop.op, src->u.intlit);
                 Property_set(constProp, dest, Ssa_Operand_new_int(r));
             }
             return;
@@ -78,7 +70,6 @@ static void analyzeFun(Ssa_Fun_t f) {
 static void analyze(Ssa_Prog_t p) {
 
     List_foreach(p->funcs, (Poly_tyVoid) analyzeFun);
-
 }
 
 ////////////////////////////////////////////////////////

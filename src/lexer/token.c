@@ -1,6 +1,6 @@
-#include "../lib/mem.h"
-#include "../lib/assert.h"
 #include "token.h"
+#include "../lib/mem.h"
+#include <assert.h>
 
 #define T Token_t
 
@@ -16,40 +16,26 @@ T Token_new(Token_Kind_t kind, String_t lexeme, Coordinate_t left, Coordinate_t 
 
 String_t Token_Kind_toString(Token_Kind_t kind) {
     switch (kind) {
-        case TOKEN_ADD:
-            return "+";
         case TOKEN_AND:
             return "&&";
-        case TOKEN_ASSIGN:
-            return "=";
         case TOKEN_BREAK:
             return "break";
         case TOKEN_CATCH:
             return "catch";
         case TOKEN_CLASS:
             return "class";
-        case TOKEN_COMMER:
-            return ",";
         case TOKEN_CONTINUE:
-            return "cotinue";
-        case TOKEN_DIVIDE:
-            return "/";
+            return "continue";
         case TOKEN_DO:
             return "do";
-        case TOKEN_DOT:
-            return ".";
         case TOKEN_ELSE:
             return "else";
         case TOKEN_EQ:
             return "==";
-        case TOKEN_EOF:
-            return "EOF";
         case TOKEN_FOR:
             return "for";
         case TOKEN_GE:
             return ">=";
-        case TOKEN_GT:
-            return ">";
         case TOKEN_ID:
             return "id<>";
         case TOKEN_IF:
@@ -58,48 +44,24 @@ String_t Token_Kind_toString(Token_Kind_t kind) {
             return "int";
         case TOKEN_INTLIT:
             return "int<>";
-        case TOKEN_LBRACE:
-            return "{";
-        case TOKEN_LBRACK:
-            return "[";
         case TOKEN_LE:
             return "<=";
-        case TOKEN_LPAREN:
-            return "(";
-        case TOKEN_LT:
-            return "<";
-        case TOKEN_MINUS:
-            return "-";
         case TOKEN_NEQ:
             return "!=";
         case TOKEN_NEW:
             return "new";
-        case TOKEN_NOT:
-            return "!";
         case TOKEN_NULL:
             return "null";
         case TOKEN_OF:
             return "of";
         case TOKEN_OR:
             return "||";
-        case TOKEN_PERCENT:
-            return "%";
-        case TOKEN_RBRACE:
-            return "}";
-        case TOKEN_RBRACK:
-            return "]";
         case TOKEN_RETURN:
             return "return";
-        case TOKEN_RPAREN:
-            return ")";
-        case TOKEN_SEMI:
-            return ";";
         case TOKEN_STRING:
             return "string";
         case TOKEN_STRINGLIT:
             return "str<>";
-        case TOKEN_TIMES:
-            return "*";
         case TOKEN_THROW:
             return "throw";
         case TOKEN_TRY:
@@ -108,17 +70,17 @@ String_t Token_Kind_toString(Token_Kind_t kind) {
             return "while";
         default:
             fprintf(stderr, "kind==%d\n", kind);
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
-    return 0;
+    Error_impossible();
+    //    return 0;
 }
 
 String_t Token_toString(T t) {
     String_t extra = "";
 
-    Assert_ASSERT(t);
+    assert(t);
     switch (t->kind) {
         case TOKEN_ID:
         case TOKEN_STRINGLIT:
@@ -126,6 +88,52 @@ String_t Token_toString(T t) {
             extra = t->lexeme;
             break;
         default:
+            break;
+        case TOKEN_AND:
+            break;
+        case TOKEN_BREAK:
+            break;
+        case TOKEN_CATCH:
+            break;
+        case TOKEN_CLASS:
+            break;
+        case TOKEN_CONTINUE:
+            break;
+        case TOKEN_DO:
+            break;
+        case TOKEN_ELSE:
+            break;
+        case TOKEN_EQ:
+            break;
+        case TOKEN_FOR:
+            break;
+        case TOKEN_GE:
+            break;
+        case TOKEN_IF:
+            break;
+        case TOKEN_INT:
+            break;
+        case TOKEN_LE:
+            break;
+        case TOKEN_NEQ:
+            break;
+        case TOKEN_NEW:
+            break;
+        case TOKEN_NULL:
+            break;
+        case TOKEN_OF:
+            break;
+        case TOKEN_OR:
+            break;
+        case TOKEN_RETURN:
+            break;
+        case TOKEN_STRING:
+            break;
+        case TOKEN_THROW:
+            break;
+        case TOKEN_TRY:
+            break;
+        case TOKEN_WHILE:
             break;
     }
     return String_concat(Token_Kind_toString(t->kind), extra, 0);
@@ -133,6 +141,7 @@ String_t Token_toString(T t) {
 
 String_t Token_toStringWithPos(T t) {
     String_t extra = "";
+    assert(t);
 
     switch (t->kind) {
         case TOKEN_ID:
@@ -142,13 +151,58 @@ String_t Token_toStringWithPos(T t) {
             break;
         default:
             break;
+        case TOKEN_AND:
+            break;
+        case TOKEN_BREAK:
+            break;
+        case TOKEN_CATCH:
+            break;
+        case TOKEN_CLASS:
+            break;
+        case TOKEN_CONTINUE:
+            break;
+        case TOKEN_DO:
+            break;
+        case TOKEN_ELSE:
+            break;
+        case TOKEN_EQ:
+            break;
+        case TOKEN_FOR:
+            break;
+        case TOKEN_GE:
+            break;
+        case TOKEN_IF:
+            break;
+        case TOKEN_INT:
+            break;
+        case TOKEN_LE:
+            break;
+        case TOKEN_NEQ:
+            break;
+        case TOKEN_NEW:
+            break;
+        case TOKEN_NULL:
+            break;
+        case TOKEN_OF:
+            break;
+        case TOKEN_OR:
+            break;
+        case TOKEN_RETURN:
+            break;
+        case TOKEN_STRING:
+            break;
+        case TOKEN_THROW:
+            break;
+        case TOKEN_TRY:
+            break;
+        case TOKEN_WHILE:
+            break;
     }
-    return String_concat
-            (Token_Kind_toString(t->kind),
-             extra,
-             " \t\tat: ",
-             Coordinate_toString(Region_from(t->region)),
-             0);
+    return String_concat(Token_Kind_toString(t->kind),
+                         extra,
+                         " \t\tat: ",
+                         Coordinate_toString(Region_from(t->region)),
+                         0);
 }
 
 

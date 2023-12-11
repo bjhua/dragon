@@ -1,9 +1,9 @@
-#include "../lib/mem.h"
-#include "../lib/int.h"
-#include "../lib/assert.h"
-#include "../lib/todo.h"
-#include "../control/control.h"
 #include "ast.h"
+#include "../control/control.h"
+#include "../lib/int.h"
+#include "../lib/mem.h"
+#include "../lib/unused.h"
+#include <assert.h>
 
 #define Id_t AstId_t
 
@@ -23,7 +23,7 @@ static void spaces(File_t);
 /* left-value */
 L Ast_Lval_new_var(Id_t var, Type_t ty, Region_t r) {
     L l;
-    Mem_NEW (l);
+    Mem_NEW(l);
     l->kind = AST_LVAL_VAR;
     l->u.var = var;
     l->ty = ty;
@@ -34,7 +34,7 @@ L Ast_Lval_new_var(Id_t var, Type_t ty, Region_t r) {
 L Ast_Lval_new_dot(L lval, Id_t var, Type_t ty,
                    Region_t r) {
     L l;
-    Mem_NEW (l);
+    Mem_NEW(l);
     l->kind = AST_LVAL_DOT;
     l->u.dot.lval = lval;
     l->u.dot.var = var;
@@ -45,7 +45,7 @@ L Ast_Lval_new_dot(L lval, Id_t var, Type_t ty,
 
 L Ast_Lval_new_array(L lval, E e, Type_t ty, Region_t r) {
     L l;
-    Mem_NEW (l);
+    Mem_NEW(l);
     l->kind = AST_LVAL_ARRAY;
     l->u.array.lval = lval;
     l->u.array.exp = e;
@@ -55,7 +55,7 @@ L Ast_Lval_new_array(L lval, E e, Type_t ty, Region_t r) {
 }
 
 File_t Ast_Lval_print(File_t file, L l) {
-    Assert_ASSERT(l);
+    assert(l);
 
     switch (l->kind) {
         case AST_LVAL_VAR:
@@ -73,15 +73,16 @@ File_t Ast_Lval_print(File_t file, L l) {
             fprintf(file, "%s", "]");
             break;
         default:
-            Error_impossible ();
+            Error_impossible();
             break;
     }
-    if (Control_showType)
+    assert(l);
+    if (Control_showType) {
         if (l->ty)
             fprintf(file, "@: %s @", Type_toString(l->ty));
         else
             fprintf(file, "%s", "@NO_TYPE@");
-    else;
+    }
     return file;
 }
 
@@ -91,7 +92,7 @@ E Ast_Exp_new_assign(E left, E right, Type_t ty,
                      Region_t r) {
     E e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_ASSIGN;
     e->u.bop.left = left;
     e->u.bop.right = right;
@@ -102,7 +103,7 @@ E Ast_Exp_new_assign(E left, E right, Type_t ty,
 
 E Ast_Exp_new_bop(Ast_Exp_Kind_t kind, E left, E right, Type_t ty, Region_t r) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = kind;
     e->u.bop.left = left;
     e->u.bop.right = right;
@@ -113,7 +114,7 @@ E Ast_Exp_new_bop(Ast_Exp_Kind_t kind, E left, E right, Type_t ty, Region_t r) {
 
 E Ast_Exp_new_unary(Ast_Exp_Kind_t kind, E x, Type_t ty, Region_t r) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = kind;
     e->u.unary.e = x;
     e->ty = ty;
@@ -122,24 +123,24 @@ E Ast_Exp_new_unary(Ast_Exp_Kind_t kind, E x, Type_t ty, Region_t r) {
 }
 
 
-E Ast_Exp_new_null() {
+E Ast_Exp_new_null(void) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_NULL;
     return e;
 }
 
 E Ast_Exp_new_intlit(String_t s) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_INTLIT;
-    e->u.intlit = atoi(s);
+    e->u.intlit = strtol(s, 0, 10);
     return e;
 }
 
 E Ast_Exp_new_stringlit(String_t s) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_STRINGLIT;
     e->u.stringlit = s;
     return e;
@@ -148,7 +149,7 @@ E Ast_Exp_new_stringlit(String_t s) {
 E Ast_Exp_new_newArray(T t, Type_t ty, E size) {
     E e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_NEW_ARRAY;
     e->u.newArray.type = t;
     e->u.newArray.size = size;
@@ -159,7 +160,7 @@ E Ast_Exp_new_newArray(T t, Type_t ty, E size) {
 E Ast_Exp_new_newClass(Id_t id, List_t args, Type_t ty) {
     E e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_NEW_CLASS;
     e->u.newClass.name = id;
     e->u.newClass.args = args;
@@ -170,7 +171,7 @@ E Ast_Exp_new_newClass(Id_t id, List_t args, Type_t ty) {
 E Ast_Exp_new_lval(L lval, Type_t ty) {
     E e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_LVAL;
     e->u.lval = lval;
     e->ty = ty;
@@ -180,7 +181,7 @@ E Ast_Exp_new_lval(L lval, Type_t ty) {
 E Ast_Exp_new_call(Id_t f, List_t args, Type_t ty) {
     E e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = AST_EXP_CALL;
     e->u.call.f = f;
     e->u.call.args = args;
@@ -189,7 +190,7 @@ E Ast_Exp_new_call(Id_t f, List_t args, Type_t ty) {
 }
 
 File_t Ast_Exp_print(File_t file, E e) {
-    Assert_ASSERT (e);
+    assert(e);
 
     switch (e->kind) {
         case AST_EXP_ASSIGN:
@@ -276,7 +277,7 @@ File_t Ast_Exp_print(File_t file, E e) {
             fprintf(file, "%s", " null ");
             break;
         case AST_EXP_INTLIT:
-            fprintf(file, "%d", e->u.intlit);
+            fprintf(file, "%ld", e->u.intlit);
             break;
         case AST_EXP_STRINGLIT:
             fprintf(file, "%s", "\"");
@@ -317,15 +318,17 @@ File_t Ast_Exp_print(File_t file, E e) {
             break;
         default:
             fprintf(stderr, "%d", e->kind);
-            Error_impossible ();
+            Error_impossible();
             break;
     }
+    assert(e);
     if (Control_showType)
         if (e->ty)
             fprintf(file, "@ %s @", Type_toString(e->ty));
         else
             fprintf(file, "%s", "@NO_TYPE@");
-    else;
+    else
+        ;
     return file;
 }
 
@@ -334,7 +337,7 @@ File_t Ast_Exp_print(File_t file, E e) {
 S Ast_Stm_new_exp(E e) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_EXP;
     s->u.exp = e;
     s->region = 0;
@@ -343,7 +346,7 @@ S Ast_Stm_new_exp(E e) {
 
 S Ast_Stm_new_if(E e, S t, S f, Region_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_IF;
     s->u.iff.cond = e;
     s->u.iff.then = t;
@@ -355,7 +358,7 @@ S Ast_Stm_new_if(E e, S t, S f, Region_t r) {
 S Ast_Stm_new_while(E e, S t, Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_WHILE;
     s->u.whilee.cond = e;
     s->u.whilee.body = t;
@@ -366,7 +369,7 @@ S Ast_Stm_new_while(E e, S t, Region_t r) {
 S Ast_Stm_new_do(E e, S t, Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_DO;
     s->u.doo.cond = e;
     s->u.doo.body = t;
@@ -378,7 +381,7 @@ S Ast_Stm_new_for(E header, E e, E tail,
                   S body, Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_FOR;
     s->u.forr.header = header;
     s->u.forr.cond = e;
@@ -391,7 +394,7 @@ S Ast_Stm_new_for(E header, E e, E tail,
 S Ast_Stm_new_break(Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_BREAK;
     s->region = r;
     return s;
@@ -400,7 +403,7 @@ S Ast_Stm_new_break(Region_t r) {
 S Ast_Stm_new_continue(Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_CONTINUE;
     s->region = r;
     return s;
@@ -409,7 +412,7 @@ S Ast_Stm_new_continue(Region_t r) {
 S Ast_Stm_new_throw(Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_THROW;
     s->region = r;
     return s;
@@ -418,7 +421,7 @@ S Ast_Stm_new_throw(Region_t r) {
 S Ast_Stm_new_tryCatch(S tryy, S catchh, Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_TRYCATCH;
     s->u.trycatch.tryy = tryy;
     s->u.trycatch.catchh = catchh;
@@ -429,7 +432,7 @@ S Ast_Stm_new_tryCatch(S tryy, S catchh, Region_t r) {
 S Ast_Stm_new_return(E e, Region_t r) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_RETURN;
     s->u.returnn = e;
     s->region = r;
@@ -439,7 +442,7 @@ S Ast_Stm_new_return(E e, Region_t r) {
 S Ast_Stm_new_block(B b) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = AST_STM_BLOCK;
     s->u.block = b;
     return s;
@@ -447,11 +450,11 @@ S Ast_Stm_new_block(B b) {
 
 static int current = 0;
 
-static void indent() {
+static void indent(void) {
     current += 2;
 }
 
-static void unindent() {
+static void unindent(void) {
     current -= 2;
 }
 
@@ -464,11 +467,12 @@ static void spaces(File_t file) {
 }
 
 Box_t Ast_Stm_box(S s) {
+    assert(s);
     return Box_str("<junk>;");
 }
 
 File_t Ast_Stm_print(File_t file, S s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case AST_STM_EXP: {
             spaces(file);
@@ -554,7 +558,7 @@ File_t Ast_Stm_print(File_t file, S s) {
             break;
         default:
             fprintf(stderr, "%d", s->kind);
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     fprintf(file, "%s", "\n");
@@ -566,26 +570,24 @@ File_t Ast_Stm_print(File_t file, S s) {
 D Ast_Dec_new(T type, Id_t var, E init) {
     D d;
 
-    Mem_NEW (d);
+    Mem_NEW(d);
     d->type = type;
     d->var = var;
     d->init = init;
     return d;
 }
 
-Box_t Ast_Dec_box(D d) {
-    Assert_ASSERT (d);
+static Box_t Ast_Dec_box(D d) {
+    assert(d);
 
     return Box_h(Ast_Type_box(d->type),
                  Box_str(AstId_toString(d->var)),
-                 (d->init) ?
-                 (Box_str(" = <TODO>;")) :
-                 Box_str(";"),
+                 (d->init) ? (Box_str(" = <TODO>;")) : Box_str(";"),
                  0);
 }
 
 File_t Ast_Dec_print(File_t file, D d) {
-    Assert_ASSERT (d);
+    assert(d);
     spaces(file);
     fprintf(file, "%s", Ast_Type_toString(d->type));
     fprintf(file, "%s", " ");
@@ -602,16 +604,16 @@ File_t Ast_Dec_print(File_t file, D d) {
 // Block
 B Ast_Block_new(List_t decs, List_t stms) {
     B b;
-    Mem_NEW (b);
+    Mem_NEW(b);
     b->decs = decs;
     b->stms = stms;
     return b;
 }
 
-Box_t Ast_Block_box(B b) {
+static Box_t Ast_Block_box(B b) {
     Box_t b1, b2, b3;
 
-    Assert_ASSERT(b);
+    assert(b);
     b1 = Box_str("{");
     b2 = Box_vlist(List_map(b->decs,
                             (Poly_tyId) Ast_Dec_box));
@@ -623,7 +625,7 @@ Box_t Ast_Block_box(B b) {
 }
 
 File_t Ast_Block_print(File_t file, B b) {
-    Assert_ASSERT(b);
+    assert(b);
     spaces(file);
     fprintf(file, "%s", "{\n");
     indent();
@@ -640,7 +642,7 @@ File_t Ast_Block_print(File_t file, B b) {
 F Ast_Fun_new(T type, Id_t name, List_t args,
               B block, Region_t r) {
     F f;
-    Mem_NEW (f);
+    Mem_NEW(f);
     f->type = type;
     f->name = name;
     f->args = args;
@@ -652,24 +654,22 @@ F Ast_Fun_new(T type, Id_t name, List_t args,
 Box_t Ast_Fun_box(F f) {
     Box_t b1, b2;
 
-    Assert_ASSERT(f);
-    b1 = Box_h
-            (Box_str(Ast_Type_toString(f->type)),
-             Box_str(AstId_toString(f->name)),
-             Box_str("("),
-             Box_hlist(List_map
-                               (f->args,
-                                (Poly_tyId) Ast_Dec_box)),
-             Box_str(")"),
-             0);
+    assert(f);
+    b1 = Box_h(Box_str(Ast_Type_toString(f->type)),
+               Box_str(AstId_toString(f->name)),
+               Box_str("("),
+               Box_hlist(List_map(f->args,
+                                  (Poly_tyId) Ast_Dec_box)),
+               Box_str(")"),
+               0);
     b2 = Ast_Block_box(f->block);
     return Box_v(b1, b2, 0);
 }
 
-File_t Ast_Arguments_print(File_t file, List_t args) {
+static File_t Ast_Arguments_print(File_t file, List_t args) {
     Ast_Dec_t dec;
 
-    Assert_ASSERT(args);
+    assert(args);
 
     args = args->next;
     if (!args)
@@ -691,7 +691,7 @@ File_t Ast_Arguments_print(File_t file, List_t args) {
 }
 
 File_t Ast_Fun_print(File_t file, F f) {
-    Assert_ASSERT(f);
+    assert(f);
     Ast_Type_print(file, f->type);
     fprintf(file, "%s", " ");
     fprintf(file, "%s", AstId_toString(f->name));
@@ -705,19 +705,19 @@ File_t Ast_Fun_print(File_t file, F f) {
 
 ///////////////////////////////////////////////
 // type
-T Ast_Type_new_int() {
+T Ast_Type_new_int(void) {
     T t;
 
-    Mem_NEW (t);
+    Mem_NEW(t);
     t->kind = AST_TYPE_INT;
     t->isArray = 0;
     return t;
 }
 
-T Ast_Type_new_string() {
+T Ast_Type_new_string(void) {
     T t;
 
-    Mem_NEW (t);
+    Mem_NEW(t);
     t->kind = AST_TYPE_STRING;
     t->isArray = 0;
     return t;
@@ -726,7 +726,7 @@ T Ast_Type_new_string() {
 T Ast_Type_new_id(Id_t id) {
     T t;
 
-    Mem_NEW (t);
+    Mem_NEW(t);
     t->kind = AST_TYPE_ID;
     t->id = id;
     t->isArray = 0;
@@ -734,23 +734,23 @@ T Ast_Type_new_id(Id_t id) {
 }
 
 void Ast_Type_setArray(T t) {
-    Assert_ASSERT(t);
+    assert(t);
 
     if (t->isArray)
-        Error_impossible ();
+        Error_impossible();
+    assert(t);
     t->isArray = 1;
-    return;
 }
 
 Box_t Ast_Type_box(T x) {
-    Assert_ASSERT (x);
+    assert(x);
 
-    Error_bug ("TODO");
-    return 0;
+    Error_bug("TODO");
+    //    return 0;
 }
 
 File_t Ast_Type_print(File_t file, T x) {
-    Assert_ASSERT (x);
+    assert(x);
     switch (x->kind) {
         case AST_TYPE_INT:
             fprintf(file, "%s", "int");
@@ -773,7 +773,7 @@ File_t Ast_Type_print(File_t file, T x) {
 String_t Ast_Type_toString(T x) {
     String_t s;
 
-    Assert_ASSERT (x);
+    assert(x);
     switch (x->kind) {
         case AST_TYPE_INT:
             s = "int";
@@ -799,20 +799,22 @@ String_t Ast_Type_toString(T x) {
 C Ast_Class_new(Id_t name, List_t decs) {
     C c;
 
-    Mem_NEW (c);
+    Mem_NEW(c);
     c->name = name;
     c->fields = decs;
     return c;
 }
 
 Box_t Ast_Class_box(C c) {
+    // to suppress warnings
+    UNUSED(c);
     return 0;
 }
 
 File_t Ast_Class_print(File_t file, C c) {
     List_t p;
 
-    Assert_ASSERT(c);
+    assert(c);
 
     p = List_getFirst(c->fields);
     fprintf(file, "%s", "\nclass ");
@@ -836,7 +838,7 @@ File_t Ast_Class_print(File_t file, C c) {
 P Ast_Prog_new(List_t classes, List_t funcs) {
     P p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
     p->classes = classes;
     p->funcs = funcs;
     return p;
@@ -854,11 +856,11 @@ Box_t Ast_Prog_box(P x) {
 }
 
 void Ast_Prog_print(File_t file, P x) {
-    Assert_ASSERT(x);
+    assert(x);
     List_foldl(x->classes, file, (Poly_tyFold) Ast_Class_print);
     fprintf(file, "%s", "\n");
     List_foldl(x->funcs, file, (Poly_tyFold) Ast_Fun_print);
-    return;
+    //    return;
 }
 
 #undef B

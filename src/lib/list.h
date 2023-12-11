@@ -2,8 +2,8 @@
 #define LIST_H
 
 #include "file.h"
-#include "string.h"
 #include "poly.h"
+#include "string.h"
 
 #define T List_t
 #define P Poly_t
@@ -18,7 +18,7 @@ typedef P (*Poly_tyFold)(P, P);
 
 typedef File_t (*Poly_tyListPrint)(File_t, P);
 
-T List_new();
+T List_new(void);
 
 T List_concat(T, T);
 
@@ -48,7 +48,7 @@ P List_removeHead(T l);
 
 P List_nth(T l, int n);
 // f (f (f (starter, x1), x2), ...)
-P List_foldl(T list, P starter, P(*f)(P, P));
+P List_foldl(T list, P starter, P (*f)(P, P));
 
 T List_rev(T l);
 

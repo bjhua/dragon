@@ -1,10 +1,10 @@
+#include "x86.h"
+#include "../control/control.h"
+#include "../lib/char-buffer.h"
+#include "../lib/int.h"
 #include "../lib/mem.h"
 #include "../lib/todo.h"
-#include "../lib/int.h"
-#include "../lib/char-buffer.h"
-#include "../lib/assert.h"
-#include "../control/control.h"
-#include "x86.h"
+#include <assert.h>
 
 
 #define P X86_Prog_t
@@ -18,7 +18,7 @@
 #define R X86_Register_t
 
 
-#define ONEM (1024*1024)
+#define ONEM (1024 * 1024)
 #define NUM 16
 
 static char buffer[16 * ONEM];
@@ -89,16 +89,16 @@ void X86_Register_print(R r) {
             print("%esp");
             return;
         default:
-            Error_impossible ();
+            Error_impossible();
             return;
     }
-    Error_impossible ();
+    Error_impossible();
     return;
 }
 
 O X86_Operand_new_int(int i) {
     O e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = X86_OP_INT;
     e->u.intlit = i;
     return e;
@@ -106,7 +106,7 @@ O X86_Operand_new_int(int i) {
 
 O X86_Operand_new_global(Id_t id) {
     O e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = X86_OP_GLOBAL;
     e->u.global = id;
     return e;
@@ -114,7 +114,7 @@ O X86_Operand_new_global(Id_t id) {
 
 O X86_Operand_new_inStack(int index) {
     O e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = X86_OP_INSTACK;
     e->u.index = index;
     return e;
@@ -122,7 +122,7 @@ O X86_Operand_new_inStack(int index) {
 
 O X86_Operand_new_reg(R r) {
     O e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = X86_OP_REG;
     e->u.reg = r;
     return e;
@@ -130,7 +130,7 @@ O X86_Operand_new_reg(R r) {
 
 O X86_Operand_new_mem(R base, int offset) {
     O e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = X86_OP_MEM;
     e->u.mem.base = base;
     e->u.mem.offset = offset;
@@ -138,14 +138,13 @@ O X86_Operand_new_mem(R base, int offset) {
 }
 
 int X86_Operand_sameStackSlot(O x, O y) {
-    if (x->kind != X86_OP_INSTACK
-        || y->kind != X86_OP_INSTACK)
+    if (x->kind != X86_OP_INSTACK || y->kind != X86_OP_INSTACK)
         return 0;
     return x->u.index == y->u.index;
 }
 
 void X86_Operand_print(O o) {
-    Assert_ASSERT(o);
+    assert(o);
     switch (o->kind) {
         case X86_OP_INT:
             print("$");
@@ -178,7 +177,7 @@ void X86_Operand_print(O o) {
 
 S X86_Stm_new_moverr(R dest, R src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_MOVERR;
     s->u.moverr.dest = dest;
     s->u.moverr.src = src;
@@ -187,7 +186,7 @@ S X86_Stm_new_moverr(R dest, R src) {
 
 S X86_Stm_new_moveri(R dest, int src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_MOVERI;
     s->u.moveri.dest = dest;
     s->u.moveri.src = src;
@@ -196,7 +195,7 @@ S X86_Stm_new_moveri(R dest, int src) {
 
 S X86_Stm_new_load(R dest, O src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_LOAD;
     s->u.load.dest = dest;
     s->u.load.src = src;
@@ -205,7 +204,7 @@ S X86_Stm_new_load(R dest, O src) {
 
 S X86_Stm_new_store(O dest, R src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_STORE;
     s->u.store.dest = dest;
     s->u.store.src = src;
@@ -215,7 +214,7 @@ S X86_Stm_new_store(O dest, R src) {
 S X86_Stm_new_bop(R dest, Operator_t opr,
                   R src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_BOP;
     s->u.bop.src = src;
     s->u.bop.op = opr;
@@ -225,7 +224,7 @@ S X86_Stm_new_bop(R dest, Operator_t opr,
 
 S X86_Stm_new_uop(R dest, Operator_t opr, R src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_UOP;
     s->u.uop.dest = dest;
     s->u.uop.src = src;
@@ -235,7 +234,7 @@ S X86_Stm_new_uop(R dest, Operator_t opr, R src) {
 
 S X86_Stm_new_call(Id_t f) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_CALL;
     s->u.call.name = f;
     return s;
@@ -243,7 +242,7 @@ S X86_Stm_new_call(Id_t f) {
 
 S X86_Stm_new_cmp(R dest, R src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_CMP;
     s->u.cmp.src = src;
     s->u.cmp.dest = dest;
@@ -252,7 +251,7 @@ S X86_Stm_new_cmp(R dest, R src) {
 
 S X86_Stm_new_label(Label_t label) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_LABEL;
     s->u.label = label;
     return s;
@@ -260,7 +259,7 @@ S X86_Stm_new_label(Label_t label) {
 
 S X86_Stm_new_je(Label_t label) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_JE;
     s->u.je = label;
     return s;
@@ -268,7 +267,7 @@ S X86_Stm_new_je(Label_t label) {
 
 S X86_Stm_new_jl(Label_t label) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_JL;
     s->u.jl = label;
     return s;
@@ -276,7 +275,7 @@ S X86_Stm_new_jl(Label_t label) {
 
 S X86_Stm_new_jump(Label_t label) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_JUMP;
     s->u.jump = label;
     return s;
@@ -284,7 +283,7 @@ S X86_Stm_new_jump(Label_t label) {
 
 S X86_Stm_new_push(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_PUSH;
     s->u.push = r;
     return s;
@@ -292,7 +291,7 @@ S X86_Stm_new_push(X86_Register_t r) {
 
 S X86_Stm_new_neg(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_NEG;
     s->u.neg = r;
     return s;
@@ -300,7 +299,7 @@ S X86_Stm_new_neg(X86_Register_t r) {
 
 S X86_Stm_new_setl(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_SETL;
     s->u.setAny = r;
     return s;
@@ -308,7 +307,7 @@ S X86_Stm_new_setl(X86_Register_t r) {
 
 S X86_Stm_new_setle(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_SETLE;
     s->u.setAny = r;
     return s;
@@ -316,7 +315,7 @@ S X86_Stm_new_setle(X86_Register_t r) {
 
 S X86_Stm_new_setg(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_SETG;
     s->u.setAny = r;
     return s;
@@ -324,7 +323,7 @@ S X86_Stm_new_setg(X86_Register_t r) {
 
 S X86_Stm_new_setge(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_SETGE;
     s->u.setAny = r;
     return s;
@@ -332,7 +331,7 @@ S X86_Stm_new_setge(X86_Register_t r) {
 
 S X86_Stm_new_sete(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_SETE;
     s->u.setAny = r;
     return s;
@@ -340,7 +339,7 @@ S X86_Stm_new_sete(X86_Register_t r) {
 
 S X86_Stm_new_setne(X86_Register_t r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_SETNE;
     s->u.setAny = r;
     return s;
@@ -348,28 +347,28 @@ S X86_Stm_new_setne(X86_Register_t r) {
 
 S X86_Stm_new_extendAl() {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_EXTENDAL;
     return s;
 }
 
 S X86_Stm_new_return() {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_RETURN;
     return s;
 }
 
 S X86_Stm_new_cltd() {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_CLTD;
     return s;
 }
 
 S X86_Stm_new_xor(R dest, R src) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_XOR;
     s->u.xor.dest = dest;
     s->u.xor.src = src;
@@ -378,7 +377,7 @@ S X86_Stm_new_xor(R dest, R src) {
 
 S X86_Stm_new_not(R r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_NOT;
     s->u.not = r;
     return s;
@@ -386,7 +385,7 @@ S X86_Stm_new_not(R r) {
 
 S X86_Stm_new_inc(R r) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = X86_STM_INC;
     s->u.inc = r;
     return s;
@@ -408,10 +407,10 @@ static void X86_Operator_print(Operator_t o) {
             return;
         default:
             TODO;
-            Error_impossible ();
+            Error_impossible();
             return;
     }
-    Error_impossible ();
+    Error_impossible();
     return;
 }
 
@@ -423,7 +422,7 @@ static void space4() {
 }
 
 void X86_Stm_print(S s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case X86_STM_MOVERR:
             space4();
@@ -553,7 +552,7 @@ void X86_Stm_print(S s) {
         case X86_STM_NOT: {
             space4();
             print("notl ");
-            X86_Register_print(s->u.not);
+            X86_Register_print(s->u.not );
             break;
         }
         case X86_STM_RETURN:
@@ -582,7 +581,7 @@ F X86_Fun_new(Id_t type, Id_t name, List_t args,
               Id_t retId,
               Label_t entry, Label_t exitt) {
     F f;
-    Mem_NEW (f);
+    Mem_NEW(f);
     f->type = type;
     f->name = name;
     f->args = args;
@@ -595,10 +594,10 @@ F X86_Fun_new(Id_t type, Id_t name, List_t args,
 }
 
 
-static void X86_Dec_print(X86_Struct_t);
+//static void X86_Dec_print(X86_Struct_t);
 
 void X86_Fun_print(F f) {
-    Assert_ASSERT(f);
+    assert(f);
     print("\t.text\n");
     print("\t.globl _");
     print(Id_toString(f->name));
@@ -624,33 +623,33 @@ void X86_Fun_print(F f) {
 
 Stt X86_Struct_new(Id_t type, Id_t var) {
     Stt x;
-    Mem_NEW (x);
+    Mem_NEW(x);
     x->type = type;
     x->var = var;
     return x;
 }
 
 void X86_Struct_print(Stt x) {
-    Assert_ASSERT(x);
+    assert(x);
     print(Id_toString(x->type));
     print(" ");
     print(Id_toString(x->var));
     print(";\n");
 }
 
-static void X86_Dec_print(Stt x) {
-    Assert_ASSERT(x);
-    print("\t");
-    print(Id_toString(x->type));
-    print(" ");
-    print(Id_toString(x->var));
-    print(";\n");
-}
+//static void X86_Dec_print(Stt x) {
+//    assert(x);
+//    print("\t");
+//    print(Id_toString(x->type));
+//    print(" ");
+//    print(Id_toString(x->var));
+//    print(";\n");
+//}
 
 
 Str X86_Str_new(Id_t name, String_t value) {
     Str d;
-    Mem_NEW (d);
+    Mem_NEW(d);
     d->name = name;
     d->value = value;
     return d;
@@ -705,7 +704,7 @@ static void printStrs(List_t strings) {
 
 M X86_Mask_new(Id_t name, int size, List_t index) {
     M m;
-    Mem_NEW (m);
+    Mem_NEW(m);
     m->name = name;
     m->size = size;
     m->index = index;
@@ -715,7 +714,7 @@ M X86_Mask_new(Id_t name, int size, List_t index) {
 File_t X86_Mask_print(File_t file, M m) {
     List_t p;
 
-    Assert_ASSERT(m);
+    assert(m);
     fprintf(file, "%s", Id_toString(m->name));
     fprintf(file, ":\n\t.int ");
     fprintf(file, "%s", Int_toString(m->size));
@@ -747,7 +746,7 @@ static void printMask(File_t file, List_t ms) {
 P X86_Prog_new(List_t strings, List_t masks, List_t funcs) {
     P p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
     p->strings = strings;
     p->masks = masks;
     p->funcs = funcs;
@@ -755,8 +754,8 @@ P X86_Prog_new(List_t strings, List_t masks, List_t funcs) {
 }
 
 File_t X86_Prog_print(File_t file, P p) {
-    Assert_ASSERT(file);
-    Assert_ASSERT(p);
+    assert(file);
+    assert(p);
 
     file_init(file);
     buffer_init();

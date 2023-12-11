@@ -1,11 +1,11 @@
 #ifndef AST_H
 #define AST_H
 
-#include "../lib/list.h"
-#include "../lib/file.h"
-#include "../lib/box.h"
 #include "../control/region.h"
 #include "../elaborate/type.h"
+#include "../lib/box.h"
+#include "../lib/file.h"
+#include "../lib/list.h"
 #include "ast-id.h"
 
 #define Id_t AstId_t
@@ -115,7 +115,7 @@ struct E {
             /* List_t<E> */
             List_t args;
         } newClass;
-        int intlit;
+        long intlit;
         String_t stringlit;
         struct {
             AstId_t f;
@@ -138,7 +138,7 @@ E Ast_Exp_new_bop(Ast_Exp_Kind_t kind, E left, E right, Type_t ty, Region_t r);
 E Ast_Exp_new_unary(Ast_Exp_Kind_t kind,
                     E e, Type_t ty, Region_t r);
 
-E Ast_Exp_new_null();
+E Ast_Exp_new_null(void);
 
 E Ast_Exp_new_intlit(String_t);
 
@@ -176,7 +176,7 @@ struct S {
         struct {
             E cond;
             S then;
-            S elsee; // empty list for dangling else (not 0)
+            S elsee;// empty list for dangling else (not 0)
         } iff;
         struct {
             E cond;
@@ -229,8 +229,8 @@ Box_t Ast_Stm_box(S);
 File_t Ast_Stm_print(File_t file, S);
 
 /////////////////////////////////////////////////////
-// declaration. for 3 purposes: 
-//   * class fields, 
+// declaration. for 3 purposes:
+//   * class fields,
 //   * local dec, and
 //   * function argument declaration.
 //
@@ -285,13 +285,13 @@ struct T {
         AST_TYPE_STRING,
         AST_TYPE_ID
     } kind;
-    Id_t id;       // effective only for AST_TYPE_ID
-    int isArray;   // 1 for array, otherwise 0.
+    Id_t id;    // effective only for AST_TYPE_ID
+    int isArray;// 1 for array, otherwise 0.
 };
 
-T Ast_Type_new_int();
+T Ast_Type_new_int(void);
 
-T Ast_Type_new_string();
+T Ast_Type_new_string(void);
 
 T Ast_Type_new_id(Id_t id);
 
@@ -346,4 +346,3 @@ void Ast_Prog_print(File_t file, P x);
 #undef Id_t
 
 #endif
-

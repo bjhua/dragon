@@ -1,12 +1,12 @@
-#include "../lib/assert.h"
-#include "../lib/list.h"
-#include "../lib/trace.h"
-#include "../lib/property.h"
-#include "../lib/error.h"
-#include "../control/log.h"
-#include "../control/control.h"
-#include "runtime.h"
 #include "gen-layout.h"
+#include "../control/control.h"
+#include "../control/log.h"
+#include "../lib/error.h"
+#include "../lib/list.h"
+#include "../lib/property.h"
+#include "../lib/trace.h"
+#include "runtime.h"
+#include <assert.h>
 
 // Generate object layout information for each class.
 
@@ -22,9 +22,9 @@ static Property_t fieldProp = 0;
 static Property_t sizeProp = 0;
 
 
-// 
+//
 static Machine_Mem_t genMem(Machine_Mem_t m) {
-    Assert_ASSERT(m);
+    assert(m);
     switch (m->kind) {
         case MACHINE_MEM_ARRAY:
             return m;
@@ -33,14 +33,14 @@ static Machine_Mem_t genMem(Machine_Mem_t m) {
             return Machine_Mem_new_class(m->u.class.name, m->u.class.field, index);
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
-// 
+//
 static Machine_Stm_t genStm(Machine_Stm_t s) {
     switch (s->kind) {
         case MACHINE_STM_STORE: {
@@ -60,32 +60,30 @@ static Machine_Stm_t genStm(Machine_Stm_t s) {
 
             switch (ty->kind) {
                 case ATYPE_INT:
-                    return Machine_Stm_Runtime_array
-                            (s->u.newArray.dest, 0, s->u.newArray.size, Control_Target_size, Runtime_array);
+                    return Machine_Stm_Runtime_array(s->u.newArray.dest, 0, s->u.newArray.size, Control_Target_size, Runtime_array);
                 case ATYPE_STRING:
-                    return Machine_Stm_Runtime_array
-                            (s->u.newArray.dest, 0, s->u.newArray.size, Control_Target_size, Runtime_array);
+                    return Machine_Stm_Runtime_array(s->u.newArray.dest, 0, s->u.newArray.size, Control_Target_size, Runtime_array);
                 case ATYPE_CLASS:
-                    return Machine_Stm_Runtime_array
-                            (s->u.newArray.dest, 1, s->u.newArray.size, Control_Target_size, Runtime_array);
+                    return Machine_Stm_Runtime_array(s->u.newArray.dest, 1, s->u.newArray.size, Control_Target_size, Runtime_array);
                 default:
-                    Error_impossible ();
+                    Error_impossible();
                     return 0;
             }
         }
         default:
             return s;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
-// 
+//
 static Machine_Block_t genBlock(Machine_Block_t b) {
     List_t newStms;
 
     newStms = List_map(b->stms, (Poly_tyId) genStm);
-    return Machine_Block_new(b->label, newStms, b->transfer);;
+    return Machine_Block_new(b->label, newStms, b->transfer);
+    ;
 }
 
 static Machine_Fun_t genFunc(Machine_Fun_t f) {
@@ -106,7 +104,7 @@ static Machine_ObjInfo_t genLayout(Class_t class) {
     List_t decs;
     long num = 0;
 
-    Assert_ASSERT(class);
+    assert(class);
 
     name = class->name;
     decs = class->decs;

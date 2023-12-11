@@ -1,15 +1,16 @@
+#include "hash.h"
+#include "double.h"
+#include "error.h"
+#include "int.h"
+#include "list.h"
+#include "mem.h"
+#include "string.h"
+#include "todo.h"
+#include "triple.h"
+#include "unused.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "assert.h"
-#include "int.h"
-#include "double.h"
-#include "mem.h"
-#include "list.h"
-#include "string.h"
-#include "error.h"
-#include "triple.h"
-#include "todo.h"
-#include "hash.h"
 
 #define INIT_SIZE 4096
 #define INIT_MASK 4095
@@ -35,18 +36,17 @@ struct T {
     double load;
 };
 
-T Hash_newRaw(long (*hashCode)(K), long (*equals)(K, K)) {
-    return Hash_new(hashCode, equals, 0);
-}
+//T Hash_newRaw(long (*hashCode)(K), long (*equals)(K, K)) {
+//    return Hash_new(hashCode, equals, 0);
+//}
 
 T Hash_new(long (*hashCode)(K), long (*equals)(K, K), void (*dup)(K, K)) {
-    int i;
     T h;
 
-    Mem_NEW (h);
-    Mem_NEW_SIZE (h->buckets, INIT_SIZE);
+    Mem_NEW(h);
+    Mem_NEW_SIZE(h->buckets, INIT_SIZE);
 
-    for (i = 0; i < INIT_SIZE; i++)
+    for (long i = 0; i < INIT_SIZE; i++)
         *(h->buckets + i) = List_new();
     h->hashCode = hashCode;
     h->equals = equals;
@@ -60,33 +60,33 @@ T Hash_new(long (*hashCode)(K), long (*equals)(K, K), void (*dup)(K, K)) {
 }
 
 static double currentLoad(T h) {
-    return 1.0 * h->numItems / h->size;
+    return 1.0 * (double) h->numItems / (double) h->size;
 }
 
-T Hash_clone(T old) {
-    T h;
-    int i;
-    int newSize = old->size * 2;
-
-    Mem_NEW (h);
-    Mem_NEW_SIZE (h->buckets, newSize);
-
-    for (i = 0; i < newSize; i++)
-        *(h->buckets + i) = List_new();
-    h->numItems = old->numItems + 1;
-    h->size = newSize;
-    h->mask = newSize - 1;
-    h->hashCode = old->hashCode;
-    h->equals = old->equals;
-    return h;
-}
+//T Hash_clone(T old) {
+//    T h;
+//    int i;
+//    int newSize = old->size * 2;
+//
+//    Mem_NEW(h);
+//    Mem_NEW_SIZE(h->buckets, newSize);
+//
+//    for (i = 0; i < newSize; i++)
+//        *(h->buckets + i) = List_new();
+//    h->numItems = old->numItems + 1;
+//    h->size = newSize;
+//    h->mask = newSize - 1;
+//    h->hashCode = old->hashCode;
+//    h->equals = old->equals;
+//    return h;
+//}
 
 typedef struct {
-    int insertions;
-    int lookups;
-    int links;
-    int longest;
-    int maxSize;
+    long insertions;
+    long lookups;
+    long links;
+    long longest;
+    long maxSize;
     double maxLoad;
 } Status_t;
 
@@ -97,7 +97,7 @@ void Hash_insert(T h, K k, V v) {
     List_t list;
     K result;
 
-    Assert_ASSERT (h);
+    assert(h);
     all.insertions++;
     if (Hash_lookupCand(h, k, &result)) {
         if (h->dup) {
@@ -114,27 +114,24 @@ void Hash_insert(T h, K k, V v) {
     if (currentLoad(h) >= h->load) {
         List_t *oldBuckets, *newBuckets;
         long oldSize, newSize;
-        long i;
 
         oldBuckets = h->buckets;
         oldSize = h->size;
         newSize = oldSize * 2;
-        Mem_NEW_SIZE (newBuckets, newSize);
-        for (i = 0; i < newSize; i++)
+        Mem_NEW_SIZE(newBuckets, newSize);
+        for (long i = 0; i < newSize; i++)
             *(newBuckets + i) = List_new();
         h->buckets = newBuckets;
         h->size = newSize;
         h->mask = newSize - 1;
-        for (i = 0; i < oldSize; i++) {
-            List_t list;
-            list = *(oldBuckets + i);
-            list = List_getFirst(list);
-            while (list) {
-                Triple_t t = (Triple_t) (list->data);
-                long initHc = (long) Triple_second(t);
-
-                List_insertLast
-                        (*(newBuckets + (initHc & h->mask)), t);
+        for (long i = 0; i < oldSize; i++) {
+            List_t listx = *(oldBuckets + i);
+            listx = List_getFirst(listx);
+            while (listx) {
+                Triple_t t = (Triple_t) (listx->data);
+                Poly_t p = Triple_second(t);
+                long initHcx = (long) p;
+                List_insertLast(*(newBuckets + (initHcx & h->mask)), t);
                 list = list->next;
             }
         }
@@ -158,7 +155,7 @@ static int longestChain(T h) {
 static int numEmptyBuckets(T h) {
     int empty = 0;
     int i;
-    Assert_ASSERT(h);
+    assert(h);
 
     for (i = 0; i < h->size; i++) {
         if (List_isEmpty(*(h->buckets + i)))
@@ -171,24 +168,23 @@ String_t Hash_status(T h) {
     int empty;
     String_t s;
 
-    Assert_ASSERT(h);
+    assert(h);
     empty = numEmptyBuckets(h);
-    s = String_concat
-            ("number of items are: ",
-             Int_toString(h->numItems),
-             "\nnumber of buckets: ",
-             Int_toString(h->size),
-             "\nnumber of empty buckets: ",
-             numEmptyBuckets(h),
-             "\nnumber of not empty buckets: ",
-             Int_toString(h->size - empty),
-             "\nlongest chain size: ",
-             Int_toString(longestChain(h)),
-             "\ncrrent load factor: ",
-             Double_toString(h->load),
-             "\ndefault load factor: ",
-             Double_toString(INIT_LOAD_FACTOR),
-             0);
+    s = String_concat("number of items are: ",
+                      Int_toString(h->numItems),
+                      "\nnumber of buckets: ",
+                      Int_toString(h->size),
+                      "\nnumber of empty buckets: ",
+                      numEmptyBuckets(h),
+                      "\nnumber of not empty buckets: ",
+                      Int_toString(h->size - empty),
+                      "\nlongest chain size: ",
+                      Int_toString(longestChain(h)),
+                      "\ncrrent load factor: ",
+                      Double_toString(h->load),
+                      "\ndefault load factor: ",
+                      Double_toString(INIT_LOAD_FACTOR),
+                      0);
     return s;
 }
 
@@ -197,26 +193,26 @@ V Hash_lookup(T h, K x) {
 }
 
 V Hash_lookupCand(T h, K x, K *result) {
-    int hc;
-    int link = 0;
-    int size;
+    long hc;
+    long link = 0;
     double load;
     List_t list;
 
-    Assert_ASSERT (h);
+    assert(h);
 
     all.lookups++;
-    size = Hash_size(h);
+    long size = Hash_size(h);
     if (size > all.maxSize)
         all.maxSize = size;
-    load = 1.0 * Hash_numItems(h) / size;
+    long ns = Hash_numItems(h);
+    load = 1.0 * (double) ns / (double) size;
     if (load > all.maxLoad)
         all.maxLoad = load;
 
     hc = h->hashCode(x);
     hc &= h->mask;
 
-    Assert_ASSERT((hc >= 0 && hc < h->size));
+    assert((hc >= 0 && hc < h->size));
 
     list = List_getFirst(*(h->buckets + hc));
     while (list) {
@@ -252,16 +248,18 @@ V Hash_lookupOrInsert(T h, K k, V (*gen)(K)) {
 }
 
 void Hash_delete(T h, K k) {
+    UNUSED(h);
+    UNUSED(k);
     TODO;
 }
 
-int Hash_size(T h) {
-    Assert_ASSERT (h);
+long Hash_size(T h) {
+    assert(h);
     return h->size;
 }
 
-int Hash_numItems(T h) {
-    Assert_ASSERT(h);
+long Hash_numItems(T h) {
+    assert(h);
     return h->numItems;
 }
 
@@ -302,14 +300,14 @@ List_t Hash_keyToList(T h) {
 
 void Hash_statusAll() {
     printf("%s\n", "Hash table status:");
-    printf("  Num of insertions: %d\n", all.insertions);
-    printf("  Num of lookups   : %d\n", all.lookups);
-    printf("  Num of links     : %d\n", all.links);
-    printf("  Longest chain    : %d\n", all.longest);
-    printf("  Max hash size    : %d\n", all.maxSize);
+    printf("  Num of insertions: %ld\n", all.insertions);
+    printf("  Num of lookups   : %ld\n", all.lookups);
+    printf("  Num of links     : %ld\n", all.links);
+    printf("  Longest chain    : %ld\n", all.longest);
+    printf("  Max hash size    : %ld\n", all.maxSize);
     printf("  Max load factor  : %lf\n", all.maxLoad);
     printf("  Average position : %lf\n",
-           1.0 * all.links / all.lookups);
+           1.0 * (double) all.links / (double) all.lookups);
     return;
 }
 

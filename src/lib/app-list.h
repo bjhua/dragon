@@ -22,7 +22,7 @@ T AppList_fromItem(Poly_t x);
 // argument: List<P>
 T AppList_fromItemList(List_t);
 // An empty applist
-T AppList_new_empty();
+T AppList_new_empty(void);
 
 List_t AppList_toList(T);
 

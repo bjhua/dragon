@@ -1,12 +1,13 @@
-#include "../lib/assert.h"
+#include "construct-ssa.h"
+#include "../control/log.h"
 #include "../lib/error.h"
 #include "../lib/property.h"
-#include "../lib/trace.h"
 #include "../lib/set.h"
 #include "../lib/stack.h"
+#include "../lib/trace.h"
 #include "../lib/tuple.h"
-#include "../control/log.h"
-#include "construct-ssa.h"
+#include "../lib/unused.h"
+#include <assert.h>
 
 
 static Ssa_Fun_t renameVar(Ssa_Fun_t f, Graph_t g, Tree_t tree);
@@ -14,18 +15,21 @@ static Ssa_Fun_t renameVar(Ssa_Fun_t f, Graph_t g, Tree_t tree);
 /////////////////////////////////////////////////////
 // properties:
 // Ssa_Block_t -> Set<Ssa_Block_t>
-// given a block, return it's dominance frontier
+// given a block, return its dominance frontier
 static Property_t dfProp = 0;
-
-static Set_t dfPropInitFun(Ssa_Block_t b) {
-    return Set_new((Poly_tyEquals) Ssa_Block_equals);
-}
+//
+//static Set_t dfPropInitFun(Ssa_Block_t b) {
+//    UNUSED(b);
+//    return Set_new((Poly_tyEquals) Ssa_Block_equals);
+//}
 
 // Ssa_Block_t -> Set<Id_t>
 // given a block, return set of vars defined in phi-stm
 static Property_t phiVarsProp = 0;
 
 static Set_t phiVarsPropInitFun(Ssa_Block_t b) {
+    UNUSED(b);
+    
     return Set_new((Poly_tyEquals) Id_equals);
 }
 
@@ -35,6 +39,8 @@ static Set_t phiVarsPropInitFun(Ssa_Block_t b) {
 static Property_t defSitesProp = 0;
 
 static Set_t defSitesPropInitFun(Id_t id) {
+    UNUSED(id);
+
     return Set_new((Poly_tyEquals) Ssa_Block_equals);
 }
 
@@ -74,13 +80,14 @@ static Ssa_Block_t markDefSitesOneTraced(Ssa_Block_t b) {
 }
 
 static void dumb(Ssa_Block_t b) {
+    UNUSED(b);
 }
 
 static void markDefSitesOne(Ssa_Block_t b) {
     Ssa_Block_t r;
 
     Trace_TRACE("markDefSites", markDefSitesOneTraced, (b), dumb, r, dumb);
-    return;
+    //    return;
 }
 
 // This function implements algorithm 19.6 in Appel's book.
@@ -112,9 +119,9 @@ static void insertPhiOne(Dec_t dec) {
                 Set_insert(w, y);
 
             dfList = dfList->next;
-        } // end of inner while
-    } // end of outer while
-    return;
+        }// end of inner while
+    }    // end of outer while
+    //    return;
 }
 
 static void printDefSites(Dec_t dec) {
@@ -133,7 +140,7 @@ static void printDefSites(Dec_t dec) {
         blockList = blockList->next;
     }
     Log_str("]");
-    return;
+    //    return;
 }
 
 static void printOrigVars(Ssa_Block_t b) {
@@ -150,7 +157,7 @@ static void printOrigVars(Ssa_Block_t b) {
         origVarsList = origVarsList->next;
     }
     Log_str("]");
-    return;
+    //    return;
 }
 
 static void printPhiVars(Ssa_Block_t b) {
@@ -183,7 +190,7 @@ static void printDf(Ssa_Block_t b) {
         dfList = dfList->next;
     }
     Log_str("]");
-    return;
+    //    return;
 }
 
 static List_t realInsertPhi(List_t bs, Graph_t g) {
@@ -196,14 +203,12 @@ static List_t realInsertPhi(List_t bs, Graph_t g) {
         Ssa_Block_t fresh;
         Set_t phiVars = Property_get(phiVarsProp,
                                      b);
-        List_t phiVarsList
-                = List_getFirst(Set_toList(phiVars));
+        List_t phiVarsList = List_getFirst(Set_toList(phiVars));
 
         while (phiVarsList) {
             Id_t var = (Id_t) phiVarsList->data;
             List_t preds = Graph_predessors(g, b);
-            Ssa_Stm_t phi
-                    = Ssa_Stm_new_phi_predsBlock(var, preds);
+            Ssa_Stm_t phi = Ssa_Stm_new_phi_predsBlock(var, preds);
 
             List_insertLast(phiStms, phi);
             phiVarsList = phiVarsList->next;
@@ -223,20 +228,17 @@ static Ssa_Fun_t insertPhiAndRename(Ssa_Fun_t f) {
     Tree_t tree;
     Ssa_Fun_t tempf;
 
-    Assert_ASSERT(f);
+    assert(f);
 
     blocks = f->blocks;
 
     // map every id to a set of its definition block
     // Id_t -> Set_t<Ssa_Block_t>
-    defSitesProp
-            = Property_newInitFun
-            ((Poly_tyPlist) Id_plist, (Poly_tyPropInit) defSitesPropInitFun);
+    defSitesProp = Property_newInitFun((Poly_tyPlist) Id_plist, (Poly_tyPropInit) defSitesPropInitFun);
 
     // a set of vars that originially defined in a block
     // excluding phis
-    origVarsProp
-            = Property_new((Poly_tyPlist) Ssa_Block_plist);
+    origVarsProp = Property_new((Poly_tyPlist) Ssa_Block_plist);
 
     // two jobs:
     //   1. mark each var for its definition blocks, and
@@ -254,15 +256,12 @@ static Ssa_Fun_t insertPhiAndRename(Ssa_Fun_t f) {
 
     // insert phi
     // this is the phi-vars on every block
-    phiVarsProp
-            = Property_newInitFun
-            ((Poly_tyPlist) Ssa_Block_plist, (Poly_tyPropInit) phiVarsPropInitFun);
+    phiVarsProp = Property_newInitFun((Poly_tyPlist) Ssa_Block_plist, (Poly_tyPropInit) phiVarsPropInitFun);
 
     dfProp = Property_new((Poly_tyPlist) Ssa_Block_plist);
 
     g = Ssa_Fun_toGraph(f);
-    tree = Graph_df
-            (g, (Poly_t) Ssa_Fun_searchLabel(f, f->entry), (void (*)(Poly_t, Set_t)) markDf);
+    tree = Graph_df(g, (Poly_t) Ssa_Fun_searchLabel(f, f->entry), (void (*)(Poly_t, Set_t)) markDf);
 
     Log_str("checking dominance frontier starting:");
     List_foreach(blocks, (Poly_tyVoid) printDf);
@@ -280,8 +279,7 @@ static Ssa_Fun_t insertPhiAndRename(Ssa_Fun_t f) {
     tempf = Ssa_Fun_new(f->type, f->name, f->args, f->decs, blocks, f->retId, f->entry, f->exitt);
 
     g = Ssa_Fun_toGraph(tempf);
-    tree = Graph_df
-            (g, (Poly_t) Ssa_Fun_searchLabel(f, f->entry), (void (*)(Poly_t, Set_t)) markDf);
+    tree = Graph_df(g, (Poly_t) Ssa_Fun_searchLabel(f, f->entry), (void (*)(Poly_t, Set_t)) markDf);
 
     Log_strs("num of blocks in this function =", Int_toString(List_size(blocks)), "\n", 0);
 
@@ -335,6 +333,8 @@ static Property_t substProp = 0;
 static Property_t substPhiProp = 0;
 
 static List_t substPhiPropInitFun(Ssa_Block_t b) {
+    UNUSED(b);
+
     return List_new();
 }
 
@@ -343,6 +343,7 @@ static List_t substPhiPropInitFun(Ssa_Block_t b) {
 static Property_t freshNameProp = 0;
 
 static List_t freshNamePropInitFun(Id_t id) {
+    UNUSED(id);
     return List_new();
 }
 
@@ -355,7 +356,7 @@ static Id_t use(Id_t id) {
         printf("id = %s\n", Id_toString(id));
         Log_reset();
         printf("empty stack on id: %s\n", Id_toString(id));
-        Error_impossible ();
+        Error_impossible();
     }
     newid = Stack_getTop(stk);
     return newid;
@@ -363,9 +364,7 @@ static Id_t use(Id_t id) {
 
 static void callBackSubstPhiProp(Ssa_Block_t current, Ssa_Block_t pred, Id_t oldid) {
     Id_t new = use(oldid);
-    Ssa_Stm_PhiArg_t arg
-            = Ssa_Stm_PhiArg_new
-                    (Ssa_Operand_new_id(oldid), pred);
+    Ssa_Stm_PhiArg_t arg = Ssa_Stm_PhiArg_new(Ssa_Operand_new_id(oldid), pred);
     Tuple_t t = Tuple_new(arg, new);
     List_t l = Property_get(substPhiProp, current);
     Log_strs("record (", Id_toString(oldid), ", ", Label_toString(pred->label), ") ~~~~> ", Id_toString(new), " on ",
@@ -518,17 +517,11 @@ static Ssa_Fun_t renameVarTraced(Ssa_Fun_t f, Graph_t g, Tree_t tree) {
     Ssa_Fun_t newf;
     List_t newDecs;
 
-    stackProp
-            = Property_newInitFun
-            ((Poly_tyPlist) Id_plist, (Poly_tyPropInit) stackPropInitFun);
+    stackProp = Property_newInitFun((Poly_tyPlist) Id_plist, (Poly_tyPropInit) stackPropInitFun);
     substProp = Property_new((Poly_tyPlist) Ssa_Block_plist);
-    substPhiProp
-            = Property_newInitFun
-            ((Poly_tyPlist) Ssa_Block_plist, (Poly_tyPropInit) substPhiPropInitFun);
+    substPhiProp = Property_newInitFun((Poly_tyPlist) Ssa_Block_plist, (Poly_tyPropInit) substPhiPropInitFun);
 
-    freshNameProp
-            = Property_newInitFun
-            ((Poly_tyPlist) Id_plist, (Poly_tyPropInit) freshNamePropInitFun);
+    freshNameProp = Property_newInitFun((Poly_tyPlist) Id_plist, (Poly_tyPropInit) freshNamePropInitFun);
 
     Log_str("renameVar starting:");
     theg = g;
@@ -561,9 +554,13 @@ static Ssa_Fun_t renameVarTraced(Ssa_Fun_t f, Graph_t g, Tree_t tree) {
 }
 
 static void dumb1(Ssa_Fun_t f, Graph_t g, Tree_t tree) {
+    UNUSED(f);
+    UNUSED(g);
+    UNUSED(tree);
 }
 
 static void dumb2(Ssa_Fun_t f) {
+    UNUSED(f);
 }
 
 static Ssa_Fun_t renameVar(Ssa_Fun_t f, Graph_t g, Tree_t tree) {
@@ -576,9 +573,9 @@ static Ssa_Fun_t renameVar(Ssa_Fun_t f, Graph_t g, Tree_t tree) {
 //////////////////////////////////////////////////////
 // functions
 static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
-    Ssa_Block_t eb;    // entry block
+    //    Ssa_Block_t eb;// entry block
 
-    Assert_ASSERT(f);
+    assert(f);
     //Log_dot (Ssa_Fun_toDot, f, "raw");
     Log_strs("now ready to translate function: ", Id_toString(f->name), "\n", 0);
     f = insertPhiAndRename(f);
@@ -592,7 +589,7 @@ static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
 static Ssa_Prog_t Ssa_constructSsaTraced(Ssa_Prog_t p) {
     List_t newFuncs;
 
-    Assert_ASSERT(p);
+    assert(p);
     newFuncs = List_map(p->funcs, (Poly_tyId) transFunEach);
     return Ssa_Prog_new(p->classes, newFuncs);
 }
@@ -620,4 +617,3 @@ Ssa_Prog_t Ssa_constructSsa(Ssa_Prog_t p) {
     Trace_TRACE("Ssa_constructSsa", Ssa_constructSsaTraced, (p), printArg, r, printResult);
     return r;
 }
-

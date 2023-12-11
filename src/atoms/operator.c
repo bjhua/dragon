@@ -1,5 +1,5 @@
-#include "../lib/error.h"
 #include "operator.h"
+#include "../lib/error.h"
 
 #define T Operator_t
 
@@ -37,14 +37,14 @@ String_t Operator_toString(T t) {
             return "-";
         default:
             fprintf(stderr, "%d\n", t);
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
-int Operator_binary(int left, T t, int right) {
+long Operator_binary(long left, T t, long right) {
     switch (t) {
         case OP_ADD:
             return left + right;
@@ -77,20 +77,20 @@ int Operator_binary(int left, T t, int right) {
         case OP_GE:
             return left >= right;
         case OP_NOT:
-            Error_impossible ();
+            Error_impossible();
             return 0;
         case OP_NEG:
-            Error_impossible ();
+            Error_impossible();
             return 0;
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
-int Operator_unary(T t, int x) {
+long Operator_unary(Operator_t t, long x) {
     switch (t) {
         case OP_NOT:
             return !x;
@@ -98,10 +98,36 @@ int Operator_unary(T t, int x) {
             return -x;
         default:
             fprintf(stderr, "%d", t);
-            Error_impossible ();
+            Error_impossible();
             return 0;
+        case OP_ADD:
+            break;
+        case OP_SUB:
+            break;
+        case OP_TIMES:
+            break;
+        case OP_DIVIDE:
+            break;
+        case OP_MODUS:
+            break;
+        case OP_OR:
+            break;
+        case OP_AND:
+            break;
+        case OP_EQ:
+            break;
+        case OP_NE:
+            break;
+        case OP_LT:
+            break;
+        case OP_LE:
+            break;
+        case OP_GT:
+            break;
+        case OP_GE:
+            break;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 

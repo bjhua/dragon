@@ -1,12 +1,13 @@
+#include "command-line.h"
+#include "../lib/error.h"
+#include "../lib/int.h"
+#include "../lib/io.h"
+#include "../lib/trace.h"
+#include "../lib/unused.h"
+#include "control.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../lib/io.h"
-#include "../lib/int.h"
-#include "../lib/error.h"
-#include "../lib/assert.h"
-#include "../lib/trace.h"
-#include "control.h"
-#include "command-line.h"
 
 static void errorNoName(String_t);
 
@@ -14,16 +15,13 @@ static void errorWrongArg(String_t, String_t, String_t);
 
 typedef enum {
     ARGTYPE_BOOL,
-    ARGTYPE_EMPTY, // expects no argument
+    ARGTYPE_EMPTY,// expects no argument
     ARGTYPE_INT,
     ARGTYPE_STRING,
 } ArgType_t;
 
 //////////////////////////////////////////////////////
 /*        all functions */
-static void Arg_setAssert(long b) {
-    Assert_flag = b;
-}
 
 static void Arg_setBuffer(long i) {
     Control_bufferSize = i;
@@ -38,7 +36,8 @@ static void Arg_setCodegen(String_t s) {
         Control_codegen = CODEGEN_C;
     else if (String_equals(s, "x86"))
         Control_codegen = CODEGEN_X86;
-    else errorWrongArg("-codegen", "{C|x86}", s);
+    else
+        errorWrongArg("-codegen", "{C|x86}", s);
     return;
 }
 
@@ -55,7 +54,8 @@ static void Arg_setDump(String_t s) {
         Control_dump_insert(DUMP_C);
     else if (String_equals(s, "x86"))
         Control_dump_insert(DUMP_X86);
-    else errorWrongArg("-dump", "<ir>", s);
+    else
+        errorWrongArg("-dump", "<ir>", s);
 }
 
 static void Arg_setExpert(long b) {
@@ -79,10 +79,14 @@ static void Arg_setO(String_t s) {
 }
 
 static void Arg_setS(void *arg) {
+    UNUSED(arg);
+
     Control_dump_insert(DUMP_X86);
 }
 
 static void Arg_setShowType(void *arg) {
+    UNUSED(arg);
+
     Control_showType = 1;
 }
 
@@ -120,118 +124,107 @@ static void Arg_setVerbose(long i) {
  * the following data structure defines this.
  */
 struct Arg_t {
-    Expert_t level;    // on what level should this see
-    String_t name;     // argument name
-    String_t arg;      // argument (for displaying)
-    String_t desc;     // argument description
-    ArgType_t argtype; // what type of argument expects
-    void (*action)(void *, ...);  // a call-back
+    Expert_t level;             // on what level should this see
+    String_t name;              // argument name
+    String_t arg;               // argument (for displaying)
+    String_t desc;              // argument description
+    ArgType_t argtype;          // what type of argument expects
+    void (*action)(void *, ...);// a call-back
 };
-typedef void(*TyArg)(void *, ...);
+typedef void (*TyArg)(void *, ...);
 
 /* all available arguments */
 static struct Arg_t allArgs[] = {
         {EXPERT_NORMAL,
-                        "assert",
-                                   "{false|true}",
-                                              "enable assertions",
-                                                                             ARGTYPE_BOOL,
-                (TyArg)Arg_setAssert},
+         "buffer",
+         "<n>",
+         "set output buffer size for file (n M)",
+         ARGTYPE_INT,
+         (TyArg) Arg_setBuffer},
+        {EXPERT_NORMAL, "codegen", "{C|x86}", "which code generator to use", ARGTYPE_STRING, (TyArg) Arg_setCodegen},
         {EXPERT_NORMAL,
-                        "buffer",
-                                   "<n>",
-                                              "set output buffer size for file (n M)",
-                                                                             ARGTYPE_INT,
-                (TyArg)Arg_setBuffer},
-        {EXPERT_NORMAL, "codegen", "{C|x86}", "which code generator to use", ARGTYPE_STRING, (TyArg)Arg_setCodegen},
+         "drop-pass",
+         "<pass>",
+         "drop this compiler pass",
+         ARGTYPE_STRING,
+         (TyArg) Arg_setDropPass},
         {EXPERT_NORMAL,
-                        "drop-pass",
-                                   "<pass>",
-                                              "drop this compiler pass",
-                                                                             ARGTYPE_STRING,
-                (TyArg)Arg_setDropPass},
-        {EXPERT_NORMAL,
-                        "dump",
-                                   "<il>",
-                                              "which intermediate "
-                                              "language to dump",
-                                                                             ARGTYPE_STRING,
-                (TyArg)Arg_setDump},
+         "dump",
+         "<il>",
+         "which intermediate "
+         "language to dump",
+         ARGTYPE_STRING,
+         (TyArg) Arg_setDump},
         {EXPERT_EXPERT,
-                        "expert",
-                                   "{false|true}",
-                                              "show expert level switches",
-                                                                             ARGTYPE_BOOL,
-                (TyArg)Arg_setExpert},
+         "expert",
+         "{false|true}",
+         "show expert level switches",
+         ARGTYPE_BOOL,
+         (TyArg) Arg_setExpert},
         {EXPERT_NORMAL,
-                        "jpg",
-                                   "{flase|true}",
-                                              "keep jpg files for ILs (require graphviz)",
-                                                                             ARGTYPE_BOOL,
-                (TyArg)Arg_setJpg},
+         "jpg",
+         "{flase|true}",
+         "keep jpg files for ILs (require graphviz)",
+         ARGTYPE_BOOL,
+         (TyArg) Arg_setJpg},
         {EXPERT_NORMAL,
-                        "labelinfo",
-                                   "{flase|true}",
-                                              "show extra information on labels",
-                                                                             ARGTYPE_BOOL,
-                (TyArg)Arg_setLabelInfo},
+         "labelinfo",
+         "{flase|true}",
+         "show extra information on labels",
+         ARGTYPE_BOOL,
+         (TyArg) Arg_setLabelInfo},
         {EXPERT_EXPERT,
-                        "log",
-                                   "<pass>",
-                                              "keep logs for a pass",
-                                                                             ARGTYPE_STRING,
-                (TyArg)Arg_setLog},
+         "log",
+         "<pass>",
+         "keep logs for a pass",
+         ARGTYPE_STRING,
+         (TyArg) Arg_setLog},
         {EXPERT_NORMAL,
-                        "o",
-                                   "<file>",
-                                              "set the output file name",
-                                                                             ARGTYPE_STRING,
-                (TyArg)Arg_setO},
+         "o",
+         "<file>",
+         "set the output file name",
+         ARGTYPE_STRING,
+         (TyArg) Arg_setO},
         {EXPERT_NORMAL,
-                        "S",
-                                   "",
-                                              "keep assembly",
-                                                                             ARGTYPE_EMPTY,
-                (TyArg)Arg_setS},
+         "S",
+         "",
+         "keep assembly",
+         ARGTYPE_EMPTY,
+         (TyArg) Arg_setS},
         {EXPERT_EXPERT,
-                        "showtype",
-                                   "{false|true}",
-                                              "show type information when dumping ILs",
-                                                                             ARGTYPE_BOOL,
-                (TyArg)Arg_setShowType},
+         "showtype",
+         "{false|true}",
+         "show type information when dumping ILs",
+         ARGTYPE_BOOL,
+         (TyArg) Arg_setShowType},
         {EXPERT_EXPERT,
-                        "trace",
-                                   "<name>",
-                                              "to trace a function",
-                                                                             ARGTYPE_STRING,
-                (TyArg)Arg_setTrace},
+         "trace",
+         "<name>",
+         "to trace a function",
+         ARGTYPE_STRING,
+         (TyArg) Arg_setTrace},
         {EXPERT_NORMAL,
-                        "verbose",
-                                   "{0|1|2|3}",
-                                              "how verbose to be",
-                                                                             ARGTYPE_INT,
-                (TyArg)Arg_setVerbose},
+         "verbose",
+         "{0|1|2|3}",
+         "how verbose to be",
+         ARGTYPE_INT,
+         (TyArg) Arg_setVerbose},
         {EXPERT_NORMAL,
-                        0,
-                                   0,
-                                              0,
-                                                                             ARGTYPE_EMPTY,
-                                                                                             0}
-};
+         0,
+         0,
+         0,
+         ARGTYPE_EMPTY,
+         0}};
 
 
 #define LEFT_SIZE 28
 #define INDENT_SIZE 3
 
-static void Arg_print() {
-    int left, i;
-
-    for (i = 0; allArgs[i].action; ++i) {
-        if (!Control_Verb_order
-                ((Verbose_t) allArgs[i].level, (Verbose_t) Control_expert))
+static void Arg_print(void) {
+    for (long i = 0; allArgs[i].action; ++i) {
+        if (!Control_Verb_order((Verbose_t) allArgs[i].level, (Verbose_t) Control_expert))
             return;
-        left = INDENT_SIZE + 1 + String_size(allArgs[i].name)
-               + 1 + String_size(allArgs[i].arg) + 1;
+        long left = INDENT_SIZE + 1 + String_size(allArgs[i].name) + 1 + String_size(allArgs[i].arg) + 1;
         Io_printSpaces(INDENT_SIZE);
         printf("-%s", allArgs[i].name);
         printf(" ");
@@ -239,7 +232,8 @@ static void Arg_print() {
         if (left > LEFT_SIZE) {
             printf("\n");
             Io_printSpaces(LEFT_SIZE);
-        } else Io_printSpaces(LEFT_SIZE - left);
+        } else
+            Io_printSpaces(LEFT_SIZE - left);
         printf(" %s\n", allArgs[i].desc);
     }
     return;
@@ -254,7 +248,8 @@ static void errorNoName(String_t s) {
 static void errorNoArg(String_t name,
                        String_t arg) {
     printf("no argument is given to switch: %s\n"
-           "expects arg: %s\n", name, arg);
+           "expects arg: %s\n",
+           name, arg);
     Arg_print();
     exit(0);
 }
@@ -264,7 +259,8 @@ static void errorWrongArg(String_t name,
                           String_t input) {
     printf("invalid arg for switch: %s\n"
            "expects: %s\n"
-           "but got: %s\n", name, arg, input);
+           "but got: %s\n",
+           name, arg, input);
     Arg_print();
     exit(0);
 }
@@ -301,8 +297,8 @@ List_t CommandLine_doarg(int argc, char **argv) {
 
             switch (allArgs[i].argtype) {
                 case ARGTYPE_BOOL: {
-                    long b;
-                    char *arg;
+                    long b = 0;
+                    char *arg = 0;
 
                     if (index >= argc)
                         errorNoArg(allArgs[i].name,
@@ -354,7 +350,7 @@ List_t CommandLine_doarg(int argc, char **argv) {
                     break;
                 }
                 default: {
-                    Error_impossible ();
+                    Error_impossible();
                     break;
                 }
             }
@@ -363,8 +359,7 @@ List_t CommandLine_doarg(int argc, char **argv) {
         if (!allArgs[i].action)
             errorNoName(inputName);
     }
-    if (Control_Verb_order
-            (VERBOSE_SUBPASS, Control_verbose))
+    if (Control_Verb_order(VERBOSE_SUBPASS, Control_verbose))
         Control_printFlags();
     return files;
 }

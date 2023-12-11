@@ -3,7 +3,7 @@
 
 #include "token.h"
 
-Token_t Lex_getToken ();
-void Lex_init (String_t fileName);
+Token_t Lex_getToken(void);
+void Lex_init(String_t fileName);
 
 #endif

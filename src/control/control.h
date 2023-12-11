@@ -4,25 +4,25 @@
 #include "../lib/list.h"
 #include "../lib/string.h"
 
-typedef enum {VERBOSE_SILENT, 
-              VERBOSE_PASS, 
-              VERBOSE_SUBPASS, 
-              VERBOSE_DETAIL} Verbose_t;
+typedef enum { VERBOSE_SILENT,
+               VERBOSE_PASS,
+               VERBOSE_SUBPASS,
+               VERBOSE_DETAIL } Verbose_t;
 
-typedef enum {EXPERT_NORMAL, 
-              EXPERT_EXPERT} Expert_t;
+typedef enum { EXPERT_NORMAL,
+               EXPERT_EXPERT } Expert_t;
 
-typedef enum {DUMP_AST,
-              DUMP_HIL,
-              DUMP_TAC,
-              DUMP_MACHINE,
-              DUMP_C
-              , DUMP_X86} Dump_t;
+typedef enum { DUMP_AST,
+               DUMP_HIL,
+               DUMP_TAC,
+               DUMP_MACHINE,
+               DUMP_C,
+               DUMP_X86 } Dump_t;
 
-typedef enum{
-  CODEGEN_C
-  , CODEGEN_X86
-}Codegen_t;
+typedef enum {
+    CODEGEN_C,
+    CODEGEN_X86
+} Codegen_t;
 
 extern long Control_bufferSize;
 extern Codegen_t Control_codegen;
@@ -44,23 +44,22 @@ extern String_t Control_asmDirectory;
 extern String_t Control_libDirectory;
 extern String_t Control_headerDirectory;
 
-int Control_Verb_order (Verbose_t v1, Verbose_t v2);
-void Control_dump_insert (Dump_t);
-int Control_dump_lookup (Dump_t);
+int Control_Verb_order(Verbose_t v1, Verbose_t v2);
+void Control_dump_insert(Dump_t);
+int Control_dump_lookup(Dump_t);
 // drop pass
-int Control_mayDropPass (String_t name);
-void Control_dropPass_insert (String_t name);
+int Control_mayDropPass(String_t name);
+void Control_dropPass_insert(String_t name);
 
 // log pass
-int Control_logPass (String_t passname);
-void Control_logPass_insert (String_t passname);
+int Control_logPass(String_t passname);
+void Control_logPass_insert(String_t passname);
 
 // code-generation-related
 extern int Control_Target_size;
 //
-void Control_init ();
-void Control_printFlags ();
-
+void Control_init(void);
+void Control_printFlags(void);
 
 
 #endif

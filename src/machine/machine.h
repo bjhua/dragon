@@ -1,10 +1,10 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
+#include "../atoms/atoms.h"
+#include "../lib/file.h"
 #include "../lib/list.h"
 #include "../lib/string.h"
-#include "../lib/file.h"
-#include "../atoms/atoms.h"
 
 #define B Machine_Block_t
 #define F Machine_Fun_t
@@ -37,12 +37,12 @@ struct O {
         MACHINE_OP_ID,
     } kind;
     union {
-        int intlit;
+        long intlit;
         Id_t id;
     } u;
 };
 
-O Machine_Operand_new_int(int i);
+O Machine_Operand_new_int(long i);
 
 O Machine_Operand_new_global(Id_t id);
 
@@ -66,14 +66,14 @@ struct M {
             Id_t name;
             Id_t field;
             // starting from 0
-            int index;
+            long index;
         } class;
     } u;
 };
 
 M Machine_Mem_new_array(Id_t, O);
 
-M Machine_Mem_new_class(Id_t, Id_t, int);
+M Machine_Mem_new_class(Id_t, Id_t, long);
 
 File_t Machine_Mem_print(File_t file, M m);
 
@@ -140,9 +140,9 @@ struct S {
         struct {
             Id_t dest;
             // object layout index, effective when index >= 1.
-            int index;
+            long index;
             // length of this object
-            int size;
+            long size;
             // runtime name of this function
             Id_t fname;
         } class;
@@ -180,7 +180,7 @@ S Machine_Stm_new_newClass(Id_t dest, Id_t className);
 
 S Machine_Stm_new_newArray(Id_t, Atype_t, O size);
 
-S Machine_Stm_Runtime_class(Id_t dest, int index, int size, Id_t fname);
+S Machine_Stm_Runtime_class(Id_t dest, long index, long size, Id_t fname);
 
 S Machine_Stm_Runtime_array(Id_t, int isPtr, O size, int scale, Id_t fname);
 
@@ -226,7 +226,7 @@ T Machine_Transfer_new_jump(Label_t);
 
 T Machine_Transfer_new_return(O);
 
-T Machine_Transfer_new_throw();
+T Machine_Transfer_new_throw(void);
 
 T Machine_Transfer_new_call(Id_t dest, Id_t name, List_t args, Label_t leave, Label_t normal);
 
@@ -263,7 +263,7 @@ struct F {
     Id_t retId;
     Label_t entry;
     Label_t exitt;
-    int frameIndex;  // index into "frameInfo"
+    int frameIndex;// index into "frameInfo"
 };
 
 F Machine_Fun_new(Atype_t type, Id_t name, List_t args, List_t decs, List_t blocks, Id_t retId, Label_t entry,
@@ -323,9 +323,9 @@ File_t Machine_FrameInfo_print(File_t file, I);
 // program
 struct P {
     // List<Mahine_Str_t>
-    List_t strings;  // a list of all strings
+    List_t strings;// a list of all strings
     // List<I>
-    List_t frameInfo;  // frame informations for each func
+    List_t frameInfo;// frame informations for each func
     // List<J>
     List_t layoutInfo;
     // List<F>

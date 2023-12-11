@@ -1,11 +1,11 @@
 #ifndef SSA_H
 #define SSA_H
 
+#include "../atoms/atoms.h"
 #include "../lib/file.h"
 #include "../lib/graph.h"
 #include "../lib/list.h"
 #include "../lib/set.h"
-#include "../atoms/atoms.h"
 
 #define B Ssa_Block_t
 #define F Ssa_Fun_t
@@ -32,24 +32,24 @@ struct O {
         SSA_OP_ID,
     } kind;
     union {
-        int intlit;
+        long intlit;
         String_t strlit;
         Id_t id;
     } u;
 };
 
-O Ssa_Operand_new_int(int i);
+O Ssa_Operand_new_int(long i);
 
 O Ssa_Operand_new_string(String_t strlit);
 
 O Ssa_Operand_new_id(Id_t id);
 
-int Ssa_Operand_equals(O, O);
+long Ssa_Operand_equals(O, O);
 
-int Ssa_Operand_isConst(O o);
+long Ssa_Operand_isConst(O o);
 
 // given a list of operands, are they all same constants?
-int Ssa_Operand_isSameConst(List_t os);
+long Ssa_Operand_isSameConst(List_t os);
 
 File_t Ssa_Operand_print(File_t file, O);
 
@@ -181,7 +181,7 @@ S Ssa_Stm_new_try(Label_t label);
 S Ssa_Stm_new_try_end(Label_t label);
 // preds: List<Block_t>, a list of predessors
 S Ssa_Stm_new_phi_preds(Id_t, List_t preds);
-// for every use of "id" in s, apply "f" to "id", if the 
+// for every use of "id" in s, apply "f" to "id", if the
 // result "src" is nonzero, rewrite the "id" to "src".
 S Ssa_Stm_renameUse2Op(S, O (*f)(Id_t));
 
@@ -237,7 +237,7 @@ T Ssa_Transfer_new_jump(Label_t);
 
 T Ssa_Transfer_new_return(O);
 
-T Ssa_Transfer_new_throw();
+T Ssa_Transfer_new_throw(void);
 
 T Ssa_Transfer_new_call(Id_t dest, Id_t f, List_t args, Label_t leave, Label_t normal);
 

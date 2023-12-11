@@ -17,7 +17,7 @@ struct T {
 };
 
 
-T Dlist_new();
+T Dlist_new(void);
 
 void Dlist_insertLast(T, Poly_t);
 
@@ -25,4 +25,3 @@ void Dlist_insertLast(T, Poly_t);
 #undef T
 
 #endif
-

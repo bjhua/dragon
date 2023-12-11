@@ -1,14 +1,14 @@
-#include "../lib/mem.h"
-#include "../lib/assert.h"
 #include "class.h"
+#include "../lib/mem.h"
 #include "dec.h"
+#include <assert.h>
 
 #define T Class_t
 
 T Class_new(Id_t name, List_t decs) {
     T p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
     p->name = name;
     p->decs = decs;
     return p;
@@ -18,7 +18,7 @@ String_t Class_toString(T c) {
     String_t s;
     List_t p;
 
-    Assert_ASSERT(c);
+    assert(c);
     s = String_concat("class ",
                       Id_toString(c->name),
                       "\n{\n",
@@ -38,9 +38,7 @@ String_t Class_toString(T c) {
 }
 
 File_t Class_print(File_t file, T c) {
-    List_t p;
-
-    Assert_ASSERT(c);
+    assert(c);
     fprintf(file, "%s", "class ");
     fprintf(file, "%s\n{\n", Id_toString(c->name));
     List_foldl(c->decs, file, (Poly_tyFold) Dec_printAsLocal);

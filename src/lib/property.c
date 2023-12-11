@@ -1,11 +1,10 @@
-#include "assert.h"
-#include "mem.h"
 #include "property.h"
-#include "list.h"
-#include "poly.h"
-#include "int.h"
 #include "double.h"
+#include "int.h"
+#include "list.h"
+#include "mem.h"
 #include "tuple.h"
+#include <assert.h>
 
 #define T Property_t
 #define K Poly_t
@@ -17,7 +16,8 @@ struct T {
 
     Plist_t (*getPlist)(Poly_t);
 
-    V (*init)(K);
+    V(*init)
+    (K);
 };
 
 static int counter = 0;
@@ -29,7 +29,7 @@ static int longestPath = 0;
 T Property_new(Plist_t (*get)(K)) {
     T t;
 
-    Mem_NEW (t);
+    Mem_NEW(t);
     t->i = counter++;
     t->plists = List_new();
     t->getPlist = get;
@@ -40,7 +40,7 @@ T Property_new(Plist_t (*get)(K)) {
 T Property_newInitFun(Plist_t (*get)(K), V (*init)(K)) {
     T t;
 
-    Mem_NEW (t);
+    Mem_NEW(t);
     t->i = counter++;
     t->plists = List_new();
     t->getPlist = get;
@@ -52,14 +52,14 @@ void Property_set(T prop, K k, V v) {
     Tuple_t tuple;
     Plist_t plist;
 
-    Assert_ASSERT(prop);
-    Assert_ASSERT(k);
+    assert(prop);
+    assert(k);
     plist = prop->getPlist(k);
-    Assert_ASSERT(plist);
+    assert(plist);
     tuple = Tuple_new((Poly_t) prop, v);
     List_insertFirst(plist, tuple);
     List_insertFirst(prop->plists, plist);
-    return;
+    //    return;
 }
 
 V Property_get(T prop, K k) {
@@ -68,8 +68,8 @@ V Property_get(T prop, K k) {
     int thisPath = 0;
     V v = 0;
 
-    Assert_ASSERT(prop);
-    Assert_ASSERT(k);
+    assert(prop);
+    assert(k);
     plist = prop->getPlist(k);
     p = List_getFirst(plist);
     ++numGets;
@@ -86,12 +86,10 @@ V Property_get(T prop, K k) {
         }
         p = p->next;
     }
-
     // if the init is there, then set the new value and
     // return it.
     if (prop->init) {
         v = prop->init(k);
-
         Property_set(prop, k, v);
     }
     if (thisPath > longestPath)
@@ -104,7 +102,7 @@ void Property_clear(T prop) {
     Plist_t prev;
     Tuple_t tuple;
 
-    Assert_ASSERT(prop);
+    assert(prop);
     plists = List_getFirst(prop->plists);
     while (plists) {
         prev = (Plist_t) plists->data;
@@ -124,13 +122,13 @@ String_t Property_status() {
     String_t average;
     if (numGets)
         average = Double_toString(numLinks * 1.0 / numGets);
-    else average = "0.0";
-    return String_concat
-            ("plist peeks: ",
-             Int_toString(numGets),
-             ", average position: ",
-             average,
-             0);
+    else
+        average = "0.0";
+    return String_concat("plist peeks: ",
+                         Int_toString(numGets),
+                         ", average position: ",
+                         average,
+                         0);
 }
 
 #undef T

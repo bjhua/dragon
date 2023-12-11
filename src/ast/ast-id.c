@@ -1,6 +1,5 @@
-#include <stdbool.h>
+#include <assert.h>
 #include "../lib/mem.h"
-#include "../lib/assert.h"
 #include "ast-id.h"
 
 #define T AstId_t
@@ -31,43 +30,43 @@ T AstId_newNoName() {
 }
 
 Id_t AstId_toId(T id) {
-    Assert_ASSERT(id);
+    assert(id);
     return id->id;
 }
 
 long AstId_equals(T id1, T id2) {
-    Assert_ASSERT(id1);
-    Assert_ASSERT(id2);
+    assert(id1);
+    assert(id2);
     return Id_equals(id1->id, id2->id);
 }
 
 long AstId_hashCode(T t) {
-    Assert_ASSERT (t);
+    assert (t);
     return Id_hashCode(t->id);
 }
 
 String_t AstId_toString(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     return Id_toString(t->id);
 }
 
 Region_t AstId_dest(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     return t->region;
 }
 
 Region_t AstId_getRegion(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     return t->region;
 }
 
 Plist_t AstId_plist(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     return Id_plist(t->id);
 }
 
 void AstId_print(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     Id_print(t->id);
 }
 

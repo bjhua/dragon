@@ -1,9 +1,10 @@
-#include <stdarg.h>
-#include "assert.h"
-#include "error.h"
-#include "mem.h"
-#include "io.h"
 #include "box.h"
+#include "error.h"
+#include "io.h"
+#include "mem.h"
+#include "unused.h"
+#include <assert.h>
+#include <stdarg.h>
 
 #define T Box_t
 
@@ -100,8 +101,8 @@ T Box_indent(T b, int i) {
     return t;
 }
 
-static int Box_print2(T b, void (*print)(String_t),
-                      int start) {
+static long Box_print2(T b, void (*print)(String_t),
+                       int start) {
     switch (b->kind) {
         case BOX_STR: {
             print(b->u.str);
@@ -124,7 +125,7 @@ static int Box_print2(T b, void (*print)(String_t),
             List_t p = List_getFirst(b->u.boxes);
             while (p) {
                 T b = (T) p->data;
-                int i = Box_print2(b, print, start);
+                long i = Box_print2(b, print, start);
                 if (p->next) {
                     print("\n");
                     Io_printSpaces(start);
@@ -135,33 +136,34 @@ static int Box_print2(T b, void (*print)(String_t),
             return start;
         }
         case BOX_INDENT: {
-            int i;
             Io_printSpaces(b->u.indent.i);
-            i = Box_print2(b->u.indent.box,
-                           print,
-                           start + b->u.indent.i);
+            long i = Box_print2(b->u.indent.box,
+                                print,
+                                start + b->u.indent.i);
             return start + b->u.indent.i + i;
         }
         default:
-            Error_bomb ();
-            Error_impossible ();
+            Error_bomb();
+            Error_impossible();
             return -1;
     }
-    Error_impossible ();
+    Error_impossible();
     return -1;
 }
 
 void Box_print(T b, void (*print)(String_t)) {
-    Assert_ASSERT(b);
-    Assert_ASSERT(print);
+    assert(b);
+    assert(print);
 
     print("\n");
     Box_print2(b, print, 0);
-    return;
+    //    return;
 }
 
 void Box_output(T b, File_t f) {
-    return;
+    UNUSED(b);
+    UNUSED(f);
+    //    return;
 }
 
 

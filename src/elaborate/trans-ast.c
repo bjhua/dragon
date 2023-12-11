@@ -1,14 +1,14 @@
-#include "../lib/assert.h"
-#include "../lib/list.h"
-#include "../lib/stack.h"
-#include "../lib/error.h"
-#include "../lib/string.h"
-#include "../lib/tuple.h"
-#include "../lib/property.h"
-#include "../lib/trace.h"
-#include "../lib/app-list.h"
-#include "../atoms/atoms.h"
 #include "trans-ast.h"
+#include "../atoms/atoms.h"
+#include "../lib/app-list.h"
+#include "../lib/error.h"
+#include "../lib/list.h"
+#include "../lib/property.h"
+#include "../lib/stack.h"
+#include "../lib/string.h"
+#include "../lib/trace.h"
+#include "../lib/tuple.h"
+#include <assert.h>
 
 // Data structures to hold labels:
 //   labels are loop labels which jump targets for "break" and "continue".
@@ -20,36 +20,36 @@ static Tuple_t pushLabel() {
     Label_t entryLabel = Label_new(),
             exitLabel = Label_new();
 
-    Assert_ASSERT(labels);
+    assert(labels);
     Stack_push(labels, Tuple_new(entryLabel, exitLabel));
     return Tuple_new(entryLabel, exitLabel);
 }
 
 static void popLabel() {
-    Assert_ASSERT(labels);
+    assert(labels);
     Stack_pop(labels);
 }
 
 static Tuple_t peekLabel() {
-    Assert_ASSERT(labels);
+    assert(labels);
     return Stack_getTop(labels);
 }
 
 static Label_t pushExnLabel() {
     Label_t label = Label_new();
 
-    Assert_ASSERT(exnLabels);
+    assert(exnLabels);
     Stack_push(exnLabels, label);
     return label;
 }
 
 static void popExnLabel() {
-    Assert_ASSERT(exnLabels);
+    assert(exnLabels);
     Stack_pop(exnLabels);
 }
 
 static Label_t peekExnLabel() {
-    Assert_ASSERT(exnLabels);
+    assert(exnLabels);
     return Stack_getTop(exnLabels);
 }
 
@@ -77,7 +77,7 @@ static List_t Elab_stm(Ast_Stm_t);
 ///////////////////////////////////////////////////////
 // translation of semantic "elaborate/type" to "atom/atype"
 static Atype_t type2atype(Type_t ty) {
-    Assert_ASSERT(ty);
+    assert(ty);
     switch (ty->kind) {
         case TYPE_A_INT:
             if (ty->isArray)
@@ -89,7 +89,7 @@ static Atype_t type2atype(Type_t ty) {
             return Atype_new_string_array();
         case TYPE_A_NS:
             if (ty->isArray)
-                Error_impossible ();
+                Error_impossible();
             return Atype_new_int();
         case TYPE_A_CLASS: {
             Id_t id = AstId_toId(ty->u.className);
@@ -99,31 +99,30 @@ static Atype_t type2atype(Type_t ty) {
             return Atype_new_class(id);
         }
         case TYPE_A_PRODUCT:
-            Error_impossible ();
+            Error_impossible();
             return 0;
         case TYPE_A_FUN: {
             Type_t from = ty->u.fun.from;
 
             if (from->kind != TYPE_A_PRODUCT) {
-                Error_impossible ();
+                Error_impossible();
                 return 0;
             }
-            return Atype_new_fun
-                    (List_map(from->u.product, (Poly_tyId) type2atype),
-                     type2atype(ty->u.fun.to));
+            return Atype_new_fun(List_map(from->u.product, (Poly_tyId) type2atype),
+                                 type2atype(ty->u.fun.to));
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 ///////////////////////////////////////////////////////
 // translation of ast "type" to "atom/atype"
 static Atype_t asttype2atype(Ast_Type_t ty) {
-    Assert_ASSERT(ty);
+    assert(ty);
     switch (ty->kind) {
         case AST_TYPE_INT: {
             if (ty->isArray)
@@ -141,10 +140,10 @@ static Atype_t asttype2atype(Ast_Type_t ty) {
             return Atype_new_class(AstId_toId(ty->id));
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
@@ -153,7 +152,7 @@ static Atype_t asttype2atype(Ast_Type_t ty) {
 static struct Lval_Result_t Elab_lval(Ast_Lval_t l) {
     struct Lval_Result_t result = {0, 0};
 
-    Assert_ASSERT(l);
+    assert(l);
     switch (l->kind) {
         case AST_LVAL_VAR: {
             Id_t newId = AstId_toId(l->u.var);
@@ -192,10 +191,10 @@ static struct Lval_Result_t Elab_lval(Ast_Lval_t l) {
             return result;
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return result;
     }
-    Error_impossible ();
+    Error_impossible();
     return result;
 }
 
@@ -232,10 +231,10 @@ static Operator_t convertOperator(Ast_Exp_Kind_t k) {
         case AST_EXP_NEGATIVE:
             return OP_NEG;
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     };
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
@@ -244,7 +243,7 @@ static Operator_t convertOperator(Ast_Exp_Kind_t k) {
 static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
     struct Exp_Result_t result = {0, 0};
 
-    Assert_ASSERT(e);
+    assert(e);
     switch (e->kind) {
         case AST_EXP_ASSIGN: {
             struct Exp_Result_t newLeft, newRight;
@@ -254,12 +253,11 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             newRight = Elab_exp(e->u.assign.right);
             result.exp = newLeft.exp;
             if (result.exp->kind != HIL_EXP_LVAL)
-                Error_impossible ();
+                Error_impossible();
 
             newAssign = Hil_Stm_new_assign(newLeft.exp->u.lval, newRight.exp);
             result.list =
-                    AppList_new_list(List_list
-                                             (newRight.list, newLeft.list, AppList_fromItem(newAssign), 0));
+                    AppList_new_list(List_list(newRight.list, newLeft.list, AppList_fromItem(newAssign), 0));
             return result;
         }
         case AST_EXP_ADD:
@@ -290,8 +288,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
 
             new = Elab_exp(e->u.unary.e);
 
-            result.exp = Hil_Exp_new_unary
-                    (convertOperator(e->kind), new.exp, type2atype(e->ty));
+            result.exp = Hil_Exp_new_unary(convertOperator(e->kind), new.exp, type2atype(e->ty));
             result.list = new.list;
             return result;
         }
@@ -306,8 +303,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             return result;
         }
         case AST_EXP_STRINGLIT: {
-            result.exp = Hil_Exp_new_stringlit
-                    (e->u.stringlit, Atype_new_string(""));
+            result.exp = Hil_Exp_new_stringlit(e->u.stringlit, Atype_new_string(""));
             result.list = AppList_new_empty();
             return result;
         }
@@ -326,8 +322,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
                 List_insertLast(stms, temp.list);
                 args = args->next;
             }
-            result.exp = Hil_Exp_new_newClass
-                    (AstId_toId(className), newArgs);
+            result.exp = Hil_Exp_new_newClass(AstId_toId(className), newArgs);
             result.list = AppList_new_list(stms);
             return result;
         }
@@ -345,8 +340,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             struct Lval_Result_t newLeft;
 
             newLeft = Elab_lval(e->u.lval);
-            result.exp = Hil_Exp_new_lval
-                    (newLeft.lval, type2atype(e->u.lval->ty));
+            result.exp = Hil_Exp_new_lval(newLeft.lval, type2atype(e->u.lval->ty));
             result.list = newLeft.list;
             return result;
         }
@@ -388,11 +382,10 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
 static List_t Elab_stm(Ast_Stm_t s) {
     List_t result = 0;
 
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case AST_STM_EXP: {
             struct Exp_Result_t er;
-            Hil_Stm_t newStm;
 
             er = Elab_exp(s->u.exp);
             result = AppList_toList(er.list);
@@ -413,14 +406,13 @@ static List_t Elab_stm(Ast_Stm_t s) {
         }
         case AST_STM_WHILE: {
             Ast_Stm_t new =
-                    Ast_Stm_new_if
-                            (s->u.whilee.cond,
-                             Ast_Stm_new_do(s->u.whilee.cond,
-                                            s->u.whilee.body,
-                                            s->region),
-                             Ast_Stm_new_block(Ast_Block_new(List_new(),
-                                                             List_new())),
-                             s->region);
+                    Ast_Stm_new_if(s->u.whilee.cond,
+                                   Ast_Stm_new_do(s->u.whilee.cond,
+                                                  s->u.whilee.body,
+                                                  s->region),
+                                   Ast_Stm_new_block(Ast_Block_new(List_new(),
+                                                                   List_new())),
+                                   s->region);
             return Elab_stm(new);
         }
         case AST_STM_DO: {
@@ -441,12 +433,9 @@ static List_t Elab_stm(Ast_Stm_t s) {
             // for (header; cond; tail)
             //   body;
             Tuple_t tuple = pushLabel();
-            struct Exp_Result_t newHeader
-                    = Elab_exp(s->u.forr.header);
-            List_t newHeaderx;
+            struct Exp_Result_t newHeader = Elab_exp(s->u.forr.header);
             List_t newBody;
-            struct Exp_Result_t newCond
-                    = Elab_exp(s->u.forr.cond);
+            struct Exp_Result_t newCond = Elab_exp(s->u.forr.cond);
             List_t newCondx = AppList_toList(newCond.list);
             struct Exp_Result_t newTail;
             List_t newTailx;
@@ -461,11 +450,8 @@ static List_t Elab_stm(Ast_Stm_t s) {
             List_append(result, AppList_toList(newHeader.list));
             List_insertLast(result, Hil_Stm_new_exp(newHeader.exp));
             List_append(result, AppList_toList(newCond.list));
-            List_insertLast
-                    (result, Hil_Stm_new_if(newCond.exp, List_list(Hil_Stm_new_do
-                                                                           (newCond.exp, newBody, Tuple_first(tuple),
-                                                                            Tuple_second(tuple), newTailx), 0),
-                                            List_new()));
+            List_insertLast(result, Hil_Stm_new_if(newCond.exp, List_list(Hil_Stm_new_do(newCond.exp, newBody, Tuple_first(tuple), Tuple_second(tuple), newTailx), 0),
+                                                   List_new()));
             popLabel();
             return result;
         }
@@ -501,7 +487,7 @@ static List_t Elab_stm(Ast_Stm_t s) {
             return List_list(Hil_Stm_new_localThrow(label), 0);
         }
         case AST_STM_TRYCATCH: {
-            Label_t label, end;
+            Label_t label;
             List_t newTry, newCatch;
 
             label = pushExnLabel();
@@ -528,7 +514,7 @@ static List_t Elab_block(Ast_Block_t b) {
     //
     List_t result, p, stms = List_new();
 
-    Assert_ASSERT(b);
+    assert(b);
     result = List_map(b->stms, (Poly_tyId) Elab_stm);
     p = List_getFirst(result);
     while (p) {
@@ -548,7 +534,7 @@ static List_t Elab_block(Ast_Block_t b) {
 ///////////////////////////////////////////////////////
 // translation of declaration
 static Dec_t Elab_dec(Ast_Dec_t dec) {
-    Assert_ASSERT(dec);
+    assert(dec);
     return Dec_new(asttype2atype(dec->type), AstId_toId(dec->var));
 }
 
@@ -559,7 +545,7 @@ static Hil_Fun_t Elab_funEach(Ast_Fun_t f) {
     Id_t newName;
     Atype_t newType;
 
-    Assert_ASSERT (f);
+    assert(f);
     newName = AstId_toId(f->name);
     newType = asttype2atype(f->type);
 
@@ -571,7 +557,7 @@ static Hil_Fun_t Elab_funEach(Ast_Fun_t f) {
 static List_t Elab_fun(List_t fs) {
     List_t newList;
 
-    Assert_ASSERT(fs);
+    assert(fs);
     newList = List_map(fs, (Poly_tyId) Elab_funEach);
     return newList;
 }
@@ -591,7 +577,7 @@ static List_t Elab_classes(List_t classes) {
 static Hil_Prog_t Elaborate_ast_traced(Ast_Prog_t p) {
     List_t newClasses, newFuncs;
 
-    Assert_ASSERT(p);
+    assert(p);
     // init the two groups of labels
     labels = Stack_new();
     exnLabels = Stack_new();

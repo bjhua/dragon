@@ -1,9 +1,9 @@
-#include "../lib/assert.h"
-#include "../lib/error.h"
-#include "../lib/trace.h"
-#include "../lib/list.h"
-#include "../control/log.h"
 #include "dead-code.h"
+#include "../control/log.h"
+#include "../lib/error.h"
+#include "../lib/list.h"
+#include "../lib/trace.h"
+#include <assert.h>
 
 ///////////////////////////////////////////////////////
 // This module eliminates dead code and dead (local)
@@ -21,9 +21,9 @@ static void mark() {
     founddead = 1;
 }
 
-static void clear() {
-    founddead = 0;
-}
+//static void clear() {
+//    founddead = 0;
+//}
 
 
 enum Dead_t {
@@ -89,7 +89,7 @@ static int notUsed(Id_t id) {
 static void decUse(Id_t id) {
     long r = (long) Property_get(usedProp, id);
     if (!r) {
-        Error_impossible ();
+        Error_impossible();
         return;
     }
     --r;
@@ -97,7 +97,7 @@ static void decUse(Id_t id) {
     // to catch bugs
     if (!r) {
         if (Property_get(deadProp, id)) {
-            Error_impossible ();
+            Error_impossible();
             return;
         }
         // found a new dead var
@@ -108,7 +108,7 @@ static void decUse(Id_t id) {
 }
 
 static void analyzeStm(Ssa_Stm_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case SSA_STM_MOVE: {
             if (isDead(s->u.move.dest))
@@ -211,15 +211,15 @@ static void analyzeStm(Ssa_Stm_t s) {
             return;
         default:
             fprintf(stderr, "%d", s->kind);
-            Error_impossible ();
+            Error_impossible();
             return;
     }
-    Error_impossible ();
+    Error_impossible();
     return;
 }
 
 static void analyzeTransfer(Ssa_Transfer_t t) {
-    Assert_ASSERT(t);
+    assert(t);
     switch (t->kind) {
         case SSA_TRANS_IF:
             return;
@@ -245,10 +245,10 @@ static void analyzeTransfer(Ssa_Transfer_t t) {
             return;
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return;
     }
-    Error_impossible ();
+    Error_impossible();
     return;
 }
 
@@ -265,7 +265,6 @@ static void analyzeFun(Ssa_Fun_t f) {
 static void analyze(Ssa_Prog_t p) {
 
     List_foreach(p->funcs, (Poly_tyVoid) analyzeFun);
-
 }
 
 ////////////////////////////////////////////////////////
@@ -273,7 +272,7 @@ static void analyze(Ssa_Prog_t p) {
 
 // zero for dead.
 static Ssa_Stm_t doit(Ssa_Stm_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case SSA_STM_MOVE:
             if (isDead(s->u.move.dest))
@@ -311,15 +310,15 @@ static Ssa_Stm_t doit(Ssa_Stm_t s) {
             return s;
         default:
             fprintf(stderr, "%d", s->kind);
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 static Ssa_Transfer_t rewriteTransfer(Ssa_Transfer_t t) {
-    Assert_ASSERT(t);
+    assert(t);
     switch (t->kind) {
         case SSA_TRANS_IF:
             return t;
@@ -339,10 +338,10 @@ static Ssa_Transfer_t rewriteTransfer(Ssa_Transfer_t t) {
             return t;
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
@@ -366,8 +365,7 @@ static int decFilter(Dec_t dec) {
         Log_strs(Dec_toString(dec), " is NOT dead\n", 0);
         return 1;
     }
-    if ((long) Property_get(deadProp, dec->id) == DEAD
-        || (0 == Property_get(usedProp, dec->id))) {
+    if ((long) Property_get(deadProp, dec->id) == DEAD || (0 == Property_get(usedProp, dec->id))) {
         Log_strs("found a dead declaration: ", Dec_toString(dec), "\n", 0);
         return 0;
     } else {

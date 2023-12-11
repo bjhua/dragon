@@ -7,7 +7,7 @@
 
 typedef struct T *T;
 
-T AppendList_new();
+T AppendList_new(void);
 
 #undef T
 

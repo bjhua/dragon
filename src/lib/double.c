@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include "mem.h"
 #include "double.h"
+#include "mem.h"
+#include <stdio.h>
 
 #define BUF_SIZE 1024
 
@@ -12,7 +12,7 @@ String_t Double_toString(double f) {
      * but it seems that this version of GCC I'm using has a bug on
      * the function "snprintf". So I've to write this unsafe "sprintf".
      */
-    sprintf (temp, "%lf", f);
+    snprintf(temp, BUF_SIZE - 1, "%lf", f);
     return temp;
 }
 

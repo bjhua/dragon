@@ -1,16 +1,17 @@
-#include <stdio.h>
-#include "assert.h"
+#include "graph.h"
+#include "../ssa/ssa.h"
+#include "dot.h"
+#include "error.h"
+#include "list.h"
 #include "mem.h"
 #include "property-list.h"
 #include "property.h"
-#include "list.h"
-#include "error.h"
-#include "dot.h"
 #include "set.h"
-#include "../ssa/ssa.h"
-#include "graph.h"
+#include "unused.h"
+#include <assert.h>
+#include <stdio.h>
 
-// 
+//
 #ifdef printf
 #undef printf
 #endif
@@ -18,6 +19,7 @@
 #define dprintf noop
 
 static int noop(char *s, ...) {
+    UNUSED(s);
     return 0;
 }
 
@@ -58,14 +60,14 @@ static V Vertex_new(Poly_t data) {
 }
 
 static Plist_t Vertex_plist(V v) {
-    Assert_ASSERT(v);
+    assert(v);
 
     return v->plist;
 }
 
 static int Vertex_equals(V v1, V v2) {
-    Assert_ASSERT(v1);
-    Assert_ASSERT(v2);
+    assert(v1);
+    assert(v2);
 
     return v1 == v2;
 }
@@ -88,20 +90,20 @@ static E Edge_new(V from, V to) {
     return e;
 }
 
-static E Edge_fromData(Poly_t from, Poly_t to) {
-    E e;
+//static E Edge_fromData(Poly_t from, Poly_t to) {
+//    E e = 0;
+//
+//    Error_impossible();
+//    return e;
+//}
 
-    Error_impossible ();
-    return e;
-}
 
-
-static Plist_t Edge_plist(E e) {
-    Assert_ASSERT(e);
-
-    return e->plist;
-}
-
+//static Plist_t Edge_plist(E e) {
+//    assert(e);
+//
+//    return e->plist;
+//}
+//
 
 /////////////////////////////////////////////////////
 // graph
@@ -129,8 +131,8 @@ static V searchVertex(T g, Poly_t data) {
     List_t p;
     Poly_tyEquals equals;
 
-    Assert_ASSERT(g);
-    Assert_ASSERT(data);
+    assert(g);
+    assert(data);
 
     p = List_getFirst(g->vs);
     equals = g->equals;
@@ -145,22 +147,22 @@ static V searchVertex(T g, Poly_t data) {
     return 0;
 }
 
-static E searchEdge(T g, Poly_t from, Poly_t to) {
-    V fv = searchVertex(g, from);
-    List_t edges = List_getFirst(fv->edges);
-    while (edges) {
-        E current = (E) (edges->data);
-        V currentTo = current->to;
-        if (g->equals(to, currentTo->data))
-            return current;
-        edges = edges->next;
-    }
-    Error_error("no this edge: searchEdge: graph.c\n");
-    return 0;
-}
+//static E searchEdge(T g, Poly_t from, Poly_t to) {
+//    V fv = searchVertex(g, from);
+//    List_t edges = List_getFirst(fv->edges);
+//    while (edges) {
+//        E current = (E) (edges->data);
+//        V currentTo = current->to;
+//        if (g->equals(to, currentTo->data))
+//            return current;
+//        edges = edges->next;
+//    }
+//    Error_error("no this edge: searchEdge: graph.c\n");
+//    return 0;
+//}
 
 /////////////////////////////////////////////////////
-// 
+//
 void Graph_insertVertex(T g, Poly_t x) {
     V v = Vertex_new(x);
     List_insertLast(g->vs, v);
@@ -175,17 +177,17 @@ void Graph_insertEdge(T g, Poly_t from, Poly_t to) {
     return;
 }
 
-void Graph_visitAllVertex(T g, void (*visit)(Poly_t)) {
-    List_t l = List_getFirst(g->vs);
-
-    while (l) {
-        V v = (V) l->data;
-
-        visit(v->data);
-        l = l->next;
-    }
-    return;
-}
+//void Graph_visitAllVertex(T g, void (*visit)(Poly_t)) {
+//    List_t l = List_getFirst(g->vs);
+//
+//    while (l) {
+//        V v = (V) l->data;
+//
+//        visit(v->data);
+//        l = l->next;
+//    }
+//    return;
+//}
 
 void Graph_toJpgWithName(T g, Poly_tyPrint printer, String_t fname) {
     Dot_t d = Dot_new(printer);
@@ -226,7 +228,8 @@ static void Graph_dfsDoit(T g, V v, Poly_tyVoid f, Property_t visited) {
         Poly_t visitedTo = Property_get(visited, to);
         if (!visitedTo) {
             Graph_dfsDoit(g, to, f, visited);
-        } else;
+        } else
+            ;
         edges = edges->next;
     }
     return;
@@ -236,9 +239,9 @@ void Graph_dfs(T g, Poly_t start, Poly_tyVoid f) {
     V sv;
     Property_t visited;
 
-    Assert_ASSERT(g);
-    Assert_ASSERT(start);
-    Assert_ASSERT(f);
+    assert(g);
+    assert(start);
+    assert(f);
 
     sv = searchVertex(g, start);
     visited = Property_new((Poly_tyPlist) Vertex_plist);
@@ -255,7 +258,7 @@ void Graph_dfs(T g, Poly_t start, Poly_tyVoid f) {
 ////////////////////////////////////////////////////
 // dominator tree-related
 static void markPreds(T g, Property_t preds) {
-    Assert_ASSERT(g);
+    assert(g);
 
     List_t vs = List_getFirst(g->vs);
     while (vs) {
@@ -270,8 +273,7 @@ static void markPreds(T g, Property_t preds) {
             if (set) {
                 Set_insert(set, from);
             } else {
-                Set_t newSet
-                        = Set_new((Poly_tyEquals) Vertex_equals);
+                Set_t newSet = Set_new((Poly_tyEquals) Vertex_equals);
                 Set_insert(newSet, from);
                 Property_set(preds, to, newSet);
             }
@@ -282,37 +284,38 @@ static void markPreds(T g, Property_t preds) {
     return;
 }
 
-static void predDoit(V v) {
-    printf("%s ", v->data);
-    return;
-}
+//static void predDoit(V v) {
+//    printf("%s ", v->data);
+//    return;
+//}
 
-static void printPreds(T g, Property_t preds) {
-    Assert_ASSERT(g);
-
-    List_t vs = List_getFirst(g->vs);
-    while (vs) {
-        V from = (V) vs->data;
-        Set_t set = Property_get(preds, from);
-        // hard-coded here
-        printf("%s ==>", from->data);
-        if (set) {
-            printf("(%d) ", Set_size(set));
-            Set_foreach(set, (Poly_tyVoid) predDoit);
-        } else
-            printf("[]");
-        printf("\n");
-        vs = vs->next;
-    }
-    return;
-}
+//static void printPreds(T g, Property_t preds) {
+//
+//    assert(g);
+//
+//    List_t vs = List_getFirst(g->vs);
+//    while (vs) {
+//        V from = (V) vs->data;
+//        Set_t set = Property_get(preds, from);
+//        // hard-coded here
+//        printf("%s ==>", from->data);
+//        if (set) {
+//            printf("(%d) ", Set_size(set));
+//            Set_foreach(set, (Poly_tyVoid) predDoit);
+//        } else
+//            printf("[]");
+//        printf("\n");
+//        vs = vs->next;
+//    }
+//    return;
+//}
 
 static void printOneVertex(V v) {
     dprintf("%s, ", Label_toString(((Ssa_Block_t) (v->data))->label));
 }
 
 static void printDoms(T g, Property_t domProp) {
-    Assert_ASSERT(g);
+    assert(g);
 
     List_t vs = List_getFirst(g->vs);
     while (vs) {
@@ -321,7 +324,7 @@ static void printDoms(T g, Property_t domProp) {
         // hard-coded here
         dprintf("%s ==>", Label_toString(((Ssa_Block_t) (from->data))->label));
         if (!set)
-            Error_impossible ();
+            Error_impossible();
 
         dprintf("(%d doms) [", Set_size(set));
         Set_foreach(set, (Poly_tyVoid) printOneVertex);
@@ -337,8 +340,7 @@ static void initDom(T g, V start, Property_t dom) {
     while (vs) {
         V v = (V) vs->data;
 
-        Property_set(dom, v, Set_fromList
-                ((Poly_tyEquals) Vertex_equals, g->vs));
+        Property_set(dom, v, Set_fromList((Poly_tyEquals) Vertex_equals, g->vs));
         vs = vs->next;
     }
     Property_set(dom, start, Set_singleton((Poly_tyEquals) Vertex_equals, start));
@@ -346,22 +348,24 @@ static void initDom(T g, V start, Property_t dom) {
 }
 
 static Set_t idomPropInitFun(V v) {
+    UNUSED(v);
     return Set_new((Poly_tyEquals) Vertex_equals);
 }
 
 static Property_t globalDeletable = 0;
 
 static long idomDeletable(V v) {
-    return (long) Property_get(globalDeletable, v);
+    Poly_t k = Property_get(globalDeletable, v);
+    return (long) k;
 }
 
 // This algorithm is based on Figure 7-14 of Muchnick.
 
-// Calculate dominator tree. 
+// Calculate dominator tree.
 // The returned tree consists of graph vertex.
 // If dom!=0, return dominace property
 // If idom!=0, return the
-// immediate dominator in "idom" (it is on the 
+// immediate dominator in "idom" (it is on the
 // graph vertex, not tree vertex).
 static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property_t *idomProp) {
     // Tree<Vertex_t>
@@ -414,7 +418,7 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
             // as the dom set has been properly initialized, so
             // it must not be empty.
             if (!domSetCurrent)
-                Error_impossible ();
+                Error_impossible();
             // the entry vertex should not be caculated
             if (Vertex_equals(current, startv)) {
                 vs = vs->next;
@@ -424,7 +428,7 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
             // have predessor set, except for entry vertex.
             predSet = (Set_t) Property_get(preds, current);
             if (!predSet)
-                Error_impossible ();
+                Error_impossible();
 
             // /\ pred_p dom(p)
             predList = List_getFirst(Set_toList(predSet));
@@ -454,15 +458,13 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
     {
         List_t vs = List_getFirst(g->vs);
         // which vertex is the deleta candidate from idom
-        Property_t deletable
-                = Property_new((Poly_tyPlist) Vertex_plist);
+        Property_t deletable = Property_new((Poly_tyPlist) Vertex_plist);
 
         // init
         while (vs) {
             V current = (V) vs->data;
             Set_t domSet = (Set_t) Property_get(dom, current);
-            Set_t idomSet
-                    = (Set_t) Set_new((Poly_tyEquals) Vertex_equals);
+            Set_t idomSet = (Set_t) Set_new((Poly_tyEquals) Vertex_equals);
 
             idomSet = Set_union(idomSet, domSet);
             Set_delete(idomSet, current);
@@ -477,8 +479,7 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
         while (vs) {
             V current = (V) vs->data;
             Set_t idomSet = (Set_t) Property_get(idom, current);
-            List_t idomList
-                    = List_getFirst(Set_toList(idomSet));
+            List_t idomList = List_getFirst(Set_toList(idomSet));
             List_t loop = idomList;
             List_t nest = idomList;
 
@@ -493,10 +494,12 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
                     if (Vertex_equals(x, y)) {
                         nest = nest->next;
                         continue;
-                    } else;
+                    } else
+                        ;
                     if (Set_exists(domfory, x))
                         Property_set(deletable, x, (Poly_t) 1);
-                    else;
+                    else
+                        ;
                     nest = nest->next;
                 }
                 loop = loop->next;
@@ -506,7 +509,7 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
             Property_clear(deletable);
             vs = vs->next;
         }
-    } // local scope
+    }// local scope
 
     printf("i-dominators finished\n");
     printDoms(g, idom);
@@ -533,8 +536,7 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
         while (vs) {
             V v = (V) vs->data;
             Set_t idomSet = Property_get(idom, v);
-            List_t idomList
-                    = List_getFirst(Set_toList(idomSet));
+            List_t idomList = List_getFirst(Set_toList(idomSet));
             int num = 0;
             while (idomList) {
                 V from = (V) idomList->data;
@@ -545,7 +547,7 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
             }
             // if more that one idom, it must be our error.
             if (num > 1)
-                Error_impossible ();
+                Error_impossible();
 
             vs = vs->next;
         }
@@ -565,7 +567,6 @@ static Tree_t Graph_domTreeReal(T g, Poly_t start, Property_t *domProp, Property
 }
 
 
-
 //////////////////////////////////////////////////////
 // dominator frontier
 
@@ -577,8 +578,7 @@ static Set_t Graph_dfDoit(T g, V n, Tree_t domTree, Property_t dom, Property_t i
 
     List_t nedges = List_getFirst(n->edges);
     // List<V>
-    List_t children
-            = List_getFirst(Tree_children(domTree, n));
+    List_t children = List_getFirst(Tree_children(domTree, n));
 
     while (nedges) {
         E e = nedges->data;
@@ -590,7 +590,7 @@ static Set_t Graph_dfDoit(T g, V n, Tree_t domTree, Property_t dom, Property_t i
             Set_insert(dfSet, y);
 
         if (Set_size(idomy) > 1)
-            Error_impossible ();
+            Error_impossible();
 
 
         if (!Set_exists(idomy, n))
@@ -601,17 +601,15 @@ static Set_t Graph_dfDoit(T g, V n, Tree_t domTree, Property_t dom, Property_t i
 
     while (children) {
         V c = (V) children->data;
-        Set_t dfOfc
-                = Graph_dfDoit(g, c, domTree, dom, idom, markDf);
+        Set_t dfOfc = Graph_dfDoit(g, c, domTree, dom, idom, markDf);
         List_t dfOfcList = List_getFirst(Set_toList(dfOfc));
         while (dfOfcList) {
             V w = (V) dfOfcList->data;
             Set_t domofw = Property_get(dom, w);
             if (!domofw)
-                Error_impossible ();
+                Error_impossible();
             // if n does not dominate w, or if n==w
-            if (!Set_exists(domofw, n)
-                || Vertex_equals(n, w))
+            if (!Set_exists(domofw, n) || Vertex_equals(n, w))
                 Set_insert(dfSet, w);
 
             dfOfcList = dfOfcList->next;
@@ -642,11 +640,9 @@ static Poly_t localMap(V v) {
 // mark each vertex df, when markDf!=0
 Tree_t Graph_df(T g, Poly_t start, void (*markDf)(Poly_t, Set_t)) {
     // V -> Set_t<V>
-    Property_t domProp
-            = Property_new((Poly_tyPlist) Vertex_plist);
+    Property_t domProp = Property_new((Poly_tyPlist) Vertex_plist);
     // V -> Set_t<V>, may be empty
-    Property_t idomProp
-            = Property_new((Poly_tyPlist) Vertex_plist);
+    Property_t idomProp = Property_new((Poly_tyPlist) Vertex_plist);
     // Tree<V>
     Tree_t domTree = Graph_domTreeReal(g, start, &domProp, &idomProp);
 

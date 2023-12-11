@@ -10,7 +10,7 @@ typedef List_t T;
 
 typedef T (*Poly_tyPlist)(Poly_t);
 
-T Plist_new();
+T Plist_new(void);
 /* int PropertyList_equals (T, T); */
 
 #undef T

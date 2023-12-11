@@ -1,11 +1,10 @@
-#include "error.h"
-#include "list.h"
-#include "triple.h"
-#include "file.h"
-#include "mem.h"
-#include "assert.h"
-#include "system.h"
 #include "dot.h"
+#include "file.h"
+#include "list.h"
+#include "mem.h"
+#include "system.h"
+#include "triple.h"
+#include <assert.h>
 
 #define T Dot_t
 
@@ -27,14 +26,14 @@ T Dot_new(Poly_tyPrint printer) {
 void Dot_insert(T d, Poly_t from, Poly_t to, Poly_t info) {
     Triple_t t;
 
-    Assert_ASSERT(d);
+    assert(d);
     /* newInfo = info? (String_concat ("[label = \"" */
     /*                                 , info */
     /*                                 , "\"]" */
     /*                                 , 0)): ""; */
     t = Triple_new(from, to, info);
     List_insertLast(d->list, t);
-    return;
+    //    return;
 }
 
 void Dot_toJpg(T d, String_t fname) {
@@ -43,7 +42,7 @@ void Dot_toJpg(T d, String_t fname) {
     String_t dotfname = String_concat(fname, ".dot", 0);
     String_t jpgfname = String_concat(fname, ".dot", ".jpg", 0);
 
-    Assert_ASSERT(d);
+    assert(d);
     printer = d->printer;
 
     //printf ("file name = %s\n", dotfname);
@@ -51,8 +50,7 @@ void Dot_toJpg(T d, String_t fname) {
     fp = File_open(dotfname, "w+");
     File_write(fp, "digraph g{\n");
     File_write(fp, "\tsize = \"10, 10\";\n");
-    File_write
-            (fp, "\tnode [color=lightblue2, style=filled];\n");
+    File_write(fp, "\tnode [color=lightblue2, style=filled];\n");
 
     File_write(fp, "\n\n");
 
@@ -88,10 +86,11 @@ void Dot_toJpg(T d, String_t fname) {
         //   printf ("run command: %s\n", cmd);
         System_run(cmd);
         // should modify this...
-        if (0) {
-            cmd = String_concat("rm ", dotfname, 0);
-            System_run(cmd);
-        }
+        //        int flag = 0;
+        //        if (flag) {
+        //            cmd = String_concat("rm ", dotfname, 0);
+        //            System_run(cmd);
+        //        }
     }
-    return;
+    //    return;
 }

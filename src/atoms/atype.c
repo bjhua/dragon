@@ -1,14 +1,14 @@
-#include "../lib/mem.h"
-#include "../lib/assert.h"
-#include "../lib/error.h"
 #include "atype.h"
+#include "../lib/mem.h"
+#include "../lib/unused.h"
+#include <assert.h>
 
 #define T Atype_t
 
 T Atype_new_int() {
     T p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
 
     p->kind = ATYPE_INT;
     return p;
@@ -17,17 +17,17 @@ T Atype_new_int() {
 T Atype_new_int_array() {
     T p;
 
-    Mem_NEW (p);
-
+    Mem_NEW(p);
     p->kind = ATYPE_INT_ARRAY;
     return p;
 }
 
 T Atype_new_string(String_t x) {
+    UNUSED(x);
+
     T p;
 
-    Mem_NEW (p);
-
+    Mem_NEW(p);
     p->kind = ATYPE_STRING;
     return p;
 }
@@ -35,8 +35,7 @@ T Atype_new_string(String_t x) {
 T Atype_new_string_array() {
     T p;
 
-    Mem_NEW (p);
-
+    Mem_NEW(p);
     p->kind = ATYPE_STRING_ARRAY;
     return p;
 }
@@ -44,7 +43,7 @@ T Atype_new_string_array() {
 T Atype_new_class(Id_t id) {
     T p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
 
     p->kind = ATYPE_CLASS;
     p->u.id = id;
@@ -54,7 +53,7 @@ T Atype_new_class(Id_t id) {
 T Atype_new_class_array(Id_t id) {
     T p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
 
     p->kind = ATYPE_CLASS_ARRAY;
     p->u.id = id;
@@ -64,7 +63,7 @@ T Atype_new_class_array(Id_t id) {
 T Atype_new_fun(List_t from, T to) {
     T p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
 
     p->kind = ATYPE_FUN;
     p->u.fun.from = from;
@@ -73,33 +72,28 @@ T Atype_new_fun(List_t from, T to) {
 }
 
 int Atype_maybeGc(T ty) {
-    Assert_ASSERT (ty);
+    assert(ty);
     switch (ty->kind) {
         case ATYPE_INT:
-            return 0;
-        case ATYPE_INT_ARRAY:
-            return 1;
         case ATYPE_STRING:
             return 0;
+        case ATYPE_INT_ARRAY:
         case ATYPE_STRING_ARRAY:
-            return 1;
         case ATYPE_CLASS:
-            return 1;
         case ATYPE_CLASS_ARRAY:
             return 1;
         case ATYPE_FUN:
-            Error_impossible ();
+            Error_impossible();
             return 0;
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
-    return 0;
+    Error_impossible();
 }
 
 String_t Atype_toString(T ty) {
-    Assert_ASSERT (ty);
+    assert(ty);
     switch (ty->kind) {
         case ATYPE_INT:
             return "int";
@@ -116,14 +110,10 @@ String_t Atype_toString(T ty) {
         case ATYPE_FUN:
             return "<fun>";
         default:
-            Error_impossible ();
+            Error_impossible();
             return "<junk>";
     }
-    Error_impossible ();
-    return "<junk>";
+    Error_impossible();
 }
 
-
 #undef T
-
-

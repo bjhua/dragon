@@ -1,7 +1,7 @@
+#include "gen-frame.h"
+#include "../control/control.h"
 #include "../lib/list.h"
 #include "../lib/trace.h"
-#include "../control/control.h"
-#include "gen-frame.h"
 
 // Generate frame information for each functions.
 // For now, assume all arguments and local declarations
@@ -17,7 +17,7 @@ static List_t getFrameInfo() {
     return tmp;
 }
 
-// 
+//
 static int genOffsets(List_t args, List_t decs) {
     Machine_FrameInfo_t newInfo;
     List_t offsets = List_new();
@@ -25,7 +25,7 @@ static int genOffsets(List_t args, List_t decs) {
     int size = 0;
     int argindex = -2;
     int decindex = 1;
-    int num = 0;
+    //    int num = 0;
 
     args = List_getFirst(args);
     while (args) {

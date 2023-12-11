@@ -1,9 +1,9 @@
 #ifndef HASH_H
 #define HASH_H
 
-#include "string.h"
 #include "list.h"
 #include "poly.h"
+#include "string.h"
 
 #define T Hash_t
 #define K Poly_t
@@ -49,11 +49,11 @@ double Hash_loadFactor(T h);
 
 String_t Hash_status(T h);
 
-void Hash_statusAll();
+void Hash_statusAll(void);
 
-int Hash_size(T h);
+long Hash_size(T h);
 
-int Hash_numItems(T h);
+long Hash_numItems(T h);
 
 // turn key into a list.
 List_t Hash_keyToList(T h);

@@ -28,13 +28,13 @@ struct T {
     } u;
 };
 
-T Atype_new_int();
+T Atype_new_int(void);
 
-T Atype_new_int_array();
+T Atype_new_int_array(void);
 
 T Atype_new_string(String_t);
 
-T Atype_new_string_array();
+T Atype_new_string_array(void);
 
 T Atype_new_class(Id_t);
 

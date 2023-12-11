@@ -1,11 +1,10 @@
-#include <stdbool.h>
-#include "../lib/mem.h"
-#include "../lib/hash.h"
-#include "../lib/assert.h"
-#include "../lib/int.h"
-#include "../lib/random.h"
-#include "../lib/property-list.h"
 #include "id.h"
+#include "../lib/hash.h"
+#include "../lib/int.h"
+#include "../lib/mem.h"
+#include "../lib/property-list.h"
+#include "../lib/random.h"
+#include <assert.h>
 
 #define T Id_t
 
@@ -26,7 +25,7 @@ struct T {
 static T Id_create(String_t s) {
     T x;
 
-    Assert_ASSERT(s);
+    assert(s);
     Mem_NEW (x);
     x->name = s;
     x->newName = 0;
@@ -42,7 +41,7 @@ T Id_bogus() {
 T Id_fromString(String_t s) {
     T x;
 
-    Assert_ASSERT(s);
+    assert(s);
     x = Hash_lookupOrInsert(table, s, (tyKV) Id_create);
     return x;
 }
@@ -60,13 +59,13 @@ T Id_newNoName() {
 }
 
 long Id_hashCode(T x) {
-    Assert_ASSERT(x);
+    assert(x);
     return x->hashCode;
 }
 
 String_t Id_toString(T x) {
-    Assert_ASSERT (x);
-    Assert_ASSERT(((x->name == 0) && (x->newName == 0)));
+    assert (x);
+    assert(((x->name == 0) && (x->newName == 0)));
     return (x->name) ? (x->name) : (x->newName);
 }
 
@@ -77,21 +76,20 @@ void Id_init() {
 }
 
 long Id_equals(T x, T y) {
-    Assert_ASSERT(x);
-    Assert_ASSERT(y);
+    assert(x);
+    assert(y);
     return x == y;
 }
 
 Plist_t Id_plist(T x) {
-    Assert_ASSERT(x);
+    assert(x);
     return x->plist;
 }
 
 void Id_print(T x) {
-    Assert_ASSERT (x);
-    Assert_ASSERT((x->name == 0) && (x->newName == 0));
+    assert (x);
+    assert((x->name == 0) && (x->newName == 0));
     printf("%s", (x->name) ? (x->name) : (x->newName));
-    return;
 }
 
 

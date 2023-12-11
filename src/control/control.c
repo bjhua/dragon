@@ -1,11 +1,10 @@
-#include "../lib/string.h"
-#include "../lib/assert.h"
+#include "control.h"
+#include "../lib/int.h"
 #include "../lib/mem.h"
+#include "../lib/poly.h"
+#include "../lib/string.h"
 #include "../lib/trace.h"
 #include "../lib/tuple.h"
-#include "../lib/poly.h"
-#include "../lib/int.h"
-#include "control.h"
 
 String_t Control_asmDirectory = "./";
 String_t Control_libDirectory = "./";
@@ -17,17 +16,17 @@ struct Flag_t {
     String_t name;
 
     /* <String_t, String_t> */
-    Tuple_t (*toString)();
+    Tuple_t (*toString)(void);
 
-    void (*reset)();
+    void (*reset)(void);
 };
 
-Flag_t Flag_new(String_t name,
-                Tuple_t (*toString)(),
-                void (*reset)()) {
+static Flag_t Flag_new(String_t name,
+                       Tuple_t (*toString)(void),
+                       void (*reset)(void)) {
     Flag_t f;
 
-    Mem_NEW (f);
+    Mem_NEW(f);
     f->name = name;
     f->toString = toString;
     f->reset = reset;
@@ -37,35 +36,22 @@ Flag_t Flag_new(String_t name,
 static struct List_t allFlagsHead = {0, 0};
 static List_t allFlags = &allFlagsHead;
 
-#define Flag_add(name, f)                                      \
-  List_insertLast(allFlags,                              \
-                        Flag_new (name,                        \
-                                  f##ToString,                 \
-                                  f##Reset));
-
-
-/* assert */
-Tuple_t Control_assertToString() {
-    if (Assert_flag)
-        return Tuple_new("true", "false");
-    return Tuple_new("false", "false");
-}
-
-void Control_assertReset() {
-    Assert_flag = 0;
-}
+#define Flag_add(name, f)                 \
+    List_insertLast(allFlags,             \
+                    Flag_new(name,        \
+                             f##ToString, \
+                             f##Reset));
 
 /* buffer size */
 long Control_bufferSize = 16;
 long Control_bufferSizeDefault = 16;
 
-Tuple_t Control_bufferSizeToString() {
-    return
-            Tuple_new(Int_toString(Control_bufferSize),
-                      Int_toString(Control_bufferSizeDefault));
+static Tuple_t Control_bufferSizeToString(void) {
+    return Tuple_new(Int_toString(Control_bufferSize),
+                     Int_toString(Control_bufferSizeDefault));
 }
 
-void Control_bufferSizeReset() {
+static void Control_bufferSizeReset(void) {
     Control_bufferSize = Control_bufferSizeDefault;
 }
 
@@ -73,13 +59,11 @@ void Control_bufferSizeReset() {
 Codegen_t Control_codegen = CODEGEN_C;
 static Codegen_t Control_codegenDefault = CODEGEN_C;
 
-static Tuple_t Control_codegenToString() {
-    return
-            Tuple_new((Control_codegen == CODEGEN_X86) ?
-                      "x86" : "C", "x86");
+static Tuple_t Control_codegenToString(void) {
+    return Tuple_new((Control_codegen == CODEGEN_X86) ? "x86" : "C", "x86");
 }
 
-static void Control_codegenReset() {
+static void Control_codegenReset(void) {
     Control_codegen = Control_codegenDefault;
 }
 
@@ -89,15 +73,14 @@ static struct List_t head = {0, 0};
 static List_t Control_dropPass = &head;
 static List_t Control_dropPassDefault = 0;
 
-static Tuple_t Control_dropPassToString() {
-    return Tuple_new(List_toString
-                             (Control_dropPass,
-                              ", ",
-                              (Poly_tyToString) String_toString),
+static Tuple_t Control_dropPassToString(void) {
+    return Tuple_new(List_toString(Control_dropPass,
+                                   ", ",
+                                   (Poly_tyToString) String_toString),
                      "[]");
 }
 
-static void Control_dropPassReset() {
+static void Control_dropPassReset(void) {
     Control_dropPass = Control_dropPassDefault;
 }
 
@@ -131,27 +114,26 @@ static String_t Control_dumpFlagToString(Dump_t d) {
         case DUMP_X86:
             return "x86";
         default:
-            Error_bug ("impossible");
+            Error_bug("impossible");
             return "<bogus>";
     }
-    Error_impossible ();
+    Error_impossible();
     return "<bogus>";
 }
 
-String_t Control_dumpToString2() {
+static String_t Control_dumpToString2(void) {
     if (!Control_dump)
         return "[]";
-    return List_toString
-            (Control_dump,
-             ", ",
-             (Poly_tyToString) Control_dumpFlagToString);
+    return List_toString(Control_dump,
+                         ", ",
+                         (Poly_tyToString) Control_dumpFlagToString);
 }
 
-Tuple_t Control_dumpToString() {
+static Tuple_t Control_dumpToString(void) {
     return Tuple_new(Control_dumpToString2(), "[]");
 }
 
-void Control_dumpReset() {
+static void Control_dumpReset(void) {
     Control_dump = Control_dumpDefault;
 }
 
@@ -181,23 +163,23 @@ int Control_dump_lookup(Dump_t il) {
 Expert_t Control_expert = EXPERT_NORMAL;
 Expert_t Control_expertDefault = EXPERT_NORMAL;
 
-String_t Control_expertToString2() {
+static String_t Control_expertToString2(void) {
     switch (Control_expert) {
         case EXPERT_NORMAL:
             return "false";
         case EXPERT_EXPERT:
             return "true";
         default:
-            Error_bug ("impossible");
+            Error_bug("impossible");
             return "<bogus>";
     }
 }
 
-Tuple_t Control_expertToString() {
+static Tuple_t Control_expertToString(void) {
     return Tuple_new(Control_expertToString2(), "false");
 }
 
-void Control_expertReset() {
+static void Control_expertReset(void) {
     Control_expert = Control_expertDefault;
 }
 
@@ -206,13 +188,13 @@ void Control_expertReset() {
 long Control_labelInfo = 0;
 long Control_labelInfoDefault = 0;
 
-Tuple_t Control_labelInfoToString() {
+static Tuple_t Control_labelInfoToString(void) {
     if (Control_labelInfo)
         return Tuple_new("true", "false");
     return Tuple_new("false", "false");
 }
 
-void Control_labelInfoReset() {
+static void Control_labelInfoReset(void) {
     Control_labelInfo = Control_labelInfoDefault;
 }
 
@@ -223,15 +205,14 @@ static struct List_t logPassHead = {0, 0};
 static List_t Control_logPasses = &logPassHead;
 static List_t Control_logPassDefault = 0;
 
-static Tuple_t Control_logPassToString() {
-    return Tuple_new(List_toString
-                             (Control_logPasses,
-                              ", ",
-                              (Poly_tyToString) String_toString),
+static Tuple_t Control_logPassToString(void) {
+    return Tuple_new(List_toString(Control_logPasses,
+                                   ", ",
+                                   (Poly_tyToString) String_toString),
                      "[]");
 }
 
-static void Control_logPassReset() {
+static void Control_logPassReset(void) {
     Control_logPasses = Control_logPassDefault;
 }
 
@@ -253,39 +234,39 @@ void Control_logPass_insert(String_t name) {
 String_t Control_out_file_name = 0;
 static String_t Control_oDefault = 0;
 
-static Tuple_t Control_oToString() {
+static Tuple_t Control_oToString(void) {
     return Tuple_new((Control_out_file_name) ? Control_out_file_name : "\"\"",
                      "\"\"");
 }
 
-static void Control_oReset() {
+static void Control_oReset(void) {
     Control_out_file_name = Control_oDefault;
 }
 
 /////////////////////////////////////////////////////
 // target-size
 int Control_Target_size = 4;
-static int Control_Target_sizeDefault = 4;
+//static int Control_Target_sizeDefault = 4;
+//
+//static Tuple_t Control_Target_sizeToString() {
+//    return Tuple_new(Int_toString(Control_Target_size), Int_toString(Control_Target_sizeDefault));
+//}
 
-static Tuple_t Control_Target_sizeToString() {
-    return Tuple_new(Int_toString(Control_Target_size), Int_toString(Control_Target_sizeDefault));
-}
-
-static void Control_Target_sizeReset() {
-    Control_Target_size = Control_Target_sizeDefault;
-}
+//static void Control_Target_sizeReset() {
+//    Control_Target_size = Control_Target_sizeDefault;
+//}
 
 ////////////////////////////////////////////////////////
 /* show type */
 long Control_showType = 0;
 static int Control_showTypeDefault = 0;
 
-static Tuple_t Control_showTypeToString() {
+static Tuple_t Control_showTypeToString(void) {
     return Tuple_new(Control_showType ? "true" : "false",
                      "false");
 }
 
-static void Control_showTypeReset() {
+static void Control_showTypeReset(void) {
     Control_showType = Control_showTypeDefault;
 }
 
@@ -294,12 +275,12 @@ static void Control_showTypeReset() {
 long Control_jpg = 0;
 long Control_jpgDefault = 0;
 
-static Tuple_t Control_jpgToString() {
+static Tuple_t Control_jpgToString(void) {
     return Tuple_new(Control_jpg ? "true" : "false",
                      "false");
 }
 
-static void Control_jpgReset() {
+static void Control_jpgReset(void) {
     Control_jpg = Control_jpgDefault;
 }
 
@@ -308,18 +289,17 @@ static void Control_jpgReset() {
 List_t Control_trace = 0;
 List_t Control_traceDefault = 0;
 
-String_t Control_traceToString2() {
-    return List_toString
-            (Trace_allFuncs(),
-             ", ",
-             (Poly_tyToString) String_toString);
+static String_t Control_traceToString2(void) {
+    return List_toString(Trace_allFuncs(),
+                         ", ",
+                         (Poly_tyToString) String_toString);
 }
 
-Tuple_t Control_traceToString() {
+static Tuple_t Control_traceToString(void) {
     return Tuple_new(Control_traceToString2(), "[]");
 }
 
-void Control_traceReset() {
+static void Control_traceReset(void) {
     Trace_reset();
 }
 
@@ -329,7 +309,7 @@ void Control_traceReset() {
 Verbose_t Control_verbose = VERBOSE_SILENT;
 Verbose_t Control_verboseDefault = VERBOSE_SILENT;
 
-String_t Control_verboseToString2() {
+static String_t Control_verboseToString2(void) {
     switch (Control_verbose) {
         case VERBOSE_SILENT:
             return "0";
@@ -340,16 +320,16 @@ String_t Control_verboseToString2() {
         case VERBOSE_DETAIL:
             return "3";
         default:
-            Error_bug ("impossible");
+            Error_bug("impossible");
             return "<bogus>";
     }
 }
 
-Tuple_t Control_verboseToString() {
+static Tuple_t Control_verboseToString(void) {
     return Tuple_new(Control_verboseToString2(), "0");
 }
 
-void Control_verboseReset() {
+static void Control_verboseReset(void) {
     Control_verbose = Control_verboseDefault;
 }
 
@@ -357,8 +337,7 @@ int Control_Verb_order(Verbose_t l1, Verbose_t l2) {
     return l1 <= l2;
 }
 
-void Control_init() {
-    Flag_add("assert flag: ", Control_assert);
+void Control_init(void) {
     Flag_add("bufferSize flag: ", Control_bufferSize);
     Flag_add("code gen: ", Control_codegen);
     Flag_add("drop pass flag: ", Control_dropPass);
@@ -374,7 +353,7 @@ void Control_init() {
     return;
 }
 
-void Control_printFlags() {
+void Control_printFlags(void) {
     List_t p = List_getFirst(allFlags);
     Flag_t f;
     Tuple_t tuple;
@@ -390,5 +369,5 @@ void Control_printFlags() {
                (String_t) Tuple_second(tuple));
         p = p->next;
     }
-    return;
+    //    return;
 }

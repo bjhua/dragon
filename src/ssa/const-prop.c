@@ -1,34 +1,34 @@
-#include "../lib/error.h"
-#include "../lib/trace.h"
-#include "../lib/list.h"
-#include "../control/log.h"
 #include "const-prop.h"
+#include "../control/log.h"
+#include "../lib/error.h"
+#include "../lib/list.h"
+#include "../lib/trace.h"
 
 // This module performs const propagation and const
 // folding. Here are good reasons to perform both
-// of them togeter, rather than separately, consider
+// of them together, rather than separately, consider
 // such kind of code:
 //   x1 = c;
 //   x2 = x1 + c;
 //   x3 = x2 + c;
 // In summary, all analysis that help each other should
-// be done simutenously, and the rewriting should be
+// be done simultaneously, and the rewriting should be
 // lazy.
 
-// whether or not we found more constants.
+// can we found more constants?
 static int foundMoreConst = 0;
 static int shouldRewrite = 0;
 
-static void mark() {
+static void mark(void) {
     foundMoreConst = 1;
     shouldRewrite = 1;
 }
 
-static int hasBeenMarked() {
+static int hasBeenMarked(void) {
     return 1 == foundMoreConst;
 }
 
-static void markClear() {
+static void markClear(void) {
     foundMoreConst = 0;
     // don't clear the "shouldRewrite" here.
 }
@@ -58,14 +58,14 @@ static void analyzeStm(Ssa_Stm_t s) {
 
                 Property_set(constProp, dest, src);
             }
-                // the operand is not a constant, but a variable
-                // which has been marked as a constant.
+            // the operand is not a constant, but a variable
+            // which has been marked as a constant.
             else {
                 Ssa_Operand_t v;
                 Id_t right;
 
                 if (src->kind != SSA_OP_ID)
-                    Error_impossible ();
+                    Error_impossible();
 
                 right = src->u.id;
                 v = Property_get(constProp, right);
@@ -86,65 +86,59 @@ static void analyzeStm(Ssa_Stm_t s) {
             Id_t dest = s->u.bop.dest;
             Ssa_Operand_t left = s->u.bop.left;
             Ssa_Operand_t right = s->u.bop.right;
-            int li, ri;
+            //            int li, ri;
 
             if (Property_get(constProp, dest))
                 return;
 
             // two (integer) constants
-            if (left->kind == SSA_OP_INT
-                && right->kind == SSA_OP_INT) {
-                int r;
-
+            if (left->kind == SSA_OP_INT && right->kind == SSA_OP_INT) {
                 mark();
                 Log_str("found (const, const) in binary op: ");
                 Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
 
-                r = Operator_binary(left->u.intlit, s->u.bop.op, right->u.intlit);
+                long r = Operator_binary(left->u.intlit, s->u.bop.op, right->u.intlit);
 
                 Property_set(constProp, dest, Ssa_Operand_new_int(r));
             }
-                // an integer and an id
-            else if (left->kind == SSA_OP_INT
-                     && right->kind == SSA_OP_ID) {
+            // an integer and an id
+            else if (left->kind == SSA_OP_INT && right->kind == SSA_OP_ID) {
                 Ssa_Operand_t rv = Property_get(constProp, right->u.id);
 
                 if (rv && (rv->kind == SSA_OP_INT)) {
-                    int r = Operator_binary(left->u.intlit, s->u.bop.op, rv->u.intlit);
+                    long r = Operator_binary(left->u.intlit, s->u.bop.op, rv->u.intlit);
                     mark();
                     Log_str("found (const, idconst) in binary op:");
                     Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
                     Property_set(constProp, dest, Ssa_Operand_new_int(r));
                 }
             }
-                // and id and an integer
-            else if (left->kind == SSA_OP_ID
-                     && right->kind == SSA_OP_INT) {
+            // and id and an integer
+            else if (left->kind == SSA_OP_ID && right->kind == SSA_OP_INT) {
                 Ssa_Operand_t lv = Property_get(constProp, left->u.id);
 
                 if (lv && (lv->kind == SSA_OP_INT)) {
-                    int r = Operator_binary(lv->u.intlit, s->u.bop.op, right->u.intlit);
+                    long r = Operator_binary(lv->u.intlit, s->u.bop.op, right->u.intlit);
                     mark();
                     Log_str("found (idconst, const) in binary op:");
                     Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
                     Property_set(constProp, dest, Ssa_Operand_new_int(r));
                 }
             }
-                // two ids
-            else if (left->kind == SSA_OP_ID
-                     && right->kind == SSA_OP_ID) {
+            // two ids
+            else if (left->kind == SSA_OP_ID && right->kind == SSA_OP_ID) {
                 Ssa_Operand_t lv = Property_get(constProp, left->u.id);
                 Ssa_Operand_t rv = Property_get(constProp, right->u.id);
 
-                if (lv && (lv->kind == SSA_OP_INT)
-                    && rv && (rv->kind == SSA_OP_INT)) {
-                    int r = Operator_binary(lv->u.intlit, s->u.bop.op, rv->u.intlit);
+                if (lv && (lv->kind == SSA_OP_INT) && rv && (rv->kind == SSA_OP_INT)) {
+                    long r = Operator_binary(lv->u.intlit, s->u.bop.op, rv->u.intlit);
                     mark();
                     Log_str("found (idconst, idconst) in binary op:");
                     Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
                     Property_set(constProp, dest, Ssa_Operand_new_int(r));
                 }
-            } else;
+            } else
+                ;
             return;
         }
             // dest <- uop src
@@ -157,28 +151,28 @@ static void analyzeStm(Ssa_Stm_t s) {
 
             // integer
             if (src->kind == SSA_OP_INT) {
-                int r;
-
                 mark();
                 Log_str("found (const) in uop: ");
                 Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
 
-                r = Operator_unary(s->u.uop.op, src->u.intlit);
+                long r = Operator_unary(s->u.uop.op, src->u.intlit);
                 Property_set(constProp, dest, Ssa_Operand_new_int(r));
             }
-                // id and marked
+            // id and marked
             else if (src->kind == SSA_OP_ID) {
                 Ssa_Operand_t v = Property_get(constProp, src->u.id);
                 if (v && (v->kind == SSA_OP_INT)) {
-                    int r = Operator_unary(s->u.uop.op, v->u.intlit);
+                    long r = Operator_unary(s->u.uop.op, v->u.intlit);
 
                     mark();
                     Log_str("found (idconst) in uop: ");
                     Log_fun(s, (Poly_tyLog) Ssa_Stm_print);
 
                     Property_set(constProp, dest, Ssa_Operand_new_int(r));
-                } else;
-            } else;
+                } else
+                    ;
+            } else
+                ;
             return;
         }
         case SSA_STM_PHI: {
@@ -216,7 +210,6 @@ static void analyzeFun(Ssa_Fun_t f) {
 static void analyze(Ssa_Prog_t p) {
 
     List_foreach(p->funcs, (Poly_tyVoid) analyzeFun);
-
 }
 
 ////////////////////////////////////////////////////////

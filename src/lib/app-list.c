@@ -1,7 +1,6 @@
-#include "assert.h"
-#include "mem.h"
-#include <stdarg.h>
 #include "app-list.h"
+#include "mem.h"
+#include <assert.h>
 
 #define T AppList_t
 
@@ -42,14 +41,14 @@ T AppList_fromItem(Poly_t x) {
     return t;
 }
 
-T AppList_new_fromItemList(List_t x) {
-    T t;
-
-    Mem_NEW(t);
-    t->kind = SINGLE;
-    t->u.list = x;
-    return t;
-}
+//static T AppList_new_fromItemList(List_t x) {
+//    T t;
+//
+//    Mem_NEW(t);
+//    t->kind = SINGLE;
+//    t->u.list = x;
+//    return t;
+//}
 
 T AppList_concat(T x, T y) {
     T t;
@@ -119,14 +118,14 @@ static void toList_doit(T x) {
             break;
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return;
     }
     return;
 }
 
 List_t AppList_toList(T x) {
-    Assert_ASSERT(x);
+    assert(x);
 
     theList = List_new();
     toList_doit(x);

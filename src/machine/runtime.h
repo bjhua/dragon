@@ -6,6 +6,6 @@
 extern Id_t Runtime_array;
 extern Id_t Runtime_class;
 
-void Runtime_init();
+void Runtime_init(void);
 
 #endif

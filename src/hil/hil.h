@@ -1,9 +1,9 @@
 #ifndef HIL_H
 #define HIL_H
 
-#include "../lib/list.h"
-#include "../lib/file.h"
 #include "../atoms/atoms.h"
+#include "../lib/file.h"
+#include "../lib/list.h"
 
 #define E Hil_Exp_t
 #define F Hil_Fun_t
@@ -82,7 +82,7 @@ struct E {
             // List<E>
             List_t args;
         } newClass;
-        int intlit;
+        long intlit;
         String_t stringlit;
         struct {
             Id_t f;
@@ -110,7 +110,7 @@ E Hil_Exp_new_unary(Operator_t op,
                     E e,
                     Atype_t ty);
 
-E Hil_Exp_new_intlit(int, Atype_t ty);
+E Hil_Exp_new_intlit(long, Atype_t ty);
 
 E Hil_Exp_new_stringlit(String_t s, Atype_t ty);
 
@@ -146,12 +146,12 @@ struct S {
         E exp;
         struct {
             E cond;
-            List_t then;    // List<S>
-            List_t elsee;   // List<S>
+            List_t then; // List<S>
+            List_t elsee;// List<S>
         } iff;
         struct {
             E cond;
-            List_t body;         // List<S>
+            List_t body;// List<S>
             Label_t entryLabel;
             Label_t exitLabel;
             /* paddling the last part s3:
@@ -185,7 +185,7 @@ S Hil_Stm_new_jump(Label_t jump);
 
 S Hil_Stm_new_localThrow(Label_t label);
 
-S Hil_Stm_new_throw();
+S Hil_Stm_new_throw(void);
 
 S Hil_Stm_new_tryCatch(List_t tryy, List_t catchh, Label_t label, Label_t end);
 
@@ -196,7 +196,7 @@ File_t Hil_Stm_print(File_t file, S);
 //////////////////////////////////////////////////////
 /* function */
 struct F {
-    Atype_t type;     // return type, from atoms/atype
+    Atype_t type;// return type, from atoms/atype
     Id_t name;
     // List<Dec_t> , from atoms/dec
     List_t args;

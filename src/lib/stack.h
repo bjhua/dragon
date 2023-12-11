@@ -9,7 +9,7 @@
 
 typedef List_t Stack_t;
 
-T Stack_new();
+T Stack_new(void);
 
 void Stack_push(T stk, P x);
 

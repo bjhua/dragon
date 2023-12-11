@@ -1,13 +1,13 @@
-#include "../lib/assert.h"
-#include "../lib/list.h"
-#include "../lib/error.h"
-#include "../lib/trace.h"
 #include "combine-stm.h"
+#include "../lib/error.h"
+#include "../lib/list.h"
+#include "../lib/trace.h"
+#include <assert.h>
 
 static Ast_Block_t Elab_block(Ast_Block_t);
 
 static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case AST_STM_EXP:
             return s;
@@ -40,10 +40,10 @@ static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
         case AST_STM_BLOCK:
             return Ast_Stm_new_block(Elab_block(s->u.block));
         default:
-            Error_impossible ();
+            Error_impossible();
             return s;
     }
-    Error_impossible ();
+    Error_impossible();
     return s;
 }
 
@@ -56,7 +56,7 @@ static struct Dec_Result_t Elab_checkDecs(List_t decs) {
     struct Dec_Result_t result;
     List_t p;
 
-    Assert_ASSERT(decs);
+    assert(decs);
 
     p = List_getFirst(decs);
     result.genDecs = List_new();
@@ -66,14 +66,10 @@ static struct Dec_Result_t Elab_checkDecs(List_t decs) {
 
         List_insertLast(result.genDecs, Ast_Dec_new(dec->type, dec->var, 0));
         if (dec->init) {
-            List_insertLast
-                    (result.genStms,
-                     Ast_Stm_new_exp
-                             (Ast_Exp_new_assign
-                                      (Ast_Exp_new_lval(Ast_Lval_new_var
-                                                                (dec->var, dec->init->ty, Region_bogus()),
-                                                        dec->init->ty),
-                                       dec->init, dec->init->ty, Region_bogus())));
+            List_insertLast(result.genStms,
+                            Ast_Stm_new_exp(Ast_Exp_new_assign(Ast_Exp_new_lval(Ast_Lval_new_var(dec->var, dec->init->ty, Region_bogus()),
+                                                                                dec->init->ty),
+                                                               dec->init, dec->init->ty, Region_bogus())));
         }
         p = p->next;
     }
@@ -84,7 +80,7 @@ static Ast_Block_t Elab_block(Ast_Block_t b) {
     struct Dec_Result_t gens;
     List_t stms;
 
-    Assert_ASSERT(b);
+    assert(b);
     gens = Elab_checkDecs(b->decs);
     stms = List_map(b->stms,
                     (Poly_tyId) Elab_stm);
@@ -95,7 +91,7 @@ static Ast_Block_t Elab_block(Ast_Block_t b) {
 static Ast_Fun_t Elab_funForOne(Ast_Fun_t f) {
     Ast_Block_t b;
 
-    Assert_ASSERT(f);
+    assert(f);
     b = Elab_block(f->block);
     return Ast_Fun_new(f->type,
                        f->name,
@@ -107,17 +103,16 @@ static Ast_Fun_t Elab_funForOne(Ast_Fun_t f) {
 static List_t Elab_funDecs(List_t fs) {
     List_t list;
 
-    Assert_ASSERT(fs);
-    list = List_map
-            (fs,
-             (Poly_tyId) Elab_funForOne);
+    assert(fs);
+    list = List_map(fs,
+                    (Poly_tyId) Elab_funForOne);
     return list;
 }
 
 static Ast_Prog_t Combine_stm_traced(Ast_Prog_t p) {
     List_t funcs;
 
-    Assert_ASSERT(p);
+    assert(p);
     funcs = Elab_funDecs(p->funcs);
     return Ast_Prog_new(p->classes, funcs);
 }

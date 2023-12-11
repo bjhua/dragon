@@ -1,6 +1,6 @@
 #ifndef LIB_TEST_H
 #define LIB_TEST_H
 
-int Lib_test();
+int Lib_test(void);
 
 #endif

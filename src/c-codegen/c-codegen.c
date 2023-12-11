@@ -1,19 +1,20 @@
-#include "../lib/assert.h"
+#include "c-codegen.h"
+#include "../control/control.h"
 #include "../lib/error.h"
 #include "../lib/trace.h"
-#include "../control/control.h"
-#include "c-codegen.h"
+#include "../lib/unused.h"
+#include <assert.h>
 
 //////////////////////////////////////////////////////
 //
 static File_t file = 0;
 // to index the frames and layouts.
-static int index = 1;
+//static int index = 1;
 //
-static String_t argOffsets = "argOffsets";
-static String_t decOffsets = "decOffsets";
-// 
-static String_t layouts = "layouts";
+//static String_t argOffsets = "argOffsets";
+//static String_t decOffsets = "decOffsets";
+//
+//static String_t layouts = "layouts";
 //
 static Label_t currentLabel = 0;
 
@@ -31,7 +32,7 @@ static void outputOneString(Machine_Str_t s) {
     char c;
     char *a = s->value;
 
-    Assert_ASSERT(s->name);
+    assert(s->name);
     fprintf(file, "static char *%s = ", Id_toString(s->name));
     fprintf(file, "%s", "\"");
     while ((c = *a++)) {
@@ -57,32 +58,33 @@ static void outputStrings(List_t strings) {
 
 //////////////////////////////////////////////////////
 // frames
-static void outputFrame(Machine_FrameInfo_t p) {
-    return;
-
-    List_t tmp;
-
-    tmp = List_getFirst(p->frameOffsets);
-    fprintf(file, "int %s", argOffsets);
-    fprintf(file, "_%d[] = {%d ", index, List_size(p->frameOffsets));
-    while (tmp) {
-        long off = (long) tmp->data;
-        fprintf(file, ", %ld", off);
-        tmp = tmp->next;
-    }
-    fprintf(file, "%s", "};\n");
-
-    tmp = List_getFirst(p->frameOffsetsDec);
-    fprintf(file, "int %s", decOffsets);
-    fprintf(file, "_%d[] = {%d ", index, List_size(p->frameOffsetsDec));
-    while (tmp) {
-        long off = (long) tmp->data;
-        fprintf(file, ", %ld", off);
-        tmp = tmp->next;
-    }
-    fprintf(file, "%s", "};\n\n");
-    return;
-}
+//static void outputFrame(Machine_FrameInfo_t p) {
+//    UNUSED(p);
+//    return;
+//
+//    List_t tmp;
+//
+//    tmp = List_getFirst(p->frameOffsets);
+//    fprintf(file, "int %s", argOffsets);
+//    fprintf(file, "_%d[] = {%d ", index, List_size(p->frameOffsets));
+//    while (tmp) {
+//        long off = (long) tmp->data;
+//        fprintf(file, ", %ld", off);
+//        tmp = tmp->next;
+//    }
+//    fprintf(file, "%s", "};\n");
+//
+//    tmp = List_getFirst(p->frameOffsetsDec);
+//    fprintf(file, "int %s", decOffsets);
+//    fprintf(file, "_%d[] = {%d ", index, List_size(p->frameOffsetsDec));
+//    while (tmp) {
+//        long off = (long) tmp->data;
+//        fprintf(file, ", %ld", off);
+//        tmp = tmp->next;
+//    }
+//    fprintf(file, "%s", "};\n\n");
+//    return;
+//}
 
 /****************************************************/
 // local exception handlers
@@ -93,29 +95,29 @@ static List_t handlers = 0;
 
 //////////////////////////////////////////////////////
 // layouts
-static void outputLayouts(Machine_ObjInfo_t m) {
-    return;
-    List_t p;
-
-    Assert_ASSERT(m);
-    fprintf(file, "%s", "int ");
-    fprintf(file, "%s", "layout_");
-    fprintf(file, "%d[]", index);
-    fprintf(file, "%s", " = {");
-    fprintf(file, "%d", List_size(m->offsets));
-    p = List_getFirst(m->offsets);
-    while (p) {
-        fprintf(file, ", %ld", (long) p->data);
-        p = p->next;
-    }
-    fprintf(file, "%s", "};\n");
-    return;
-}
+//static void outputLayouts(Machine_ObjInfo_t m) {
+//    return;
+//    List_t p;
+//
+//    assert(m);
+//    fprintf(file, "%s", "int ");
+//    fprintf(file, "%s", "layout_");
+//    fprintf(file, "%d[]", index);
+//    fprintf(file, "%s", " = {");
+//    fprintf(file, "%d", List_size(m->offsets));
+//    p = List_getFirst(m->offsets);
+//    while (p) {
+//        fprintf(file, ", %ld", (long) p->data);
+//        p = p->next;
+//    }
+//    fprintf(file, "%s", "};\n");
+//    return;
+//}
 
 //////////////////////////////////////////////////////
 // atype
 static void outputAtype(Atype_t ty) {
-    Assert_ASSERT (ty);
+    assert(ty);
     switch (ty->kind) {
         case ATYPE_INT:
             fprintf(file, "%s", "int");
@@ -136,13 +138,13 @@ static void outputAtype(Atype_t ty) {
             fprintf(file, "%s", "void **");
             return;
         case ATYPE_FUN:
-            Error_impossible ();
+            Error_impossible();
             return;
         default:
-            Error_impossible ();
+            Error_impossible();
             return;
     }
-    Error_impossible ();
+    Error_impossible();
     return;
 }
 
@@ -186,10 +188,10 @@ static void outputDecs(List_t l) {
 //////////////////////////////////////////////////////
 // operand
 static void outputOperand(Machine_Operand_t o) {
-    Assert_ASSERT(o);
+    assert(o);
     switch (o->kind) {
         case MACHINE_OP_INT:
-            fprintf(file, "%d", o->u.intlit);
+            fprintf(file, "%ld", o->u.intlit);
             break;
         case MACHINE_OP_GLOBAL:
             fprintf(file, "%s", Id_toString(o->u.id));
@@ -198,7 +200,7 @@ static void outputOperand(Machine_Operand_t o) {
             fprintf(file, "%s", Id_toString(o->u.id));
             break;
         default:
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     return;
@@ -207,7 +209,7 @@ static void outputOperand(Machine_Operand_t o) {
 //////////////////////////////////////////////////////
 // memory
 static void outputMem(Machine_Mem_t m) {
-    Assert_ASSERT(m);
+    assert(m);
     switch (m->kind) {
         case MACHINE_MEM_ARRAY:
             fprintf(file, "*(((A)%s", Id_toString(m->u.array.name));
@@ -220,11 +222,11 @@ static void outputMem(Machine_Mem_t m) {
             // the index should always be equal or greater than 0,
             // so the "+" here is of no problem.
             fprintf(file, "%s", ")+");
-            fprintf(file, "%d", (m->u.class.index));
+            fprintf(file, "%ld", (m->u.class.index));
             fprintf(file, "%s", ")");
             break;
         default:
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     return;
@@ -233,7 +235,7 @@ static void outputMem(Machine_Mem_t m) {
 //////////////////////////////////////////////////////
 // stm
 static void outputStm(Machine_Stm_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     fprintf(file, "%s", "  ");
     switch (s->kind) {
         case MACHINE_STM_MOVE:
@@ -289,8 +291,8 @@ static void outputStm(Machine_Stm_t s) {
             fprintf(file, "%s", Id_toString(s->u.class.fname));
 
             fprintf(file, "%s", " (");
-            fprintf(file, "%d, ", s->u.class.index);
-            fprintf(file, "%d", s->u.class.size);
+            fprintf(file, "%ld, ", s->u.class.index);
+            fprintf(file, "%ld", s->u.class.size);
             fprintf(file, "%s", ")");
             fprintf(file, ";%s", " // (index, size)");
             break;
@@ -310,7 +312,7 @@ static void outputStm(Machine_Stm_t s) {
         }
         default:
             fprintf(stderr, "%d", s->kind);
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     fprintf(file, "%s", ";\n");
@@ -320,7 +322,7 @@ static void outputStm(Machine_Stm_t s) {
 //////////////////////////////////////////////////////
 // transfer
 static void outputTransfer(Machine_Transfer_t t) {
-    Assert_ASSERT(t);
+    assert(t);
     fprintf(file, "%s", "  ");
     switch (t->kind) {
         case MACHINE_TRANS_IF:
@@ -390,7 +392,7 @@ static void outputTransfer(Machine_Transfer_t t) {
             break;
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     fprintf(file, "%s", ";\n");
@@ -400,7 +402,7 @@ static void outputTransfer(Machine_Transfer_t t) {
 //////////////////////////////////////////////////////
 // block
 static void outputBlock(Machine_Block_t b) {
-    Assert_ASSERT(b);
+    assert(b);
 
     fprintf(file, "%s:\n", Label_toString(b->label));
     // if this label appears in the "handlers", it
@@ -416,7 +418,7 @@ static void outputBlock(Machine_Block_t b) {
 //////////////////////////////////////////////////////
 // function
 static void outputFunction(Machine_Fun_t f) {
-    Assert_ASSERT(f);
+    assert(f);
 
     handlers = List_new();
     outputAtype(f->type);
@@ -438,15 +440,15 @@ static void outputFunction(Machine_Fun_t f) {
 //////////////////////////////////////////////////////
 // programs
 
-#define COMMENT(s)\
-  "\n//////////////////////////////////////////////////\n"        \
-  "// " s "\n"
+#define COMMENT(s)                                           \
+    "\n//////////////////////////////////////////////////\n" \
+    "// " s "\n"
 
 static Machine_Prog_t C_codegenTraced(Machine_Prog_t p) {
-    List_t frame;
-    List_t layouts;
+    //    List_t frame;
+    //    List_t layouts;
 
-    Assert_ASSERT(p);
+    assert(p);
     fprintf(file, "%s", COMMENT("header files:\n"));
     fprintf(file, "%s", "extern long printi(long);\n\n");
 
@@ -531,25 +533,21 @@ static Machine_Prog_t C_codegenTraced(Machine_Prog_t p) {
 
 static void outArg(Machine_Prog_t p) {
     File_saveToFile("c-codegen.arg", (Poly_tyPrint) Machine_Prog_print, p);
-    return;
+    //    return;
 }
 
 static void outResult(Machine_Prog_t p) {
+    UNUSED(p);
     File_t file = File_open("c-codegen.result", "w+");
     File_write(file, "leave empty!");
     File_close(file);
-    return;
+    //    return;
 }
 
 int C_codegen(File_t f, Machine_Prog_t p) {
     Machine_Prog_t r;
 
     file = f;
-    Trace_TRACE("C_codegen"
-                , C_codegenTraced
-                , (p)
-                , outArg
-                , r
-                , outResult);
+    Trace_TRACE("C_codegen", C_codegenTraced, (p), outArg, r, outResult);
     return 0;
 }

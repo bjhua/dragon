@@ -1,19 +1,19 @@
-#include "../lib/assert.h"
-#include "../lib/list.h"
-#include "../lib/error.h"
-#include "../lib/trace.h"
 #include "lift-dec.h"
+#include "../lib/error.h"
+#include "../lib/list.h"
+#include "../lib/trace.h"
+#include <assert.h>
 
 static List_t allDecs = 0;
 
-void genDecs(List_t l) {
+static void genDecs(List_t l) {
     List_append(allDecs, l);
 }
 
 static Ast_Block_t Elab_block(Ast_Block_t);
 
 static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case AST_STM_EXP: {
             return s;
@@ -47,17 +47,17 @@ static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
         case AST_STM_BLOCK:
             return Ast_Stm_new_block(Elab_block(s->u.block));
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 static Ast_Block_t Elab_block(Ast_Block_t b) {
     List_t stms;
 
-    Assert_ASSERT(b);
+    assert(b);
     genDecs(b->decs);
     stms = List_map(b->stms, (Poly_tyId) Elab_stm);
     return Ast_Block_new(List_new(), stms);
@@ -66,7 +66,7 @@ static Ast_Block_t Elab_block(Ast_Block_t b) {
 static Ast_Fun_t Elab_funForOne(Ast_Fun_t f) {
     Ast_Block_t b;
 
-    Assert_ASSERT(f);
+    assert(f);
     allDecs = List_new();
     b = Elab_block(f->block);
     b = Ast_Block_new(allDecs, b->stms);
@@ -76,7 +76,7 @@ static Ast_Fun_t Elab_funForOne(Ast_Fun_t f) {
 static List_t Elab_funs(List_t fs) {
     List_t list;
 
-    Assert_ASSERT(fs);
+    assert(fs);
     list = List_map(fs,
                     (Poly_tyId) Elab_funForOne);
     return list;
@@ -85,7 +85,7 @@ static List_t Elab_funs(List_t fs) {
 static Ast_Prog_t Lift_dec_traced(Ast_Prog_t p) {
     List_t funcs;
 
-    Assert_ASSERT(p);
+    assert(p);
     funcs = Elab_funs(p->funcs);
     return Ast_Prog_new(p->classes, funcs);
 }
@@ -103,7 +103,6 @@ static void Trace_result(Ast_Prog_t p) {
 Ast_Prog_t Lift_dec(Ast_Prog_t p) {
     Ast_Prog_t r;
 
-    Trace_TRACE ("Lift_dec", Lift_dec_traced, (p), Trace_arg, r, Trace_result);
+    Trace_TRACE("Lift_dec", Lift_dec_traced, (p), Trace_arg, r, Trace_result);
     return r;
 }
-

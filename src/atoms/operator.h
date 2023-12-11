@@ -3,8 +3,6 @@
 
 #include "../lib/string.h"
 
-#define T Operator_t
-
 typedef enum {
     OP_ADD = 0x0,
     OP_SUB,
@@ -21,13 +19,13 @@ typedef enum {
     OP_GE,
     OP_NOT,
     OP_NEG = 14
-} T;
+} Operator_t;
 
-String_t Operator_toString(T);
+String_t Operator_toString(Operator_t);
 
-int Operator_binary(int, T, int);
+long Operator_binary(long, Operator_t, long);
 
-int Operator_unary(T, int);
+long Operator_unary(Operator_t, long);
 
 #undef T
 

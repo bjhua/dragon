@@ -1,10 +1,11 @@
-#include <stdio.h>
-#include "mem.h"
-#include "todo.h"
-#include "assert.h"
-#include "string.h"
-#include "error.h"
 #include "stack.h"
+#include "error.h"
+#include "mem.h"
+#include "string.h"
+#include "todo.h"
+#include "unused.h"
+#include <assert.h>
+#include <stdio.h>
 
 #define T Stack_t
 #define P Poly_t
@@ -14,12 +15,12 @@ T Stack_new() {
 }
 
 int Stack_isEmpty(T stk) {
-    Assert_ASSERT(stk);
+    assert(stk);
     return List_isEmpty(stk);
 }
 
 void Stack_push(T stk, P x) {
-    Assert_ASSERT(stk);
+    assert(stk);
     List_insertFirst(stk, x);
     return;
 }
@@ -27,7 +28,7 @@ void Stack_push(T stk, P x) {
 P Stack_pop(T stk) {
     T t;
 
-    Assert_ASSERT (stk);
+    assert(stk);
     if (List_isEmpty(stk))
         Error_error("try to pop on empty stacks\n");
     t = stk->next->data;
@@ -40,6 +41,7 @@ int Stack_size(T stk) {
 }
 
 T Stack_stack(P x1, ...) {
+    UNUSED(x1);
     TODO;
 }
 
@@ -59,7 +61,7 @@ char *Stack_toString(T stk, String_t sep,
 }
 
 P Stack_getTop(T stk) {
-    Assert_ASSERT(stk);
+    assert(stk);
     if (List_isEmpty(stk)) {
         *((int *) 1) = 0;
         Error_error("try to get top of an empty stack");

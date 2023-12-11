@@ -1,14 +1,14 @@
-#include <assert.h>
-#include "../lib/assert.h"
-#include "../lib/list.h"
-#include "../lib/error.h"
-#include "../lib/mem.h"
-#include "../lib/property.h"
-#include "../lib/trace.h"
+#include "trans-hil.h"
 #include "../atoms/atoms.h"
 #include "../control/control.h"
 #include "../control/log.h"
-#include "trans-hil.h"
+#include "../lib/error.h"
+#include "../lib/list.h"
+#include "../lib/mem.h"
+#include "../lib/property.h"
+#include "../lib/trace.h"
+#include "../lib/unused.h"
+#include <assert.h>
 
 //////////////////////////////////////////////////////
 // function information
@@ -23,14 +23,14 @@ static struct FunInfo_t fun = {0, 0, 0};
 //////////////////////////////////////////////////////
 // some dubugging utilities for control flow
 
-#define S_IF_TRUE     ("IF_TRUE")
-#define S_IF_FALSE    ("IF_FALSE")
-#define S_IF_END      ("IF_END")
+#define S_IF_TRUE ("IF_TRUE")
+#define S_IF_FALSE ("IF_FALSE")
+#define S_IF_END ("IF_END")
 
 #define S_WHILE_START ("WHILE_START")
 // label for break or continue
-#define S_WHILE_BC    ("WHILE_BC")
-#define S_WHILE_END   ("WHILE_END")
+#define S_WHILE_BC ("WHILE_BC")
+#define S_WHILE_END ("WHILE_END")
 
 /////////////////////////////////////////////////////
 // Some auxilary information on a label
@@ -38,6 +38,7 @@ static struct FunInfo_t fun = {0, 0, 0};
 static Property_t fieldProp = 0;
 
 static List_t fieldPropInitFun(Id_t id) {
+    UNUSED(id);
     return List_new();
 }
 
@@ -48,8 +49,7 @@ static Property_t labelInfoProp = 0;
 
 static void LabelInfo_init() {
     if (Control_labelInfo)
-        labelInfoProp
-                = Property_new((Poly_tyPlist) Label_plist);
+        labelInfoProp = Property_new((Poly_tyPlist) Label_plist);
 }
 
 static void LabelInfo_clear() {
@@ -67,21 +67,21 @@ static Label_t genLabel(String_t s) {
     return fresh;
 }
 
-static void printLabel(Label_t l) {
-    Label_print(l);
-    printf(": ");
-    if (labelInfoProp) {
-        String_t info = Property_get(labelInfoProp, l);
-        printf("%s", info ? info : "NOT");
-    }
-    printf("\n");
-    return;
-}
+//static void printLabel(Label_t l) {
+//    Label_print(l);
+//    printf(": ");
+//    if (labelInfoProp) {
+//        String_t info = Property_get(labelInfoProp, l);
+//        printf("%s", info ? info : "NOT");
+//    }
+//    printf("\n");
+//    return;
+//}
 
 //////////////////////////////////////////////////////
 // handle cache
 
-// Tanslation of a Hil.stm results a list of 
+// Tanslation of a Hil.stm results a list of
 // type "Cache_Data_t".
 typedef struct {
     enum {
@@ -126,14 +126,14 @@ static void emitTrans(Ssa_Transfer_t s) {
     List_insertLast(caches, p);
 }
 
-static List_t getBeforeClear() {
-    List_t t = caches;
-    caches = List_new();
-    return t;
-}
+//static List_t getBeforeClear() {
+//    List_t t = caches;
+//    caches = List_new();
+//    return t;
+//}
 
 static void Cache_log() {
-    Assert_ASSERT(caches);
+    assert(caches);
 
     List_t p = List_getFirst(caches);
     while (p) {
@@ -155,7 +155,7 @@ static void Cache_log() {
                 Log_fun(data->u.trans, (Poly_tyLog) Ssa_Transfer_print);
                 break;
             default:
-                Error_impossible ();
+                Error_impossible();
                 return;
         }
         p = p->next;
@@ -172,7 +172,7 @@ static Id_t genDec(Atype_t ty) {
     Id_t id;
     Dec_t newDec;
 
-    Assert_ASSERT(ty);
+    assert(ty);
     id = Id_newNoName();
     newDec = Dec_new(ty, id);
     List_insertLast(allDecs, newDec);
@@ -203,7 +203,7 @@ struct Lval_Result_t {
 };
 
 static Id_t Trans_lvalRight(Hil_Lval_t l) {
-    Assert_ASSERT(l);
+    assert(l);
     switch (l->kind) {
         case HIL_LVAL_VAR:
             return l->u.var;
@@ -213,7 +213,7 @@ static Id_t Trans_lvalRight(Hil_Lval_t l) {
             Id_t fresh;
             Ssa_Mem_t mem = Ssa_Mem_new_class(id, l->u.dot.var);
 
-            Assert_ASSERT(l->ty);
+            assert(l->ty);
             fresh = genDec(l->ty);
             emitStm(Ssa_Stm_new_load(fresh, mem));
             return fresh;
@@ -229,17 +229,17 @@ static Id_t Trans_lvalRight(Hil_Lval_t l) {
             return fresh;
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 static struct Lval_Result_t Trans_lvalLeft(Hil_Lval_t l) {
     struct Lval_Result_t result;
 
-    Assert_ASSERT(l);
+    assert(l);
     switch (l->kind) {
         case HIL_LVAL_VAR: {
             result.kind = ID;
@@ -256,10 +256,8 @@ static struct Lval_Result_t Trans_lvalLeft(Hil_Lval_t l) {
         }
         case HIL_LVAL_ARRAY: {
             Id_t left = Trans_lvalRight(l->u.array.lval);
-            Ssa_Operand_t opd
-                    = Trans_exp(l->u.array.exp);
-            Ssa_Mem_t mem
-                    = Ssa_Mem_new_array(left, opd);
+            Ssa_Operand_t opd = Trans_exp(l->u.array.exp);
+            Ssa_Mem_t mem = Ssa_Mem_new_array(left, opd);
 
             result.kind = MEM;
             result.u.mem = mem;
@@ -296,9 +294,8 @@ static Ssa_Operand_t Trans_bop(Hil_Exp_t left,
             emitStm(Ssa_Stm_new_move(resultId, newRight));
             emitTrans(Ssa_Transfer_new_jump(el));
             emitLabel(fl);
-            emitStm(Ssa_Stm_new_move
-                            (resultId,
-                             Ssa_Operand_new_int(0)));
+            emitStm(Ssa_Stm_new_move(resultId,
+                                     Ssa_Operand_new_int(0)));
             emitTrans(Ssa_Transfer_new_jump(el));
             emitLabel(el);
             return result;
@@ -317,9 +314,8 @@ static Ssa_Operand_t Trans_bop(Hil_Exp_t left,
                                           tl,
                                           fl));
             emitLabel(tl);
-            emitStm(Ssa_Stm_new_move
-                            (resultId,
-                             Ssa_Operand_new_int(1)));
+            emitStm(Ssa_Stm_new_move(resultId,
+                                     Ssa_Operand_new_int(1)));
             emitTrans(Ssa_Transfer_new_jump(el));
             emitLabel(fl);
             newRight = Trans_exp(right);
@@ -340,7 +336,7 @@ static Ssa_Operand_t Trans_bop(Hil_Exp_t left,
             return Ssa_Operand_new_id(resultId);
         }
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
@@ -380,12 +376,12 @@ static Ssa_Operand_t Trans_uop(Hil_Exp_t src,
             return Ssa_Operand_new_id(resultId);
         }
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 static Ssa_Operand_t Trans_exp(Hil_Exp_t e) {
-    Assert_ASSERT(e);
+    assert(e);
     switch (e->kind) {
         case HIL_EXP_BOP: {
             Ssa_Operand_t r = Trans_bop(e->u.bop.left,
@@ -429,8 +425,7 @@ static Ssa_Operand_t Trans_exp(Hil_Exp_t e) {
                 Ssa_Operand_t o = ops->data;
                 Id_t field = (Id_t) fields->data;
 
-                emitStm(Ssa_Stm_new_store
-                                (Ssa_Mem_new_class(fresh, field), o));
+                emitStm(Ssa_Stm_new_store(Ssa_Mem_new_class(fresh, field), o));
 
                 fields = fields->next;
                 ops = ops->next;
@@ -441,14 +436,14 @@ static Ssa_Operand_t Trans_exp(Hil_Exp_t e) {
             Id_t fresh = genDec(e->u.newArray.type);
             Ssa_Operand_t newSize = Trans_exp(e->u.newArray.size);
 
-            emitStm(Ssa_Stm_new_newArray
-                            (fresh, e->u.newArray.type, newSize));
+            emitStm(Ssa_Stm_new_newArray(fresh, e->u.newArray.type, newSize));
             return Ssa_Operand_new_id(fresh);
         }
         case HIL_EXP_LVAL: {
             Id_t left = Trans_lvalRight(e->u.lval);
 
-            return Ssa_Operand_new_id(left);;
+            return Ssa_Operand_new_id(left);
+            ;
         }
         case HIL_EXP_CALL: {
             Id_t result = genDec(e->ty);
@@ -476,11 +471,10 @@ static Ssa_Operand_t Trans_exp(Hil_Exp_t e) {
 }
 
 static void Trans_stm(Hil_Stm_t s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case HIL_STM_ASSIGN: {
-            struct Lval_Result_t left
-                    = Trans_lvalLeft(s->u.assign.lval);
+            struct Lval_Result_t left = Trans_lvalLeft(s->u.assign.lval);
             Ssa_Operand_t right = Trans_exp(s->u.assign.exp);
 
             if (left.kind == ID)
@@ -489,7 +483,7 @@ static void Trans_stm(Hil_Stm_t s) {
                 emitStm(Ssa_Stm_new_store(left.u.mem, right));
                 return;
             } else {
-                Error_impossible ();
+                Error_impossible();
                 return;
             }
             return;
@@ -575,15 +569,15 @@ static void Trans_stm(Hil_Stm_t s) {
             return;
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return;
     }
-    Error_impossible ();
+    Error_impossible();
     return;
 }
 
 ////////////////////////////////////////////////
-// 
+//
 static Property_t substProp = 0;
 static List_t labelCache = 0;
 
@@ -601,7 +595,7 @@ static Label_t polluteLabel() {
     List_t p;
     Label_t first, other;
 
-    Assert_ASSERT(labelCache);
+    assert(labelCache);
     p = List_getFirst(labelCache);
     // if this cache is empty, then we must encounter
     // some dead code. But we rely the optimizor to
@@ -657,17 +651,14 @@ static struct Block_Result_t cookBlocks() {
                 switch (data->u.trans->kind) {
                     case SSA_TRANS_IF:
                         newTransfer =
-                                Ssa_Transfer_renameLabels_if
-                                        (data->u.trans, Property_get(substProp,
-                                                                     data->u.trans->u.iff.truee),
-                                         Property_get(substProp,
-                                                      data->u.trans->u.iff.falsee));
+                                Ssa_Transfer_renameLabels_if(data->u.trans, Property_get(substProp, data->u.trans->u.iff.truee),
+                                                             Property_get(substProp,
+                                                                          data->u.trans->u.iff.falsee));
                         break;
                     case SSA_TRANS_JUMP:
                         newTransfer =
-                                Ssa_Transfer_renameLabels_jump
-                                        (data->u.trans, Property_get(substProp,
-                                                                     data->u.trans->u.jump));
+                                Ssa_Transfer_renameLabels_jump(data->u.trans, Property_get(substProp,
+                                                                                           data->u.trans->u.jump));
                         break;
                     case SSA_TRANS_RETURN:
                         newTransfer = data->u.trans;
@@ -679,7 +670,7 @@ static struct Block_Result_t cookBlocks() {
                         newTransfer = data->u.trans;
                         break;
                     default:
-                        Error_impossible ();
+                        Error_impossible();
                         return result;
                 }
                 block = Ssa_Block_new(firstLabel, stms, newTransfer);
@@ -688,7 +679,7 @@ static struct Block_Result_t cookBlocks() {
                 break;
             }
             default: {
-                Error_impossible ();
+                Error_impossible();
                 return result;
             }
         }
@@ -707,7 +698,7 @@ static struct Block_Result_t cookBlocks() {
 static Ssa_Fun_t Trans_funEach(Hil_Fun_t f) {
     List_t blocks;
 
-    Assert_ASSERT(f);
+    assert(f);
 
     caches = List_new();
     allDecs = List_new();
@@ -720,8 +711,7 @@ static Ssa_Fun_t Trans_funEach(Hil_Fun_t f) {
     List_foreach(f->stms,
                  (Poly_tyVoid) Trans_stm);
     emitLabel(fun.exitLabel);
-    emitTrans(Ssa_Transfer_new_return
-                      (Ssa_Operand_new_id(fun.retId)));
+    emitTrans(Ssa_Transfer_new_return(Ssa_Operand_new_id(fun.retId)));
 
     List_append(f->decs, getDecs());
 
@@ -760,7 +750,7 @@ static Ssa_Fun_t Trans_funEach(Hil_Fun_t f) {
 }
 
 static List_t Trans_funcs(List_t fs) {
-    Assert_ASSERT(fs);
+    assert(fs);
     return List_map(fs, (Poly_tyId) Trans_funEach);
 }
 
@@ -783,9 +773,8 @@ static void scanFields(Class_t c) {
 static Ssa_Prog_t Hil_transTraced(Hil_Prog_t p) {
     List_t newFuncs;
 
-    Assert_ASSERT(p);
-    fieldProp = Property_newInitFun
-            ((Poly_tyPlist) Id_plist, (Poly_tyPropInit) fieldPropInitFun);
+    assert(p);
+    fieldProp = Property_newInitFun((Poly_tyPlist) Id_plist, (Poly_tyPropInit) fieldPropInitFun);
 
     // scan all fields for each class and remember them
     List_foreach(p->classes, (Poly_tyVoid) scanFields);

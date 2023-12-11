@@ -1,7 +1,7 @@
-#include "../lib/mem.h"
-#include "../lib/int.h"
-#include "../lib/assert.h"
 #include "machine.h"
+#include "../lib/int.h"
+#include "../lib/mem.h"
+#include <assert.h>
 
 #define B Machine_Block_t
 #define F Machine_Fun_t
@@ -16,10 +16,10 @@
 
 ///////////////////////////////////////////////////////
 /* operands */
-O Machine_Operand_new_int(int i) {
+O Machine_Operand_new_int(long i) {
     O e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = MACHINE_OP_INT;
     e->u.intlit = i;
     return e;
@@ -28,7 +28,7 @@ O Machine_Operand_new_int(int i) {
 O Machine_Operand_new_global(Id_t id) {
     O e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = MACHINE_OP_GLOBAL;
     e->u.id = id;
     return e;
@@ -38,17 +38,17 @@ O Machine_Operand_new_global(Id_t id) {
 O Machine_Operand_new_id(Id_t id) {
     O e;
 
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = MACHINE_OP_ID;
     e->u.id = id;
     return e;
 }
 
 File_t Machine_Operand_print(File_t file, O o) {
-    Assert_ASSERT(o);
+    assert(o);
     switch (o->kind) {
         case MACHINE_OP_INT:
-            fprintf(file, "%d", o->u.intlit);
+            fprintf(file, "%ld", o->u.intlit);
             break;
         case MACHINE_OP_GLOBAL:
             fprintf(file, "G_%s", Id_toString(o->u.id));
@@ -57,7 +57,7 @@ File_t Machine_Operand_print(File_t file, O o) {
             fprintf(file, "%s", Id_toString(o->u.id));
             break;
         default:
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     return file;
@@ -75,7 +75,7 @@ M Machine_Mem_new_array(Id_t name, O index) {
     return m;
 }
 
-M Machine_Mem_new_class(Id_t name, Id_t field, int index) {
+M Machine_Mem_new_class(Id_t name, Id_t field, long index) {
     M m;
 
     Mem_NEW(m);
@@ -87,7 +87,7 @@ M Machine_Mem_new_class(Id_t name, Id_t field, int index) {
 }
 
 File_t Machine_Mem_print(File_t file, M m) {
-    Assert_ASSERT(m);
+    assert(m);
     switch (m->kind) {
         case MACHINE_MEM_ARRAY:
             fprintf(file, "%s", Id_toString(m->u.array.name));
@@ -99,11 +99,11 @@ File_t Machine_Mem_print(File_t file, M m) {
             fprintf(file, "%s", Id_toString(m->u.class.name));
             fprintf(file, "%s", ".");
             fprintf(file, "%s", Id_toString(m->u.class.field));
-            fprintf(file, "%s%d", "(INDEX=", m->u.class.index);
+            fprintf(file, "%s%ld", "(INDEX=", m->u.class.index);
             fprintf(file, "%s", ")");
             break;
         default:
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     return file;
@@ -114,7 +114,7 @@ File_t Machine_Mem_print(File_t file, M m) {
 S Machine_Stm_new_move(Id_t dest, O src) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_MOVE;
     s->u.move.dest = dest;
     s->u.move.src = src;
@@ -124,7 +124,7 @@ S Machine_Stm_new_move(Id_t dest, O src) {
 S Machine_Stm_new_bop(Id_t dest, O left, Operator_t opr, O right) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_BOP;
     s->u.bop.dest = dest;
     s->u.bop.left = left;
@@ -136,7 +136,7 @@ S Machine_Stm_new_bop(Id_t dest, O left, Operator_t opr, O right) {
 S Machine_Stm_new_uop(Id_t dest, Operator_t opr, O src) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_UOP;
     s->u.uop.dest = dest;
     s->u.uop.op = opr;
@@ -148,7 +148,7 @@ S Machine_Stm_new_uop(Id_t dest, Operator_t opr, O src) {
 S Machine_Stm_new_store(M m, O src) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_STORE;
     s->u.store.m = m;
     s->u.store.src = src;
@@ -158,7 +158,7 @@ S Machine_Stm_new_store(M m, O src) {
 S Machine_Stm_new_load(Id_t dest, M m) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_LOAD;
     s->u.load.dest = dest;
     s->u.load.m = m;
@@ -168,7 +168,7 @@ S Machine_Stm_new_load(Id_t dest, M m) {
 S Machine_Stm_new_try(Label_t label) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_TRY;
     s->u.try = label;
     return s;
@@ -177,7 +177,7 @@ S Machine_Stm_new_try(Label_t label) {
 S Machine_Stm_new_try_end(Label_t tryEnd) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_TRY_END;
     s->u.tryEnd = tryEnd;
     return s;
@@ -186,7 +186,7 @@ S Machine_Stm_new_try_end(Label_t tryEnd) {
 S Machine_Stm_new_newClass(Id_t dest, Id_t cname) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_NEW_CLASS;
     s->u.newClass.dest = dest;
     s->u.newClass.cname = cname;
@@ -195,7 +195,7 @@ S Machine_Stm_new_newClass(Id_t dest, Id_t cname) {
 
 S Machine_Stm_new_newArray(Id_t dest, Atype_t type, O size) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_NEW_ARRAY;
     s->u.newArray.dest = dest;
     s->u.newArray.ty = type;
@@ -203,10 +203,10 @@ S Machine_Stm_new_newArray(Id_t dest, Atype_t type, O size) {
     return s;
 }
 
-S Machine_Stm_Runtime_class(Id_t dest, int index, int size, Id_t fname) {
+S Machine_Stm_Runtime_class(Id_t dest, long index, long size, Id_t fname) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_RUNTIME_CLASS;
     s->u.class.dest = dest;
     s->u.class.index = index;
@@ -217,7 +217,7 @@ S Machine_Stm_Runtime_class(Id_t dest, int index, int size, Id_t fname) {
 
 S Machine_Stm_Runtime_array(Id_t dest, int isPtr, O size, int scale, Id_t fname) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_STM_RUNTIME_ARRAY;
     s->u.array.dest = dest;
     s->u.array.isPtr = isPtr;
@@ -233,7 +233,7 @@ static void spacetab(File_t file) {
 }
 
 File_t Machine_Stm_print(File_t file, S s) {
-    Assert_ASSERT(s);
+    assert(s);
     spacetab(file);
     switch (s->kind) {
         case MACHINE_STM_MOVE:
@@ -294,9 +294,9 @@ File_t Machine_Stm_print(File_t file, S s) {
             fprintf(file, "%s", " = ");
             fprintf(file, "%s", Id_toString(s->u.class.fname));
             fprintf(file, "%s", " (index = ");
-            fprintf(file, "%d, ", s->u.class.index);
+            fprintf(file, "%ld, ", s->u.class.index);
             fprintf(file, "%s", "size = ");
-            fprintf(file, "%d", s->u.class.size);
+            fprintf(file, "%ld", s->u.class.size);
             fprintf(file, "%s", ")");
             break;
         }
@@ -315,7 +315,7 @@ File_t Machine_Stm_print(File_t file, S s) {
         }
         default:
             fprintf(stderr, "%d", s->kind);
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     fprintf(file, "%s", ";\n");
@@ -354,7 +354,7 @@ T Machine_Transfer_new_return(O r) {
     return t;
 }
 
-T Machine_Transfer_new_throw() {
+T Machine_Transfer_new_throw(void) {
     T t;
 
     Mem_NEW(t);
@@ -365,7 +365,7 @@ T Machine_Transfer_new_throw() {
 T Machine_Transfer_new_call(Id_t dest, Id_t f, List_t args, Label_t leave, Label_t normal) {
     T s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_TRANS_CALL;
     s->u.call.dest = dest;
     s->u.call.name = f;
@@ -378,7 +378,7 @@ T Machine_Transfer_new_call(Id_t dest, Id_t f, List_t args, Label_t leave, Label
 T Machine_Transfer_new_callnoassign(Id_t f, List_t args, Label_t leave, Label_t normal) {
     T s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = MACHINE_TRANS_CALL_NOASSIGN;
     s->u.call.name = f;
     s->u.call.args = args;
@@ -389,7 +389,7 @@ T Machine_Transfer_new_callnoassign(Id_t f, List_t args, Label_t leave, Label_t 
 
 
 File_t Machine_Transfer_print(File_t file, T t) {
-    Assert_ASSERT(t);
+    assert(t);
     spacetab(file);
     switch (t->kind) {
         case MACHINE_TRANS_IF:
@@ -429,7 +429,7 @@ File_t Machine_Transfer_print(File_t file, T t) {
             fprintf(file, "goto %s", Label_toString(t->u.call.normal));
             break;
         default:
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     fprintf(file, "%s", "\n");
@@ -449,7 +449,7 @@ B Machine_Block_new(Label_t label, List_t stms, T t) {
 }
 
 File_t Machine_Block_print(File_t file, B b) {
-    Assert_ASSERT(b);
+    assert(b);
 
     fprintf(file, "%s", Label_toString(b->label));
     fprintf(file, "%s", ":\n");
@@ -466,7 +466,7 @@ F Machine_Fun_new(Atype_t type, Id_t name, List_t args, List_t decs, List_t bloc
                   Label_t exitt, int frameIndex) {
     F f;
 
-    Mem_NEW (f);
+    Mem_NEW(f);
     f->type = type;
     f->name = name;
     f->args = args;
@@ -480,7 +480,7 @@ F Machine_Fun_new(Atype_t type, Id_t name, List_t args, List_t decs, List_t bloc
 }
 
 File_t Machine_Fun_print(File_t file, F f) {
-    Assert_ASSERT(f);
+    assert(f);
 
     fprintf(file, "%s ", Atype_toString(f->type));
     fprintf(file, "%s", Id_toString(f->name));
@@ -501,13 +501,12 @@ File_t Machine_Fun_print(File_t file, F f) {
 }
 
 
-
 /////////////////////////////////////////////////////
 // string (global vars)
 R Machine_Str_new(Id_t name, String_t value) {
     R d;
 
-    Mem_NEW (d);
+    Mem_NEW(d);
     d->name = name;
     d->value = value;
     return d;
@@ -528,7 +527,7 @@ File_t Machine_Str_print(File_t file, R s) {
 J Machine_ObjInfo_new(List_t offsets) {
     J m;
 
-    Mem_NEW (m);
+    Mem_NEW(m);
     m->offsets = offsets;
     return m;
 }
@@ -538,7 +537,7 @@ static int frameIndex = 1;
 File_t Machine_ObjInfo_print(File_t file, J m) {
     List_t p;
 
-    Assert_ASSERT(m);
+    assert(m);
     fprintf(file, "%s", "int [] ");
     fprintf(file, "%s", "layout_");
     fprintf(file, "%d", frameIndex);
@@ -561,7 +560,7 @@ File_t Machine_ObjInfo_print(File_t file, J m) {
 I Machine_FrameInfo_new(List_t offsets, List_t decOffsets, int size) {
     I p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
     p->frameOffsets = offsets;
     p->frameOffsetsDec = decOffsets;
     p->size = size;
@@ -601,7 +600,7 @@ File_t Machine_FrameInfo_print(File_t file, I p) {
 P Machine_Prog_new(List_t strings, List_t frameInfo, List_t layoutInfo, List_t classes, List_t funcs) {
     P p;
 
-    Mem_NEW (p);
+    Mem_NEW(p);
     p->strings = strings;
     p->frameInfo = frameInfo;
     p->layoutInfo = layoutInfo;
@@ -614,8 +613,8 @@ File_t Machine_Prog_print(File_t file, P x) {
     List_t frame;
     List_t layouts;
 
-    Assert_ASSERT(file);
-    Assert_ASSERT(x);
+    assert(file);
+    assert(x);
 
     fprintf(file, "%s", "///////////////////////////strings:\n");
     List_foldl(x->strings, file, (Poly_tyFold) Machine_Str_print);
@@ -666,7 +665,7 @@ File_t Machine_Prog_print(File_t file, P x) {
     layouts = List_getFirst(x->layoutInfo);
     fprintf(file, "%s", "layoutInfo = {\n");
     while (layouts) {
-        J j = (J) layouts->data;
+        //        J j = (J) layouts->data;
 
         fprintf(file, "\t{%s", "layout_");
         fprintf(file, "%d", frameIndex);
@@ -694,4 +693,3 @@ File_t Machine_Prog_print(File_t file, P x) {
 #undef R
 #undef S
 #undef T
-

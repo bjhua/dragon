@@ -1,24 +1,27 @@
-#include "assert.h"
-#include "tuple.h"
 #include "list-pair.h"
+#include "tuple.h"
+#include "unused.h"
+#include <assert.h>
 
 #define T ListPair_t
 #define L List_t
 #define P Poly_t
 
 T ListPair_new(void *x, void *y) {
+    UNUSED(x);
+    UNUSED(y);
     return List_new();
 }
 
 void ListPair_insertLast(T l, P x, P y) {
-    Assert_ASSERT(l);
+    assert(l);
     List_insertLast(l, Tuple_new(x, y));
 }
 
 L ListPair_first(T l) {
     L tmp, p;
 
-    Assert_ASSERT(l);
+    assert(l);
     tmp = List_new();
     p = List_getFirst(l);
     while (p) {
@@ -31,7 +34,7 @@ L ListPair_first(T l) {
 L ListPair_second(T l) {
     L tmp, p;
 
-    Assert_ASSERT(l);
+    assert(l);
     tmp = List_new();
     p = List_getFirst(l);
     while (p) {
@@ -45,8 +48,8 @@ int ListPair_forall(T x, int (*pred)(Poly_t, Poly_t)) {
     T tmp;
     Tuple_t tuple;
 
-    Assert_ASSERT(x);
-    Assert_ASSERT(pred);
+    assert(x);
+    assert(pred);
     tmp = List_getFirst(x);
     while (tmp) {
         tuple = (Tuple_t) tmp->data;
@@ -60,5 +63,3 @@ int ListPair_forall(T x, int (*pred)(Poly_t, Poly_t)) {
 #undef L
 #undef T
 #undef P
-
-

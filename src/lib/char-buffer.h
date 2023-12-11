@@ -7,13 +7,13 @@
 
 typedef struct T *T;
 
-T CharBuffer_new();
+T CharBuffer_new(void);
 
 void CharBuffer_append(T x, int c);
 
 void CharBuffer_appendString(T x, String_t s);
 
-int CharBuffer_numItems(T x);
+long CharBuffer_numItems(T x);
 
 void CharBuffer_resetIndex(T x);
 

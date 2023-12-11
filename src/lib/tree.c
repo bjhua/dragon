@@ -1,16 +1,12 @@
-#include <stdio.h>
-#include "assert.h"
+#include "tree.h"
+#include "dot.h"
+#include "error.h"
+#include "list.h"
 #include "mem.h"
-//#include "queue.h"
 #include "property-list.h"
 #include "property.h"
-#include "list.h"
-#include "error.h"
-#include "dot.h"
-#include "set.h"
-//#include "priorityQueue.h"
-//#include "unionFind.h"
-#include "tree.h"
+#include <assert.h>
+#include <stdio.h>
 
 #define T Tree_t
 #define V Vertex_t
@@ -44,17 +40,17 @@ static V Vertex_new(Poly_t data) {
 }
 
 static Plist_t Vertex_plist(V v) {
-    Assert_ASSERT(v);
+    assert(v);
 
     return v->plist;
 }
 
-static int Vertex_equals(V v1, V v2) {
-    Assert_ASSERT(v1);
-    Assert_ASSERT(v2);
-
-    return v1 == v2;
-}
+//static int Vertex_equals(V v1, V v2) {
+//    assert(v1);
+//    assert(v2);
+//
+//    return v1 == v2;
+//}
 
 ////////////////////////////////////////////////////////
 // edge
@@ -74,19 +70,19 @@ static E Edge_new(V from, V to) {
     return e;
 }
 
-static E Edge_fromData(Poly_t from, Poly_t to) {
-    E e;
+//static E Edge_fromData(Poly_t from, Poly_t to) {
+//    E e;
+//
+//    Error_impossible();
+//    return e;
+//}
 
-    Error_impossible ();
-    return e;
-}
 
-
-static Plist_t Edge_plist(E e) {
-    Assert_ASSERT(e);
-
-    return e->plist;
-}
+//static Plist_t Edge_plist(E e) {
+//    assert(e);
+//
+//    return e->plist;
+//}
 
 
 /////////////////////////////////////////////////////
@@ -115,8 +111,8 @@ static V searchVertex(T g, Poly_t data) {
     List_t p;
     Poly_tyEquals equals;
 
-    Assert_ASSERT(g);
-    Assert_ASSERT(data);
+    assert(g);
+    assert(data);
 
     p = List_getFirst(g->vs);
     equals = g->equals;
@@ -131,23 +127,23 @@ static V searchVertex(T g, Poly_t data) {
     return 0;
 }
 
-static E searchEdge(T g, Poly_t from, Poly_t to) {
-    V fv = searchVertex(g, from);
-    List_t edges = List_getFirst(fv->edges);
-
-    while (edges) {
-        E current = (E) (edges->data);
-        V currentTo = current->to;
-        if (g->equals(to, currentTo->data))
-            return current;
-        edges = edges->next;
-    }
-    Error_error("no this edge: searchEdge: graph.c\n");
-    return 0;
-}
+//static E searchEdge(T g, Poly_t from, Poly_t to) {
+//    V fv = searchVertex(g, from);
+//    List_t edges = List_getFirst(fv->edges);
+//
+//    while (edges) {
+//        E current = (E) (edges->data);
+//        V currentTo = current->to;
+//        if (g->equals(to, currentTo->data))
+//            return current;
+//        edges = edges->next;
+//    }
+//    Error_error("no this edge: searchEdge: graph.c\n");
+//    return 0;
+//}
 
 /////////////////////////////////////////////////////
-// 
+//
 void Tree_insertVertex(T g, Poly_t x) {
     V v = Vertex_new(x);
     List_insertLast(g->vs, v);
@@ -201,7 +197,8 @@ static void Tree_dfsDoit(T g, V v, Poly_tyVoid f, Property_t visited) {
         Poly_t visitedTo = Property_get(visited, to);
         if (!visitedTo) {
             Tree_dfsDoit(g, to, f, visited);
-        } else;
+        } else
+            ;
         edges = edges->next;
     }
     return;
@@ -211,9 +208,9 @@ void Tree_dfs(T g, Poly_t start, Poly_tyVoid f) {
     V sv;
     Property_t visited;
 
-    Assert_ASSERT(g);
-    Assert_ASSERT(start);
-    Assert_ASSERT(f);
+    assert(g);
+    assert(start);
+    assert(f);
 
     sv = searchVertex(g, start);
     visited = Property_new((Poly_tyPlist) Vertex_plist);
@@ -231,7 +228,7 @@ List_t Tree_children(T t, Poly_t v) {
     V sv;
     List_t result = List_new();
 
-    Assert_ASSERT(t);
+    assert(t);
 
     sv = searchVertex(t, v);
     {
@@ -279,4 +276,3 @@ Tree_t Tree_map(T t, Poly_tyEquals equals, Poly_t (*map)(Poly_t)) {
 #undef T
 #undef V
 #undef E
-

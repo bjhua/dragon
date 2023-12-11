@@ -1,45 +1,45 @@
 /* Copyright (C).
  *
  */
-#include <string.h>
-#include "../lib/string.h"
-#include "../lib/error.h"
-#include "../lib/assert.h"
+#include "lex.h"
+#include "../control/error-msg.h"
 #include "../lib/char-buffer.h"
 #include "../lib/char.h"
-#include "../lib/trace.h"
+#include "../lib/error.h"
 #include "../lib/int.h"
-#include "../control/error-msg.h"
+#include "../lib/string.h"
+#include "../lib/trace.h"
 #include "token.h"
-#include "lex.h"
+#include <assert.h>
+#include <string.h>
 
 #include "keyword.h"
 
 // data structure for position information.
 struct Pos_t {
-    String_t fname;  // file name
-    FILE *fp;        // file pointer to the fname
-    int line;        // line number, starting from 1
-    int column;      // column number, starting from 0
+    String_t fname;// file name
+    FILE *fp;      // file pointer to the fname
+    int line;      // line number, starting from 1
+    int column;    // column number, starting from 0
 };
 
-static struct Pos_t pos = {0, 0,1, 0};
+static struct Pos_t pos = {0, 0, 1, 0};
 
 static CharBuffer_t numBuffer = 0;
 static CharBuffer_t strBuffer = 0;
 static CharBuffer_t idBuffer = 0;
 
-static int get_char(){
+static int get_char(void) {
     pos.column++;
     return getc(pos.fp);
 }
 
-static void unget_char(int c){
+static void unget_char(int c) {
     pos.column--;
     ungetc(c, pos.fp);
 }
 
-static void cookComment();
+static void cookComment(void);
 
 static Token_t cookId(int theChar, Coordinate_t left);
 
@@ -47,19 +47,19 @@ static Token_t cookNum(int theChar, Coordinate_t left);
 
 static Token_t cookString(Coordinate_t left);
 
-static int eatBlanks();
+static int eatBlanks(void);
 
 static void error(char *msg);
 
 static int escape(int c);
 
-static Coordinate_t getPos();
+static Coordinate_t getPos(void);
 
 static int isAlpha(int c);
 
 static int columnBackup = 0;
 
-static Coordinate_t getPos() {
+static Coordinate_t getPos(void) {
     return Coordinate_new(pos.fname, pos.line, pos.column - 1);
 }
 
@@ -72,7 +72,7 @@ static void error2(String_t msg, String_t fname, int line, int column) {
 }
 
 
-static int eatBlanks() {
+static int eatBlanks(void) {
     int cur;
 
     cur = get_char();
@@ -82,7 +82,7 @@ static int eatBlanks() {
     return cur;
 }
 
-static void cookComment() {
+static void cookComment(void) {
     int c;
     c = get_char();
     while ('\n' != c)
@@ -100,8 +100,7 @@ static Token_t cookNum(int c, Coordinate_t leftPos) {
         c = get_char();
     }
     unget_char(c);
-    return Token_new(TOKEN_INTLIT, CharBuffer_toStringBeforeClear
-            (numBuffer), leftPos, getPos());
+    return Token_new(TOKEN_INTLIT, CharBuffer_toStringBeforeClear(numBuffer), leftPos, getPos());
 }
 
 static Token_t cookString(Coordinate_t leftPos) {
@@ -111,21 +110,19 @@ static Token_t cookString(Coordinate_t leftPos) {
     int column = pos.column;
 
     c = get_char();
-    while (c != EOF
-           && c != '\n'
-           && c != '\"') {
+    while (c != EOF && c != '\n' && c != '\"') {
         if (c == '\\') {
             c = get_char();
             CharBuffer_append(strBuffer, escape(c));
-        } else CharBuffer_append(strBuffer, c);
+        } else
+            CharBuffer_append(strBuffer, c);
         c = get_char();
     }
     if (c == EOF)
         error2("unclosed string", fname, line, column);
     else if (c == '\n')
         error("don't allow newLine in strings");
-    return Token_new(TOKEN_STRINGLIT, CharBuffer_toStringBeforeClear
-            (strBuffer), leftPos, getPos());
+    return Token_new(TOKEN_STRINGLIT, CharBuffer_toStringBeforeClear(strBuffer), leftPos, getPos());
 }
 
 static int escape(int c) {
@@ -145,8 +142,7 @@ static int escape(int c) {
 }
 
 static int isAlpha(int c) {
-    return (Char_isAlpha(c))
-           || ('_' == c);
+    return (Char_isAlpha(c)) || ('_' == c);
 }
 
 static Token_t cookId(int c, Coordinate_t leftPos) {
@@ -168,10 +164,10 @@ static Token_t cookId(int c, Coordinate_t leftPos) {
 }
 
 
-/* This is a diagram-trasition algorithm as described
+/* This is a diagram-transition algorithm as described
  * in the section 3.4.1 in the Dragon book.
  */
-Token_t Lex_getTokenTraced() {
+static Token_t Lex_getTokenTraced(void) {
     // "leftPos" is the starting point of some token.
     Coordinate_t leftPos;
     int firstChar;
@@ -210,116 +206,91 @@ Token_t Lex_getTokenTraced() {
         case '/': {
             // we should check a character further.
             int secondChar = get_char();
-
             if (secondChar == '/') {
                 cookComment();
                 return Lex_getTokenTraced();
             }
             unget_char(secondChar);
-            return Token_new(TOKEN_DIVIDE, 0, leftPos, getPos());
+            return Token_new('/', 0, leftPos, getPos());
         }
         case '<': {
             int secondChar = get_char();
-
-            switch (secondChar) {
-                case '=':
-                    return Token_new(TOKEN_LE, 0, leftPos, getPos());
-                default:
-                    unget_char(secondChar);
-                    return Token_new(TOKEN_LT, 0, leftPos, getPos());
-            }
+            if (secondChar == '=')
+                return Token_new(TOKEN_LE, 0, leftPos, getPos());
+            unget_char(secondChar);
+            return Token_new('<', 0, leftPos, getPos());
         }
         case '>': {
             int secondChar = get_char();
-
-            switch (secondChar) {
-                case '=':
-                    return Token_new(TOKEN_GE, 0, leftPos, getPos());
-                default:
-                    unget_char(secondChar);
-                    return Token_new(TOKEN_GT, 0, leftPos, getPos());
-            }
+            if (secondChar == '=')
+                return Token_new(TOKEN_GE, 0, leftPos, getPos());
+            unget_char(secondChar);
+            return Token_new('>', 0, leftPos, getPos());
         }
         case '-':
-            return Token_new(TOKEN_MINUS, 0, leftPos, getPos());
+            return Token_new('-', 0, leftPos, getPos());
         case '=': {
             int secondChar = get_char();
-
-            switch (secondChar) {
-                case '=':
-                    return Token_new(TOKEN_EQ, 0, leftPos, getPos());
-                default:
-                    unget_char(secondChar);
-                    return Token_new(TOKEN_ASSIGN, 0, leftPos, getPos());
-            }
+            if (secondChar == '=')
+                return Token_new(TOKEN_EQ, 0, leftPos, getPos());
+            unget_char(secondChar);
+            return Token_new('=', 0, leftPos, getPos());
         }
         case '!': {
             int second_char = get_char();
-
-            switch (second_char) {
-                case '=':
-                    return Token_new(TOKEN_NEQ, 0, leftPos, getPos());
-                default:
-                    unget_char(second_char);
-                    return Token_new(TOKEN_NOT, 0, leftPos, getPos());
-            }
+            if (second_char == '=')
+                return Token_new(TOKEN_NEQ, 0, leftPos, getPos());
+            unget_char(second_char);
+            return Token_new('!', 0, leftPos, getPos());
         }
         case '|': {
             int secondChar = get_char();
-
-            switch (secondChar) {
-                case '|':
-                    return Token_new(TOKEN_OR, 0, leftPos, getPos());
-                default:
-                    error("bad operator | ");
-            }
+            if (secondChar == '|')
+                return Token_new(TOKEN_OR, 0, leftPos, getPos());
+            error("bad operator | ");
         }
         case '&': {
             int secondChar = get_char();
-
-            switch (secondChar) {
-                case '&':
-                    return Token_new(TOKEN_AND, 0, leftPos, getPos());
-                default:
-                    error("bad operator & ");
-            }
+            if (secondChar == '&')
+                return Token_new(TOKEN_AND, 0, leftPos, getPos());
+            error("bad operator & ");
         }
         case '+':
-            return Token_new(TOKEN_ADD, 0, leftPos, getPos());
+            return Token_new('+', 0, leftPos, getPos());
         case ';':
-            return Token_new(TOKEN_SEMI, 0, leftPos, getPos());
+            return Token_new(';', 0, leftPos, getPos());
         case ',':
-            return Token_new(TOKEN_COMMER, 0, leftPos, getPos());
+            return Token_new(',', 0, leftPos, getPos());
         case '*':
-            return Token_new(TOKEN_TIMES, 0, leftPos, getPos());
+            return Token_new('*', 0, leftPos, getPos());
         case '%':
-            return Token_new(TOKEN_PERCENT, 0, leftPos, getPos());
+            return Token_new('%', 0, leftPos, getPos());
         case '[':
-            return Token_new(TOKEN_LBRACK, 0, leftPos, getPos());
+            return Token_new('[', 0, leftPos, getPos());
         case ']':
-            return Token_new(TOKEN_RBRACK, 0, leftPos, getPos());
+            return Token_new(']', 0, leftPos, getPos());
         case '{':
-            return Token_new(TOKEN_LBRACE, 0, leftPos, getPos());
+            return Token_new('{', 0, leftPos, getPos());
         case '}':
-            return Token_new(TOKEN_RBRACE, 0, leftPos, getPos());
+            return Token_new('}', 0, leftPos, getPos());
         case '(':
-            return Token_new(TOKEN_LPAREN, 0, leftPos, getPos());
+            return Token_new('(', 0, leftPos, getPos());
         case ')':
-            return Token_new(TOKEN_RPAREN, 0, leftPos, getPos());
+            return Token_new(')', 0, leftPos, getPos());
         case '.':
-            return Token_new(TOKEN_DOT, 0, leftPos, getPos());
+            return Token_new('.', 0, leftPos, getPos());
         case EOF:
-            return Token_new(TOKEN_EOF, 0, leftPos, leftPos);
+            return Token_new(0, 0, leftPos, leftPos);
         default:
             error(String_concat("illegal character: ", Char_toString(firstChar), 0));
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
 
-static void Trace_arg() {
+static void Trace_arg(void) {
     //printf ("%s", "()");
     return;
 }
@@ -328,10 +299,10 @@ static void Trace_result(Token_t r) {
     fprintf(stdout, "%s", Token_toStringWithPos(r));
 }
 
-Token_t Lex_getToken() {
+Token_t Lex_getToken(void) {
     Token_t r;
 
-    Trace_TRACE ("Lex_getToken", Lex_getTokenTraced, (), Trace_arg, r, Trace_result);
+    Trace_TRACE("Lex_getToken", Lex_getTokenTraced, (), Trace_arg, r, Trace_result);
     return r;
 }
 
@@ -347,4 +318,3 @@ void Lex_init(String_t fname) {
     idBuffer = CharBuffer_new();
     return;
 }
-

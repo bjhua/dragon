@@ -1,10 +1,7 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include "assert.h"
-#include "string.h"
-#include "mem.h"
-#include "todo.h"
 #include "triple.h"
+#include "mem.h"
+#include "string.h"
+#include <assert.h>
 
 #define T Triple_t
 #define P Poly_t
@@ -18,7 +15,7 @@ struct T {
 T Triple_new(P x, P y, P z) {
     T t;
 
-    Mem_NEW (t);
+    Mem_NEW(t);
     t->x = x;
     t->y = y;
     t->z = z;
@@ -26,28 +23,26 @@ T Triple_new(P x, P y, P z) {
 }
 
 P Triple_first(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     return t->x;
 }
 
 P Triple_second(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     return t->y;
 }
 
 P Triple_third(T t) {
-    Assert_ASSERT(t);
+    assert(t);
     return t->z;
 }
 
 int Triple_equals(T t1, T t2, Poly_tyEquals eqx,
                   Poly_tyEquals eqy,
                   Poly_tyEquals eqz) {
-    Assert_ASSERT (t1);
-    Assert_ASSERT (t2);
-    return eqx(t1->x, t2->x)
-           && eqy(t1->y, t2->y)
-           && eqz(t1->z, t2->z);
+    assert(t1);
+    assert(t2);
+    return eqx(t1->x, t2->x) && eqy(t1->y, t2->y) && eqz(t1->z, t2->z);
 }
 
 char *Triple_toString(T t, Poly_tyToString tx,

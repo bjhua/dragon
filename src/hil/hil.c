@@ -1,8 +1,8 @@
-#include "../lib/mem.h"
-#include "../lib/int.h"
-#include "../lib/assert.h"
-#include "../control/control.h"
 #include "hil.h"
+#include "../control/control.h"
+#include "../lib/int.h"
+#include "../lib/mem.h"
+#include <assert.h>
 
 #define E Hil_Exp_t
 #define F Hil_Fun_t
@@ -15,7 +15,7 @@
 // lval
 L Hil_Lval_new_var(Id_t var, Atype_t ty) {
     L l;
-    Mem_NEW (l);
+    Mem_NEW(l);
     l->kind = HIL_LVAL_VAR;
     l->u.var = var;
     l->ty = ty;
@@ -24,7 +24,7 @@ L Hil_Lval_new_var(Id_t var, Atype_t ty) {
 
 L Hil_Lval_new_dot(L lval, Id_t var, Atype_t ty) {
     L l;
-    Mem_NEW (l);
+    Mem_NEW(l);
     l->kind = HIL_LVAL_DOT;
     l->u.dot.lval = lval;
     l->u.dot.var = var;
@@ -34,7 +34,7 @@ L Hil_Lval_new_dot(L lval, Id_t var, Atype_t ty) {
 
 L Hil_Lval_new_array(L lval, E e, Atype_t ty) {
     L l;
-    Mem_NEW (l);
+    Mem_NEW(l);
     l->kind = HIL_LVAL_ARRAY;
     l->u.array.lval = lval;
     l->u.array.exp = e;
@@ -43,7 +43,7 @@ L Hil_Lval_new_array(L lval, E e, Atype_t ty) {
 }
 
 File_t Hil_Lval_print(File_t file, L l) {
-    Assert_ASSERT(l);
+    assert(l);
 
     switch (l->kind) {
         case HIL_LVAL_VAR:
@@ -61,7 +61,7 @@ File_t Hil_Lval_print(File_t file, L l) {
             fprintf(file, "]");
             break;
         default:
-            Error_impossible ();
+            Error_impossible();
             return file;
     }
     if (Control_showType)
@@ -69,7 +69,8 @@ File_t Hil_Lval_print(File_t file, L l) {
             fprintf(file, "@: %s @", Atype_toString(l->ty));
         else
             fprintf(file, "@NO_TYPE@");
-    else;
+    else
+        ;
     return file;
 }
 
@@ -78,7 +79,7 @@ File_t Hil_Lval_print(File_t file, L l) {
 E Hil_Exp_new_bop(Operator_t op,
                   E left, E right, Atype_t ty) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_BOP;
     e->u.bop.left = left;
     e->u.bop.right = right;
@@ -89,7 +90,7 @@ E Hil_Exp_new_bop(Operator_t op,
 
 E Hil_Exp_new_unary(Operator_t op, E x, Atype_t ty) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_UOP;
     e->u.unary.e = x;
     e->u.unary.op = op;
@@ -97,9 +98,9 @@ E Hil_Exp_new_unary(Operator_t op, E x, Atype_t ty) {
     return e;
 }
 
-E Hil_Exp_new_intlit(int i, Atype_t ty) {
+E Hil_Exp_new_intlit(long i, Atype_t ty) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_INTLIT;
     e->u.intlit = i;
     e->ty = ty;
@@ -108,7 +109,7 @@ E Hil_Exp_new_intlit(int i, Atype_t ty) {
 
 E Hil_Exp_new_stringlit(String_t s, Atype_t ty) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_STRINGLIT;
     e->u.stringlit = s;
     e->ty = ty;
@@ -117,7 +118,7 @@ E Hil_Exp_new_stringlit(String_t s, Atype_t ty) {
 
 E Hil_Exp_new_newArray(Atype_t ty, E size) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_NEW_ARRAY;
     e->u.newArray.type = ty;
     e->u.newArray.size = size;
@@ -127,7 +128,7 @@ E Hil_Exp_new_newArray(Atype_t ty, E size) {
 
 E Hil_Exp_new_newClass(Id_t name, List_t args) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_NEW_CLASS;
     e->u.newClass.name = name;
     e->u.newClass.args = args;
@@ -137,7 +138,7 @@ E Hil_Exp_new_newClass(Id_t name, List_t args) {
 
 E Hil_Exp_new_lval(L lval, Atype_t ty) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_LVAL;
     e->u.lval = lval;
     e->ty = ty;
@@ -146,7 +147,7 @@ E Hil_Exp_new_lval(L lval, Atype_t ty) {
 
 E Hil_Exp_new_call(Id_t f, List_t args, Atype_t ty, Label_t leave, Label_t normal) {
     E e;
-    Mem_NEW (e);
+    Mem_NEW(e);
     e->kind = HIL_EXP_CALL;
     e->u.call.f = f;
     e->u.call.args = args;
@@ -157,7 +158,7 @@ E Hil_Exp_new_call(Id_t f, List_t args, Atype_t ty, Label_t leave, Label_t norma
 }
 
 File_t Hil_Exp_print(File_t file, E e) {
-    Assert_ASSERT (e);
+    assert(e);
     switch (e->kind) {
         case HIL_EXP_BOP:
             Hil_Exp_print(file, e->u.bop.left);
@@ -195,25 +196,23 @@ File_t Hil_Exp_print(File_t file, E e) {
             fprintf(file, "%s", "(");
             List_foldl(e->u.call.args, file, (Poly_tyFold) Hil_Exp_print);
             fprintf(file, "%s", ")");
-            fprintf(file, "LEAVE = %s, NORMAL = %s", (e->u.call.leave)
-                                                     ? Label_toString(e->u.call.leave) : "<LEAVE>", (e->u.call.normal) ?
-                                                                                                    Label_toString(
-                                                                                                            e->u.call.normal)
-                                                                                                                       : "<NORMAL>");
+            fprintf(file, "LEAVE = %s, NORMAL = %s", (e->u.call.leave) ? Label_toString(e->u.call.leave) : "<LEAVE>", (e->u.call.normal) ? Label_toString(e->u.call.normal) : "<NORMAL>");
             break;
         case HIL_EXP_LVAL:
             Hil_Lval_print(file, e->u.lval);
             break;
         default:
             fprintf(stderr, "%d", e->kind);
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     if (Control_showType)
         if (e->ty)
             fprintf(file, "@: %s @", Atype_toString(e->ty));
-        else fprintf(file, "@NO_TYPE@");
-    else;
+        else
+            fprintf(file, "@NO_TYPE@");
+    else
+        ;
     return file;
 }
 
@@ -221,7 +220,7 @@ File_t Hil_Exp_print(File_t file, E e) {
 /* statements */
 S Hil_Stm_new_assign(L lval, E e) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_ASSIGN;
     s->u.assign.lval = lval;
     s->u.assign.exp = e;
@@ -230,7 +229,7 @@ S Hil_Stm_new_assign(L lval, E e) {
 
 S Hil_Stm_new_exp(E e) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_EXP;
     s->u.exp = e;
     return s;
@@ -238,7 +237,7 @@ S Hil_Stm_new_exp(E e) {
 
 S Hil_Stm_new_if(E e, List_t t, List_t f) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_IF;
     s->u.iff.cond = e;
     s->u.iff.then = t;
@@ -248,7 +247,7 @@ S Hil_Stm_new_if(E e, List_t t, List_t f) {
 
 S Hil_Stm_new_do(E e, List_t t, Label_t lf, Label_t le, List_t padding) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_DO;
     s->u.doo.cond = e;
     s->u.doo.body = t;
@@ -261,7 +260,7 @@ S Hil_Stm_new_do(E e, List_t t, Label_t lf, Label_t le, List_t padding) {
 S Hil_Stm_new_jump(Label_t jump) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_JUMP;
     s->u.jump = jump;
     return s;
@@ -270,7 +269,7 @@ S Hil_Stm_new_jump(Label_t jump) {
 S Hil_Stm_new_localThrow(Label_t label) {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_LOCALTHROW;
     s->u.localThrow = label;
     return s;
@@ -279,7 +278,7 @@ S Hil_Stm_new_localThrow(Label_t label) {
 S Hil_Stm_new_throw() {
     S s;
 
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_THROW;
     return s;
 }
@@ -298,7 +297,7 @@ S Hil_Stm_new_tryCatch(List_t tryy, List_t catchh, Label_t label, Label_t end) {
 
 S Hil_Stm_new_return(E e) {
     S s;
-    Mem_NEW (s);
+    Mem_NEW(s);
     s->kind = HIL_STM_RETURN;
     s->u.returnn = e;
     return s;
@@ -323,7 +322,7 @@ static void spaces(File_t file) {
 }
 
 File_t Hil_Stm_print(File_t file, S s) {
-    Assert_ASSERT(s);
+    assert(s);
     switch (s->kind) {
         case HIL_STM_ASSIGN:
             spaces(file);
@@ -409,7 +408,7 @@ File_t Hil_Stm_print(File_t file, S s) {
             break;
         default:
             fprintf(stderr, "%d", s->kind);
-            Error_impossible ();
+            Error_impossible();
             break;
     }
     fprintf(file, "\n");
@@ -420,7 +419,7 @@ File_t Hil_Stm_print(File_t file, S s) {
 /* function */
 F Hil_Fun_new(Atype_t type, Id_t name, List_t args, List_t decs, List_t stms) {
     F f;
-    Mem_NEW (f);
+    Mem_NEW(f);
     f->type = type;
     f->name = name;
     f->args = args;
@@ -430,7 +429,7 @@ F Hil_Fun_new(Atype_t type, Id_t name, List_t args, List_t decs, List_t stms) {
 }
 
 File_t Hil_Fun_print(File_t file, F f) {
-    Assert_ASSERT(f);
+    assert(f);
     fprintf(file, "%s ", Atype_toString(f->type));
     fprintf(file, "%s", Id_toString(f->name));
     fprintf(file, "(");
@@ -449,15 +448,15 @@ File_t Hil_Fun_print(File_t file, F f) {
 // Program
 P Hil_Prog_new(List_t classes, List_t funcs) {
     P p;
-    Mem_NEW (p);
+    Mem_NEW(p);
     p->classes = classes;
     p->funcs = funcs;
     return p;
 }
 
 File_t Hil_Prog_print(File_t file, P x) {
-    Assert_ASSERT(file);
-    Assert_ASSERT(x);
+    assert(file);
+    assert(x);
 
     List_foldl(x->classes, file, (Poly_tyFold) Class_print);
     fprintf(file, "\n");
@@ -470,4 +469,3 @@ File_t Hil_Prog_print(File_t file, P x) {
 #undef L
 #undef P
 #undef S
-

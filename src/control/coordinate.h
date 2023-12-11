@@ -7,12 +7,12 @@
 
 typedef struct Coordinate_t *Coordinate_t;
 
-T Coordinate_new (String_t file, int line, int column);
-T Coordinate_bogus ();
-String_t Coordinate_file (T t);
-int Coordinate_column (T t);
-int Coordinate_line (T t);
-String_t Coordinate_toString (T t);
+T Coordinate_new(String_t file, int line, int column);
+T Coordinate_bogus(void);
+String_t Coordinate_file(T t);
+int Coordinate_column(T t);
+int Coordinate_line(T t);
+String_t Coordinate_toString(T t);
 
 #undef T
 

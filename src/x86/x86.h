@@ -1,10 +1,10 @@
 #ifndef X86_H
 #define X86_H
 
+#include "../atoms/atoms.h"
+#include "../lib/file.h"
 #include "../lib/list.h"
 #include "../lib/string.h"
-#include "../lib/file.h"
-#include "../atoms/atoms.h"
 
 #define P X86_Prog_t
 #define Str X86_Str_t
@@ -158,8 +158,8 @@ struct S {
         struct {
             R dest;
             R src;
-        } xor;
-        R not;
+        } xor ;
+        R not ;
         R inc;
     } u;
 };
@@ -195,9 +195,9 @@ S X86_Stm_new_jl(Label_t label);
 
 S X86_Stm_new_jump(Label_t label);
 
-S X86_Stm_new_return();
+S X86_Stm_new_return(void);
 
-S X86_Stm_new_cltd();
+S X86_Stm_new_cltd(void);
 
 S X86_Stm_new_neg(R r);
 
@@ -215,7 +215,7 @@ S X86_Stm_new_setne(R r);
 
 S X86_Stm_new_xor(R dest, R src);
 
-S X86_Stm_new_extendAl();
+S X86_Stm_new_extendAl(void);
 
 S X86_Stm_new_not(R r);
 

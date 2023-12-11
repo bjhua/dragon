@@ -1,32 +1,35 @@
+#include "unused.h"
 #include <stdio.h>
 
 int result = 0;
 
-static int flag = 1;
-static int ind = 0;
+//static int flag = 1;
+//static int ind = 0;
 
-void dprint(const char *s) {
-    printf("to do");
-    return;
-}
+//void dprint(const char *s) {
+//    UNUSED(s);
+//    printf("to do");
+//    return;
+//}
 
-void printIndent() {
-    int n = ind;
+//static void printIndent(void) {
+//    int n = ind;
+//
+//    while (n--)
+//        printf(" ");
+//}
+//
+//static void indent(void) {
+//    ind += 3;
+//}
+//
+//static void unindent(void) {
+//    ind -= 3;
+//}
 
-    while (n--)
-        printf(" ");
-}
-
-void indent() {
-    ind += 3;
-}
-
-void unindent() {
-    ind -= 3;
-}
-
-void Dp_print(char *s) {
-    if (flag)
-        printf("%s\n", s);
-    else;
-}
+//void Dp_print(char *s) {
+//    if (flag)
+//        printf("%s\n", s);
+//    else
+//        ;
+//}

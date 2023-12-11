@@ -1,5 +1,5 @@
-#include "mem.h"
 #include "char.h"
+#include "mem.h"
 
 /* editor-dependent. */
 #define TAB_SIZE 8
@@ -25,8 +25,7 @@ int Char_isDigit(int c) {
 }
 
 int Char_isAlpha(int c) {
-    return (('a' <= c && c <= 'z')
-            || ('A' <= c && c <= 'Z'));
+    return (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'));
 }
 
 #define BUF_SIZE 1024
@@ -39,7 +38,6 @@ String_t Char_toString(int i) {
      * but it seems that this version of GCC I'm using has a bug on
      * the function "snprintf". So I've to write this unsafe "sprintf".
      */
-    sprintf (temp, "%c", i);
+    snprintf(temp, BUF_SIZE - 1, "%c", i);
     return temp;
 }
-

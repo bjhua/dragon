@@ -1,7 +1,7 @@
+#include "error-msg.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../lib/assert.h"
-#include "error-msg.h"
 
 static int numErrors = 0;
 
@@ -31,7 +31,7 @@ void ErrorMsg_lexError(char *s, char *file,
 }
 
 void ErrorMsg_syntaxError(char *s, Region_t r) {
-    Assert_ASSERT (r);
+    assert(r);
     numErrors++;
     fprintf(stderr, "Syntax error: %s\n%s",
             Coordinate_toString(Region_from(r)),
@@ -40,7 +40,7 @@ void ErrorMsg_syntaxError(char *s, Region_t r) {
 }
 
 void ErrorMsg_elabError(char *s, Region_t r) {
-    Assert_ASSERT (s);
+    assert(s);
     numErrors++;
     if (r)
         fprintf(stderr, "Elaboration error: %s\n"
@@ -63,4 +63,3 @@ void ErrorMsg_errorExit() {
         exit(0);
     }
 }
-

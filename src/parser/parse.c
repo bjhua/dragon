@@ -1,42 +1,40 @@
-#include "../lib/assert.h"
-#include "../lib/string.h"
-#include "../lib/hash.h"
-#include "../lib/error.h"
-#include "../lib/list.h"
-#include "../lib/dlist.h"
-#include "../lib/tuple.h"
-#include "../lib/trace.h"
-#include "../lexer/token.h"
-#include "../lexer/lex.h"
-#include "../control/error-msg.h"
-#include "../control/region.h"
 #include "parse.h"
+#include "../control/error-msg.h"
+#include "../lexer/lex.h"
+#include "../lexer/token.h"
+#include "../lib/dlist.h"
+#include "../lib/error.h"
+#include "../lib/hash.h"
+#include "../lib/string.h"
+#include "../lib/trace.h"
+#include "../lib/tuple.h"
+#include <assert.h>
 
 static Token_t current = 0;
 /* tyTable: String_t -> 1 */
 static Hash_t tyTable = 0;
 
-static long lookupType(String_t name) {
-    return (long) Hash_lookup(tyTable, name);
-}
+//static long lookupType(String_t name) {
+//    return (long) Hash_lookup(tyTable, name);
+//}
 
-static void advance();
+static void advance(void);
 
 static Token_t eatToken(Token_Kind_t kind);
 
 static Ast_Exp_Kind_t convert(Token_Kind_t kind);
 
-static Ast_Type_t Parse_betaType();
+static Ast_Type_t Parse_betaType(void);
 
-static Ast_Type_t Parse_type();
+static Ast_Type_t Parse_type(void);
 
 static Ast_Lval_t Parse_lval(Token_t first);
 
-static Ast_Exp_t Parse_exp();
+static Ast_Exp_t Parse_exp(void);
 
-static Ast_Stm_t Parse_stm();
+static Ast_Stm_t Parse_stm(void);
 
-static Ast_Block_t Parse_block();
+static Ast_Block_t Parse_block(void);
 
 static void error(String_t msg, Region_t r) {
     ErrorMsg_syntaxError(msg, r);
@@ -48,7 +46,7 @@ static void error_dupTypeName(String_t old, String_t cur) {
     error(String_concat("type name redefined: ", cur, "the previous one   : ", old, 0), region);
 }
 
-static void advance() {
+static void advance(void) {
     current = Lex_getToken();
 }
 
@@ -66,19 +64,19 @@ static Token_t eatToken(Token_Kind_t kind) {
 }
 
 static AstId_t convertToken(Token_t t) {
-    Assert_ASSERT (t->kind == TOKEN_ID);
+    assert(t->kind == TOKEN_ID);
     return AstId_fromString(t->lexeme, t->region);
 }
 
-List_t Parse_parameters() {
+static List_t Parse_parameters(void) {
     List_t list = List_new();
     Ast_Exp_t e;
 
-    if (current->kind == TOKEN_RPAREN)
+    if (current->kind == ')')
         return list;
     e = Parse_exp();
     List_insertLast(list, e);
-    while (current->kind == TOKEN_COMMER) {
+    while (current->kind == ',') {
         advance();
         e = Parse_exp();
         List_insertLast(list, e);
@@ -92,20 +90,19 @@ static Ast_Exp_t Parse_lvalOrCall() {
 
     s = eatToken(TOKEN_ID);
     id = convertToken(s);
-    switch (current->kind) {
-        case TOKEN_LBRACK:
-        case TOKEN_DOT: {
+    switch ((int) current->kind) {
+        case '[':
+        case '.': {
             Ast_Lval_t lval;
 
             lval = Parse_lval(s);
             return Ast_Exp_new_lval(lval, 0);
         }
-        case TOKEN_LPAREN: {
+        case '(': {
             List_t args = List_new();
-
             advance();
             args = Parse_parameters();
-            eatToken(TOKEN_RPAREN);
+            eatToken(')');
             return Ast_Exp_new_call(id, args, 0);
         }
         default: {
@@ -113,7 +110,7 @@ static Ast_Exp_t Parse_lvalOrCall() {
             return Ast_Exp_new_lval(lval, 0);
         }
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
@@ -121,39 +118,38 @@ static Ast_Exp_t Parse_lvalOrCall() {
 // new \beta [e]
 // "new" has been eaten.
 static Ast_Exp_t Parse_classOrArray() {
-    Token_t s;
     AstId_t id;
-    Ast_Type_t t;
 
-    t = Parse_betaType();
-    switch (current->kind) {
-        case TOKEN_LBRACK: {
+    Ast_Type_t t = Parse_betaType();
+    switch ((int) current->kind) {
+        case '[': {
             Ast_Exp_t e;
-
             advance();
             e = Parse_exp();
-            eatToken(TOKEN_RBRACK);
+            eatToken(']');
             return Ast_Exp_new_newArray(t, 0, e);
         }
-        case TOKEN_LPAREN: {
+        case '(': {
             List_t fields = List_new();
-
             // type should only be a class name
             if (t->kind != AST_TYPE_ID) {
                 error(String_concat("expects: class name"
-                                    "but got: ", Ast_Type_toString(t), 0), current->region);
+                                    "but got: ",
+                                    Ast_Type_toString(t), 0),
+                      current->region);
                 return 0;
             }
-            AstId_t id = t->id;
-
+            id = t->id;
             advance();
             fields = Parse_parameters();
-            eatToken(TOKEN_RPAREN);
+            eatToken(')');
             return Ast_Exp_new_newClass(id, fields, 0);
         }
         default: {
             error(String_concat("expects: { or [\n"
-                                "but got: ", Token_toString(current), 0), current->region);
+                                "but got: ",
+                                Token_toString(current), 0),
+                  current->region);
             return 0;
         }
     }
@@ -162,47 +158,47 @@ static Ast_Exp_t Parse_classOrArray() {
 }
 
 static Ast_Exp_Kind_t convert(Token_Kind_t kind) {
-    switch (kind) {
-        case TOKEN_LT:
+    switch ((int) kind) {
+        case '<':
             return AST_EXP_LT;
         case TOKEN_LE:
             return AST_EXP_LE;
         case TOKEN_GE:
             return AST_EXP_GE;
-        case TOKEN_GT:
+        case '>':
             return AST_EXP_GT;
         case TOKEN_EQ:
             return AST_EXP_EQ;
         case TOKEN_NEQ:
             return AST_EXP_NE;
-        case TOKEN_ADD:
+        case '+':
             return AST_EXP_ADD;
-        case TOKEN_MINUS:
+        case '-':
             return AST_EXP_SUB;
-        case TOKEN_TIMES:
+        case '*':
             return AST_EXP_TIMES;
-        case TOKEN_DIVIDE:
+        case '/':
             return AST_EXP_DIVIDE;
-        case TOKEN_PERCENT:
+        case '%':
             return AST_EXP_MODUS;
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 
-// 
+//
 static Ast_Exp_t Parse_factor() {
     Ast_Exp_t e;
     String_t s;
 
-    switch (current->kind) {
-        case TOKEN_LPAREN:
+    switch ((int) current->kind) {
+        case '(':
             advance();
             e = Parse_exp();
-            eatToken(TOKEN_RPAREN);
+            eatToken(')');
             return e;
         case TOKEN_INTLIT:
             s = current->lexeme;
@@ -223,26 +219,24 @@ static Ast_Exp_t Parse_factor() {
             advance();
             return Ast_Exp_new_null();
         default:
-            error(String_concat
-                          ("expects: (, integer, identifier, "
-                           "string, null\n"
-                           "but got: ", Token_Kind_toString(current->kind), 0), current->region);
+            error(String_concat("expects: (, integer, identifier, "
+                                "string, null\n"
+                                "but got: ",
+                                Token_Kind_toString(current->kind), 0),
+                  current->region);
             return (Poly_t) 0;
     }
     Error_impossible();
-    return (Poly_t) 0;
 }
 
 static Ast_Exp_t Parse_unary() {
     Ast_Exp_t e;
     List_t all = List_new();
 
-    while (current->kind == TOKEN_MINUS
-           || current->kind == TOKEN_NOT) {
+    while (current->kind == '-' || current->kind == '!') {
         Region_t r = current->region;
-        List_insertFirst
-                (all,
-                 Tuple_new((Poly_t) current->kind, r));
+        List_insertFirst(all,
+                         Tuple_new((Poly_t) current->kind, r));
         advance();
     }
     e = Parse_factor();
@@ -251,12 +245,12 @@ static Ast_Exp_t Parse_unary() {
         Tuple_t tuple = (Tuple_t) all->data;
         long kind = (long) Tuple_first(tuple);
         Region_t r = Tuple_second(tuple);
-        if (kind == TOKEN_MINUS) {
+        if (kind == '-') {
             e = Ast_Exp_new_unary(AST_EXP_NEGATIVE, e, 0, r);
-        } else if (kind == TOKEN_NOT)
+        } else if (kind == '!')
             e = Ast_Exp_new_unary(AST_EXP_NOT, e, 0, r);
         else
-            Error_bug ("impossible");
+            Error_bug("impossible");
         all = all->next;
     }
     return e;
@@ -267,9 +261,7 @@ static Ast_Exp_t Parse_term() {
     Token_Kind_t kind;
 
     e1 = Parse_unary();
-    while (current->kind == TOKEN_TIMES
-           || current->kind == TOKEN_DIVIDE
-           || current->kind == TOKEN_PERCENT) {
+    while (current->kind == '*' || current->kind == '/' || current->kind == '%') {
         Region_t r = current->region;
         kind = current->kind;
         advance();
@@ -284,8 +276,7 @@ static Ast_Exp_t Parse_expr() {
     Token_Kind_t kind;
 
     e1 = Parse_term();
-    while (current->kind == TOKEN_ADD
-           || current->kind == TOKEN_MINUS) {
+    while (current->kind == '+' || current->kind == '-') {
         Region_t r = current->region;
         kind = current->kind;
         advance();
@@ -301,10 +292,7 @@ static Ast_Exp_t Parse_rel() {
     int kind;
 
     e1 = Parse_expr();
-    while (current->kind == TOKEN_LT
-           || current->kind == TOKEN_LE
-           || current->kind == TOKEN_GE
-           || current->kind == TOKEN_GT) {
+    while (current->kind == '<' || current->kind == TOKEN_LE || current->kind == TOKEN_GE || current->kind == '>') {
         Region_t r = current->region;
         kind = current->kind;
         advance();
@@ -320,8 +308,7 @@ static Ast_Exp_t Parse_equality() {
     int kind;
 
     e1 = Parse_rel();
-    while (current->kind == TOKEN_EQ
-           || current->kind == TOKEN_NEQ) {
+    while (current->kind == TOKEN_EQ || current->kind == TOKEN_NEQ) {
         Region_t r = current->region;
         kind = current->kind;
         advance();
@@ -368,7 +355,7 @@ static Ast_Exp_t Parse_assign() {
     e1 = Parse_bool();
     Dlist_insertLast(dlist, Tuple_new(e1,
                                       current->region));
-    while (current->kind == TOKEN_ASSIGN) {
+    while (current->kind == '=') {
         flag = 1;
         Region_t r = current->region;
         advance();
@@ -414,24 +401,24 @@ static Ast_Lval_t Parse_lval(Token_t first) {
     id = convertToken(first);
     lval = Ast_Lval_new_var(id, 0, r);
     for (;;) {
-        switch (current->kind) {
-            case TOKEN_DOT:
+        switch ((int) current->kind) {
+            case '.':
                 advance();
                 first = eatToken(TOKEN_ID);
                 id = convertToken(first);
                 lval = Ast_Lval_new_dot(lval, id, 0, r);
                 break;
-            case TOKEN_LBRACK:
+            case '[':
                 advance();
                 exp = Parse_exp();
-                eatToken(TOKEN_RBRACK);
+                eatToken(']');
                 lval = Ast_Lval_new_array(lval, exp, 0, r);
                 break;
             default:
                 return lval;
         }
     }
-    Error_bug ("impossible");
+    Error_bug("impossible");
     return 0;
 }
 
@@ -444,13 +431,13 @@ static Ast_Stm_t Parse_for() {
     Token_t t;
 
     advance();
-    t = eatToken(TOKEN_LPAREN);
+    t = eatToken('(');
     init = Parse_exp();
-    eatToken(TOKEN_SEMI);
+    eatToken(';');
     cond = Parse_exp();
-    eatToken(TOKEN_SEMI);
+    eatToken(';');
     tail = Parse_exp();
-    eatToken(TOKEN_RPAREN);
+    eatToken(')');
     body = Parse_stm();
     return Ast_Stm_new_for(init, cond, tail, body, t->region);
 }
@@ -463,10 +450,10 @@ static Ast_Stm_t Parse_do() {
     advance();
     body = Parse_stm();
     t = eatToken(TOKEN_WHILE);
-    eatToken(TOKEN_LPAREN);
+    eatToken('(');
     condition = Parse_exp();
-    eatToken(TOKEN_RPAREN);
-    eatToken(TOKEN_SEMI);
+    eatToken(')');
+    eatToken(';');
     return Ast_Stm_new_do(condition, body, t->region);
 }
 
@@ -476,9 +463,9 @@ static Ast_Stm_t Parse_while() {
     Token_t t;
 
     advance();
-    t = eatToken(TOKEN_LPAREN);
+    t = eatToken('(');
     condition = Parse_exp();
-    eatToken(TOKEN_RPAREN);
+    eatToken(')');
     body = Parse_stm();
     return Ast_Stm_new_while(condition, body, t->region);
 }
@@ -486,13 +473,13 @@ static Ast_Stm_t Parse_while() {
 static Ast_Stm_t Parse_if() {
     Ast_Exp_t condition;
     Ast_Stm_t then, elsee =
-            Ast_Stm_new_block(Ast_Block_new(List_new(), List_new()));
+                            Ast_Stm_new_block(Ast_Block_new(List_new(), List_new()));
     Token_t t;
 
     advance();
-    t = eatToken(TOKEN_LPAREN);
+    t = eatToken('(');
     condition = Parse_exp();
-    eatToken(TOKEN_RPAREN);
+    eatToken(')');
     then = Parse_stm();
     if (current->kind == TOKEN_ELSE) {
         advance();
@@ -505,7 +492,7 @@ static Ast_Stm_t Parse_stm() {
     Ast_Exp_t e;
     Ast_Block_t b;
 
-    switch (current->kind) {
+    switch ((int) current->kind) {
         case TOKEN_IF:
             return Parse_if();
         case TOKEN_WHILE:
@@ -517,26 +504,26 @@ static Ast_Stm_t Parse_stm() {
         case TOKEN_BREAK: {
             Region_t r = current->region;
             advance();
-            eatToken(TOKEN_SEMI);
+            eatToken(';');
             return Ast_Stm_new_break(r);
         }
         case TOKEN_CONTINUE: {
             Region_t r = current->region;
             advance();
-            eatToken(TOKEN_SEMI);
+            eatToken(';');
             return Ast_Stm_new_continue(r);
         }
         case TOKEN_RETURN: {
             Region_t r = current->region;
             advance();
             e = Parse_exp();
-            eatToken(TOKEN_SEMI);
+            eatToken(';');
             return Ast_Stm_new_return(e, r);
         }
         case TOKEN_THROW: {
             Region_t r = current->region;
             advance();
-            eatToken(TOKEN_SEMI);
+            eatToken(';');
             return Ast_Stm_new_throw(r);
         }
         case TOKEN_TRY: {
@@ -549,7 +536,7 @@ static Ast_Stm_t Parse_stm() {
             catchBlock = Parse_stm();
             return Ast_Stm_new_tryCatch(tryBlock, catchBlock, r);
         }
-        case TOKEN_LBRACE: {
+        case '{': {
             b = Parse_block();
             return Ast_Stm_new_block(b);
         }
@@ -557,7 +544,7 @@ static Ast_Stm_t Parse_stm() {
             Ast_Exp_t e;
 
             e = Parse_exp();
-            eatToken(TOKEN_SEMI);
+            eatToken(';');
             return Ast_Stm_new_exp(e);
         }
     }
@@ -569,7 +556,7 @@ static List_t Parse_stmList() {
     List_t list = List_new();
     Ast_Stm_t s;
 
-    while (current->kind != TOKEN_RBRACE) {
+    while (current->kind != '{') {
         s = Parse_stm();
         List_insertLast(list, s);
     }
@@ -593,7 +580,8 @@ static Ast_Type_t Parse_betaType() {
         }
         default:
             error(String_concat("expects: int, string, or id<>"
-                                "but got: ", Token_toString(current), 0),
+                                "but got: ",
+                                Token_toString(current), 0),
                   current->region);
             return 0;
     }
@@ -602,14 +590,13 @@ static Ast_Type_t Parse_betaType() {
 
 // t -> \beta | \beta[]
 static Ast_Type_t Parse_type() {
-    AstId_t id = 0;
-    Ast_Type_t t, s;
+    Ast_Type_t t;
 
     t = Parse_betaType();
-    if (current->kind == TOKEN_LBRACK) {
+    if (current->kind == '[') {
         Ast_Type_setArray(t);
         advance();
-        eatToken(TOKEN_RBRACK);
+        eatToken(']');
     }
     return t;
 }
@@ -621,21 +608,18 @@ static List_t Parse_decList() {
     AstId_t id;
     Ast_Exp_t init = 0;
 
-    while (current->kind == TOKEN_INT
-           || current->kind == TOKEN_STRING
-           || current->kind == TOKEN_ID) {
-        if (current->kind == TOKEN_ID
-            && !Hash_lookup(tyTable, current->lexeme))
+    while (current->kind == TOKEN_INT || current->kind == TOKEN_STRING || current->kind == TOKEN_ID) {
+        if (current->kind == TOKEN_ID && !Hash_lookup(tyTable, current->lexeme))
             return list;
 
         type = Parse_type();
         name = eatToken(TOKEN_ID);
         id = convertToken(name);
-        if (current->kind == TOKEN_ASSIGN) {
+        if (current->kind == '=') {
             advance();
             init = Parse_exp();
         }
-        eatToken(TOKEN_SEMI);
+        eatToken(';');
         List_insertLast(list, Ast_Dec_new(type, id, init));
         init = 0;
     }
@@ -646,10 +630,10 @@ static Ast_Block_t Parse_block() {
     List_t decs, stms;
     Ast_Block_t b;
 
-    eatToken(TOKEN_LBRACE);
+    eatToken('{');
     decs = Parse_decList();
     stms = Parse_stmList();
-    eatToken(TOKEN_RBRACE);
+    eatToken('}');
     b = Ast_Block_new(decs, stms);
     return b;
 }
@@ -660,14 +644,14 @@ static List_t Parse_arguments() {
     Token_t name;
     AstId_t id;
 
-    if (current->kind == TOKEN_RPAREN)
+    if (current->kind == '(')
         return list;
 
     type = Parse_type();
     name = eatToken(TOKEN_ID);
     id = convertToken(name);
     List_insertLast(list, Ast_Dec_new(type, id, 0));
-    while (current->kind == TOKEN_COMMER) {
+    while (current->kind == ',') {
         advance();
         type = Parse_type();
         name = eatToken(TOKEN_ID);
@@ -686,14 +670,14 @@ static List_t Parse_functionList() {
     Ast_Block_t b;
     Region_t r;
 
-    while (current->kind != TOKEN_EOF) {
+    while (current->kind != 0) {
         r = current->region;
         type = Parse_type();
         name = eatToken(TOKEN_ID);
         fid = convertToken(name);
-        eatToken(TOKEN_LPAREN);
+        eatToken('(');
         paras = Parse_arguments();
-        eatToken(TOKEN_RPAREN);
+        eatToken(')');
         b = Parse_block();
         f = Ast_Fun_new(type, fid, paras, b, r);
         List_insertLast(list, f);
@@ -701,19 +685,19 @@ static List_t Parse_functionList() {
     return list;
 }
 
-static List_t Parse_classFieldList() {
-    Ast_Type_t type;
-    AstId_t id;
-    List_t fs = List_new();
-
-    while (current->kind != TOKEN_RBRACE) {
-        type = Parse_type();
-        id = convertToken(eatToken(TOKEN_ID));
-        eatToken(TOKEN_SEMI);
-        List_insertLast(fs, Ast_Dec_new(type, id, 0));
-    }
-    return fs;
-}
+//static List_t Parse_classFieldList() {
+//    Ast_Type_t type;
+//    AstId_t id;
+//    List_t fs = List_new();
+//
+//    while (current->kind != '}') {
+//        type = Parse_type();
+//        id = convertToken(eatToken(TOKEN_ID));
+//        eatToken(';');
+//        List_insertLast(fs, Ast_Dec_new(type, id, 0));
+//    }
+//    return fs;
+//}
 
 static List_t Parse_classList() {
     Token_t className;
@@ -726,11 +710,11 @@ static List_t Parse_classList() {
         className = eatToken(TOKEN_ID);
         Hash_insert(tyTable, className->lexeme, (Poly_t) 1);
         id = convertToken(className);
-        eatToken(TOKEN_LBRACE);
+        eatToken('{');
 
         fields = Parse_decList();
 
-        eatToken(TOKEN_RBRACE);
+        eatToken('}');
         List_insertLast(list, Ast_Class_new(id, fields));
     }
     return list;

@@ -10,7 +10,7 @@
 #include "../lib/tuple.h"
 #include <assert.h>
 
-static Token_t current = 0;
+static Token_t current;
 /* tyTable: String_t -> 1 */
 static Hash_t tyTable = 0;
 
@@ -51,7 +51,7 @@ static void advance(void) {
 }
 
 
-static Token_t eatToken(Token_Kind_t kind) {
+static Token_t eatToken(int kind) {
     Token_t token;
 
     token = current;
@@ -243,7 +243,7 @@ static Ast_Exp_t Parse_unary() {
     all = List_getFirst(all);
     while (all) {
         Tuple_t tuple = (Tuple_t) all->data;
-        long kind = (long) Tuple_first(tuple);
+        long kind = (long) (Tuple_first(tuple));
         Region_t r = Tuple_second(tuple);
         if (kind == '-') {
             e = Ast_Exp_new_unary(AST_EXP_NEGATIVE, e, 0, r);
@@ -566,26 +566,27 @@ static List_t Parse_stmList() {
 // \beta -> int | string | id
 static Ast_Type_t Parse_betaType() {
     switch (current->kind) {
-        case TOKEN_INT:
-            advance();
-            return Ast_Type_new_int();
-        case TOKEN_STRING:
-            advance();
-            return Ast_Type_new_string();
-        case TOKEN_ID: {
-            AstId_t id;
-
-            id = convertToken(eatToken(TOKEN_ID));
-            return Ast_Type_new_id(id);
-        }
-        default:
+        default: {
             error(String_concat("expects: int, string, or id<>"
                                 "but got: ",
                                 Token_toString(current), 0),
                   current->region);
-            return 0;
+            return (void *) 0;
+        }
+        case TOKEN_INT: {
+            advance();
+            return Ast_Type_new_int();
+        }
+        case TOKEN_STRING: {
+            advance();
+            return Ast_Type_new_string();
+        }
+        case TOKEN_ID: {
+            AstId_t id = convertToken(eatToken(TOKEN_ID));
+            return Ast_Type_new_id(id);
+        }
     }
-    return 0;
+    //    return (void *) 0;
 }
 
 // t -> \beta | \beta[]

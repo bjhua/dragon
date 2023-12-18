@@ -800,6 +800,7 @@ static void Ssa_Stm_foreachDef(S s, void (*f)(Id_t)) {
         case SSA_STM_NEW_ARRAY:
             f(s->u.newArray.dest);
             // only rename def
+            return;
         case SSA_STM_PHI:
             f(s->u.phi.dest);
             return;

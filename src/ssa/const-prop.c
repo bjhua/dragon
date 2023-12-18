@@ -193,10 +193,11 @@ static void analyzeStm(Ssa_Stm_t s) {
             }
             return;
         }
-        default:
+        default: {
             return;
+        }
     }
-    return;
+    //    return;
 }
 
 static void analyzeBlock(Ssa_Block_t b) {

@@ -180,7 +180,7 @@ static Token_t Lex_getTokenTraced(void) {
     // such as the Windows '\r\n'.
     if ('\n' == firstChar) {
         pos.line++;
-        // We should backup the old column number for ...
+        // We should back up the old column number for ...
         columnBackup = pos.column;
         pos.column = 0;
         // recursively call itself to get a token
@@ -211,76 +211,78 @@ static Token_t Lex_getTokenTraced(void) {
                 return Lex_getTokenTraced();
             }
             unget_char(secondChar);
-            return Token_new('/', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '/', 0, leftPos, getPos());
         }
         case '<': {
             int secondChar = get_char();
             if (secondChar == '=')
                 return Token_new(TOKEN_LE, 0, leftPos, getPos());
             unget_char(secondChar);
-            return Token_new('<', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '<', 0, leftPos, getPos());
         }
         case '>': {
             int secondChar = get_char();
             if (secondChar == '=')
                 return Token_new(TOKEN_GE, 0, leftPos, getPos());
             unget_char(secondChar);
-            return Token_new('>', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '>', 0, leftPos, getPos());
         }
         case '-':
-            return Token_new('-', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '-', 0, leftPos, getPos());
         case '=': {
             int secondChar = get_char();
             if (secondChar == '=')
                 return Token_new(TOKEN_EQ, 0, leftPos, getPos());
             unget_char(secondChar);
-            return Token_new('=', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '=', 0, leftPos, getPos());
         }
         case '!': {
             int second_char = get_char();
             if (second_char == '=')
                 return Token_new(TOKEN_NEQ, 0, leftPos, getPos());
             unget_char(second_char);
-            return Token_new('!', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '!', 0, leftPos, getPos());
         }
         case '|': {
             int secondChar = get_char();
             if (secondChar == '|')
                 return Token_new(TOKEN_OR, 0, leftPos, getPos());
             error("bad operator | ");
+            exit(1);
         }
         case '&': {
             int secondChar = get_char();
             if (secondChar == '&')
                 return Token_new(TOKEN_AND, 0, leftPos, getPos());
             error("bad operator & ");
+            exit(1);
         }
         case '+':
-            return Token_new('+', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '+', 0, leftPos, getPos());
         case ';':
-            return Token_new(';', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ';', 0, leftPos, getPos());
         case ',':
-            return Token_new(',', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ',', 0, leftPos, getPos());
         case '*':
-            return Token_new('*', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '*', 0, leftPos, getPos());
         case '%':
-            return Token_new('%', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '%', 0, leftPos, getPos());
         case '[':
-            return Token_new('[', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '[', 0, leftPos, getPos());
         case ']':
-            return Token_new(']', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ']', 0, leftPos, getPos());
         case '{':
-            return Token_new('{', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '{', 0, leftPos, getPos());
         case '}':
-            return Token_new('}', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '}', 0, leftPos, getPos());
         case '(':
-            return Token_new('(', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '(', 0, leftPos, getPos());
         case ')':
-            return Token_new(')', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ')', 0, leftPos, getPos());
         case '.':
-            return Token_new('.', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '.', 0, leftPos, getPos());
         case EOF:
-            return Token_new(0, 0, leftPos, leftPos);
+            return Token_new((Token_Kind_t) 0, 0, leftPos, leftPos);
         default:
             error(String_concat("illegal character: ", Char_toString(firstChar), 0));
             return 0;
@@ -316,5 +318,5 @@ void Lex_init(String_t fname) {
     numBuffer = CharBuffer_new();
     strBuffer = CharBuffer_new();
     idBuffer = CharBuffer_new();
-    return;
+    //    return;
 }

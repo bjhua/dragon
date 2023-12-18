@@ -21,7 +21,6 @@ static Property_t fieldProp = 0;
 // Class_Name_t -> int
 static Property_t sizeProp = 0;
 
-
 //
 static Machine_Mem_t genMem(Machine_Mem_t m) {
     assert(m);
@@ -29,7 +28,7 @@ static Machine_Mem_t genMem(Machine_Mem_t m) {
         case MACHINE_MEM_ARRAY:
             return m;
         case MACHINE_MEM_CLASS: {
-            long index = (long) Property_get(fieldProp, m->u.class.field);
+            long index = (long) (Property_get(fieldProp, m->u.class.field));
             return Machine_Mem_new_class(m->u.class.name, m->u.class.field, index);
         }
         default:
@@ -49,8 +48,8 @@ static Machine_Stm_t genStm(Machine_Stm_t s) {
         case MACHINE_STM_LOAD:
             return Machine_Stm_new_load(s->u.load.dest, genMem(s->u.load.m));
         case MACHINE_STM_NEW_CLASS: {
-            long index = (long) Property_get(indexProp, s->u.newClass.cname);
-            long size = (long) Property_get(sizeProp, s->u.newClass.cname);
+            long index = (long) (Property_get(indexProp, s->u.newClass.cname));
+            long size = (long) (Property_get(sizeProp, s->u.newClass.cname));
 
             return Machine_Stm_Runtime_class(s->u.newClass.dest, index, size, Runtime_class);
         }

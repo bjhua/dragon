@@ -7,9 +7,9 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include "../lib/string.h"
 #include "../control/coordinate.h"
 #include "../control/region.h"
+#include "../lib/string.h"
 
 typedef enum {
     TOKEN_AND = -128,

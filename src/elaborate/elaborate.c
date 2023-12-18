@@ -570,7 +570,6 @@ static List_t Elab_funs(List_t fs) {
 /////////////////////////////////////////////////////
 static Ast_Type_t Elab_convertType(Ast_Type_t ty) {
     assert(ty);
-
     switch (ty->kind) {
         case AST_TYPE_ID: {
             AstId_t fresh = Cenv_lookupMustExist(ty->id);
@@ -580,8 +579,9 @@ static Ast_Type_t Elab_convertType(Ast_Type_t ty) {
                 Ast_Type_setArray(newTy);
             return newTy;
         }
-        default:
+        default: {
             return ty;
+        }
     }
 }
 

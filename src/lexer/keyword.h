@@ -28,7 +28,7 @@ struct KeyWord_t keyWordTable[] = {
         {"while", TOKEN_WHILE},
         {0, (Token_Kind_t) 0}};
 
-static Token_Kind_t isKeyWord(const char *s) {
+static int isKeyWord(const char *s) {
     char *t;
     for (int i = 0; (t = keyWordTable[i].str); i++)
         if (0 == strcmp(s, t))

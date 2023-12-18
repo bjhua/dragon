@@ -6,7 +6,7 @@
 // Label_t -> int
 static Property_t numPreds = 0;
 // Label_t -> {0|1}:
-// whether or not this label should be unioned in
+// whether this label should be unioned in
 static Property_t victim = 0;
 
 static Ssa_Fun_t fun = 0;
@@ -32,8 +32,8 @@ static void analyzeOneBlock(Ssa_Block_t b) {
         case SSA_TRANS_IF: {
             Label_t tt = b->transfer->u.iff.truee;
             Label_t tf = b->transfer->u.iff.falsee;
-            long tn = (long) Property_get(numPreds, tt);
-            long fn = (long) Property_get(numPreds, tf);
+            long tn = (long) (Property_get(numPreds, tt));
+            long fn = (long) (Property_get(numPreds, tf));
 
             Property_set(numPreds, tt, (Poly_t) ++tn);
             Property_set(numPreds, tf, (Poly_t) ++fn);
@@ -41,7 +41,7 @@ static void analyzeOneBlock(Ssa_Block_t b) {
         }
         case SSA_TRANS_JUMP: {
             Label_t l = b->transfer->u.jump;
-            long ln = (long) Property_get(numPreds, l);
+            long ln = (long) (Property_get(numPreds, l));
 
             Property_set(numPreds, l, (Poly_t) ++ln);
             return;
@@ -75,7 +75,7 @@ static void markVictim(Ssa_Block_t b) {
             return;
         }
         case SSA_TRANS_JUMP: {
-            long n = (long) Property_get(numPreds, b->transfer->u.jump);
+            long n = (long) (Property_get(numPreds, b->transfer->u.jump));
             if (n == 1 && !Label_equals(b->transfer->u.jump, label) && !Label_equals(b->transfer->u.jump, funentry)) {
                 Property_set(victim, b->transfer->u.jump, (Poly_t) 1);
             } else
@@ -101,7 +101,7 @@ static void markVictim(Ssa_Block_t b) {
 static void transOne(Ssa_Block_t b) {
     assert(b);
 
-    long v = (long) Property_get(victim, b->label);
+    long v = (long) (Property_get(victim, b->label));
     if (v)
         return;
 
@@ -113,7 +113,7 @@ static void transOne(Ssa_Block_t b) {
         case SSA_TRANS_JUMP: {
             Label_t jump = b->transfer->u.jump;
             Label_t label = b->label;
-            long vj = (long) Property_get(victim, jump);
+            long vj = (long) (Property_get(victim, jump));
             Ssa_Block_t newb;
 
             if (vj) {

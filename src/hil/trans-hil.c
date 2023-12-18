@@ -602,7 +602,6 @@ static Label_t polluteLabel() {
     // cut it.
     if (!p) {
         return Label_new();
-        return 0;
     }
     first = (Label_t) p->data;
     p = p->next;

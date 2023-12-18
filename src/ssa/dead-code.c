@@ -10,9 +10,9 @@
 // declarations.
 
 
-// whether or not we should do dead code elimination.
+// whether we should do dead code elimination.
 static int flag = 0;
-// whether or not find more dead code in one pass.
+// whether to find more dead code in one pass.
 static int founddead = 0;
 
 static void mark() {
@@ -51,7 +51,7 @@ static void incUse(Id_t id) {
     // when this property has not been set on that var, the
     // "get" will return 0 (rather than the number 0).
     // We abuse it.
-    r = (long) Property_get(usedProp, id);
+    r = (long) (Property_get(usedProp, id));
     r++;
     Property_set(usedProp, id, (Poly_t) r);
     Log_strs("\n", Id_toString(id), " ===> ", Int_toString(r), " times", 0);
@@ -74,7 +74,7 @@ static void analyzeUsed(Ssa_Prog_t p) {
 // analyzing dead code
 
 static long isDead(Id_t id) {
-    return (long) Property_get(deadProp, id) == DEAD;
+    return (long) (Property_get(deadProp, id)) == DEAD;
 }
 
 static void markDead(Id_t id) {
@@ -87,7 +87,7 @@ static int notUsed(Id_t id) {
 }
 
 static void decUse(Id_t id) {
-    long r = (long) Property_get(usedProp, id);
+    long r = (long) (Property_get(usedProp, id));
     if (!r) {
         Error_impossible();
         return;
@@ -361,11 +361,11 @@ static Ssa_Block_t rewriteBlock(Ssa_Block_t b) {
 }
 
 static int decFilter(Dec_t dec) {
-    if (NOTDEAD == (long) Property_get(deadProp, dec->id)) {
+    if (NOTDEAD == (long) (Property_get(deadProp, dec->id))) {
         Log_strs(Dec_toString(dec), " is NOT dead\n", 0);
         return 1;
     }
-    if ((long) Property_get(deadProp, dec->id) == DEAD || (0 == Property_get(usedProp, dec->id))) {
+    if ((long) (Property_get(deadProp, dec->id)) == DEAD || (0 == Property_get(usedProp, dec->id))) {
         Log_strs("found a dead declaration: ", Dec_toString(dec), "\n", 0);
         return 0;
     } else {

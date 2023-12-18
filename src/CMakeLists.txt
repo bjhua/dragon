@@ -2,7 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 PROJECT(DRAGON)
 
-add_compile_options(-W -Wall -Werror -Wstrict-prototypes
+add_compile_options(-W
+        -Wall
+        -Werror
+        -Wstrict-prototypes
         -Wmissing-prototypes
         -Wextra
         -Wconversion
@@ -18,23 +21,31 @@ add_compile_options(-W -Wall -Werror -Wstrict-prototypes
         -Wvla
         -Warray-bounds
         -Warray-bounds-pointer-arithmetic
-        -Wassign-enum -Wbad-function-cast
+        -Wassign-enum
+        -Wbad-function-cast
         -Wconditional-uninitialized
         -Wconversion
-        -Wfloat-equal -Wformat-type-confusion
+        -Wfloat-equal
+        -Wformat-type-confusion
         -Widiomatic-parentheses
-        -Wimplicit-fallthrough -Wloop-analysis
-        -Wpointer-arith -Wshift-sign-overflow
-        -Wshorten-64-to-32 -Wswitch-enum
+        -Wimplicit-fallthrough
+        -Wloop-analysis
+        -Wpointer-arith
+        -Wshift-sign-overflow
+        -Wshorten-64-to-32
+        #        -Wswitch-enum
         -Wtautological-constant-in-range-compare
-        -Wunreachable-code-aggressive -Wthread-safety
-        -Wthread-safety-beta -Wcomma
+        -Wunreachable-code-aggressive
+        -Wthread-safety
+        -Wthread-safety-beta
+        -Wcomma
         -D_FORTIFY_SOURCE=3
         -fstack-protector-strong
-        #-fsanitize=safe-stack
+        #        -fsanitize=safe-stack
         -fPIE
-        #-fstack-clash-protection
-        -fsanitize=bounds -fsanitize-undefined-trap-on-error
+        #        -fstack-clash-protection
+        -fsanitize=bounds
+        -fsanitize-undefined-trap-on-error
         #-Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-z,separate-code
         -pedantic)
 

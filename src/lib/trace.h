@@ -2,27 +2,18 @@
 #define TRACE_H
 
 #include "list.h"
+#include "string.h"
 #include <stdio.h>
 #include <time.h>
 
-#include "string.h"
-
 void Trace_indent(void);
-
 void Trace_unindent(void);
-
 void Trace_spaces(void);
-
 int Trace_lookup(char *);
-
 void Trace_insert(char *);
-
 List_t Trace_allFuncs(void);
-
 void Trace_reset(void);
-
 String_t Trace_junk(void);
-
 String_t Trace_junk2(void *);
 
 #ifndef NDEBUG

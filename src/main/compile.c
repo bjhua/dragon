@@ -1,21 +1,13 @@
-#include "../lib/string.h"
-#include "../lib/file.h"
-#include "../lib/tuple.h"
-#include "../lib/error.h"
-#include "../control/command-line.h"
-#include "../control/pass.h"
-#include "../parser/parse.h"
-#include "../ast/ast.h"
-#include "../elaborate/elaborate-main.h"
-#include "../hil/hil.h"
-#include "../hil/hil-main.h"
-#include "../ssa/ssa-main.h"
-#include "../machine/machine-main.h"
-#include "../c-codegen/c-codegen-main.h"
-#include "../x86/x86.h"
-#include "../x86/x86-main.h"
 #include "compile.h"
-
+#include "../c-codegen/c-codegen-main.h"
+#include "../control/pass.h"
+#include "../elaborate/elaborate-main.h"
+#include "../hil/hil-main.h"
+#include "../lib/error.h"
+#include "../machine/machine-main.h"
+#include "../parser/parse.h"
+#include "../ssa/ssa-main.h"
+#include "../x86/x86-main.h"
 
 static String_t Compile_one(String_t file);
 
@@ -94,10 +86,10 @@ static String_t Compile_one(String_t file) {
             return Tuple_second(tuple);
         }
         default:
-            Error_impossible ();
+            Error_impossible();
             return 0;
     }
-    Error_impossible ();
+    Error_impossible();
     return 0;
 }
 

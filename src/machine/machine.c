@@ -1,5 +1,4 @@
 #include "machine.h"
-#include "../lib/int.h"
 #include "../lib/mem.h"
 #include <assert.h>
 
@@ -215,7 +214,7 @@ S Machine_Stm_Runtime_class(Id_t dest, long index, long size, Id_t fname) {
     return s;
 }
 
-S Machine_Stm_Runtime_array(Id_t dest, int isPtr, O size, int scale, Id_t fname) {
+S Machine_Stm_Runtime_array(Id_t dest, int isPtr, O size, int scale, Id_t file_name) {
     S s;
     Mem_NEW(s);
     s->kind = MACHINE_STM_RUNTIME_ARRAY;
@@ -223,13 +222,12 @@ S Machine_Stm_Runtime_array(Id_t dest, int isPtr, O size, int scale, Id_t fname)
     s->u.array.isPtr = isPtr;
     s->u.array.size = size;
     s->u.array.scale = scale;
-    s->u.array.fname = fname;
+    s->u.array.fname = file_name;
     return s;
 }
 
 static void spacetab(File_t file) {
     fprintf(file, "%s", "\t");
-    return;
 }
 
 File_t Machine_Stm_print(File_t file, S s) {

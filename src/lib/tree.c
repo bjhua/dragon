@@ -10,7 +10,7 @@
 
 #define T Tree_t
 #define V Vertex_t
-#define E Edge_t
+#define Ex Edge_t
 
 struct T {
     String_t name;
@@ -19,7 +19,7 @@ struct T {
 };
 
 typedef struct V *V;
-typedef struct E *E;
+typedef struct Ex *Ex;
 
 ///////////////////////////////////////////////////////
 // vertex
@@ -54,14 +54,14 @@ static Plist_t Vertex_plist(V v) {
 
 ////////////////////////////////////////////////////////
 // edge
-struct E {
+struct Ex {
     V from;
     V to;
     Plist_t plist;
 };
 
-static E Edge_new(V from, V to) {
-    E e;
+static Ex Edge_new(V from, V to) {
+    Ex e;
 
     Mem_NEW(e);
     e->from = from;
@@ -153,7 +153,7 @@ void Tree_insertVertex(T g, Poly_t x) {
 void Tree_insertEdge(T g, Poly_t from, Poly_t to) {
     V fv = searchVertex(g, from);
     V tv = searchVertex(g, to);
-    E e = Edge_new(fv, tv);
+    Ex e = Edge_new(fv, tv);
     List_insertLast(fv->edges, e);
     return;
 }
@@ -169,7 +169,7 @@ void Tree_toJpgWithName(T g, Poly_tyPrint printer, String_t fname) {
         List_t es = List_getFirst(v->edges);
 
         while (es) {
-            E e = (E) (es->data);
+            Ex e = (Ex) (es->data);
             Poly_t sto = e->to->data;
             Dot_insert(d, sfrom, sto, 0);
             es = es->next;
@@ -192,7 +192,7 @@ static void Tree_dfsDoit(T g, V v, Poly_tyVoid f, Property_t visited) {
     Property_set(visited, v, (Poly_t) 1);
     edges = List_getFirst(v->edges);
     while (edges) {
-        E e = (E) edges->data;
+        Ex e = (Ex) edges->data;
         V to = e->to;
         Poly_t visitedTo = Property_get(visited, to);
         if (!visitedTo) {
@@ -234,7 +234,7 @@ List_t Tree_children(T t, Poly_t v) {
     {
         List_t edges = List_getFirst(sv->edges);
         while (edges) {
-            E e = (E) edges->data;
+            Ex e = (Ex) edges->data;
             V to = e->to;
             Poly_t data = to->data;
 
@@ -260,7 +260,7 @@ Tree_t Tree_map(T t, Poly_tyEquals equals, Poly_t (*map)(Poly_t)) {
         V v = (V) vs->data;
         List_t edges = List_getFirst(v->edges);
         while (edges) {
-            E e = (E) edges->data;
+            Ex e = (Ex) edges->data;
             V from = e->from;
             V to = e->to;
 
@@ -275,4 +275,4 @@ Tree_t Tree_map(T t, Poly_tyEquals equals, Poly_t (*map)(Poly_t)) {
 
 #undef T
 #undef V
-#undef E
+#undef Ex

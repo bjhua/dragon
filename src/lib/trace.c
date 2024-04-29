@@ -11,15 +11,15 @@ static int indent = 0;
 
 static List_t names = 0;
 
-void Trace_indent() {
+void Trace_indent(void) {
     indent += STEP;
 }
 
-void Trace_unindent() {
+void Trace_unindent(void) {
     indent -= STEP;
 }
 
-void Trace_spaces() {
+void Trace_spaces(void) {
     int i = indent;
     while (i--)
         printf(" ");
@@ -39,17 +39,17 @@ void Trace_insert(char *s) {
     List_insertFirst(names, s);
 }
 
-List_t Trace_allFuncs() {
+List_t Trace_allFuncs(void) {
     if (!names)
         return List_new();
     return names;
 }
 
-void Trace_reset() {
+void Trace_reset(void) {
     names = 0;
 }
 
-String_t Trace_junk() {
+String_t Trace_junk(void) {
     return "<Trace_junk>";
 }
 

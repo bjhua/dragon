@@ -38,7 +38,7 @@ static int Check_block(Ast_Block_t);
 
 static void Check_lval(Ast_Lval_t l);
 
-static void Check_exp(Ast_Exp_t e);
+static void Check_exp(E e);
 
 static void Check_lval(Ast_Lval_t l) {
     assert(l);
@@ -63,7 +63,7 @@ static void Check_lval(Ast_Lval_t l) {
     return;
 }
 
-static void Check_exp(Ast_Exp_t e) {
+static void Check_exp(E e) {
     assert(e);
 
     switch (e->kind) {

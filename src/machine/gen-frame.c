@@ -3,7 +3,7 @@
 #include "../lib/list.h"
 #include "../lib/trace.h"
 
-// Generate frame information for each functions.
+// Generate frame information for each function.
 // For now, assume all arguments and local declarations
 // are located on the stack. (change this later!)
 
@@ -11,7 +11,7 @@ static List_t allOffsets = 0;
 // the 0 index is the "length" info
 static int index = 1;
 
-static List_t getFrameInfo() {
+static List_t getFrameInfo(void) {
     List_t tmp = allOffsets;
     allOffsets = 0;
     return tmp;
@@ -77,14 +77,12 @@ static void printArg(Machine_Prog_t p) {
     File_t file = File_open("genFrame.arg", "w+");
     Machine_Prog_print(file, p);
     File_close(file);
-    return;
 }
 
 static void printResult(Machine_Prog_t p) {
     File_t file = File_open("genFrame.result", "w+");
     Machine_Prog_print(file, p);
     File_close(file);
-    return;
 }
 
 Machine_Prog_t Machine_genFrame(Machine_Prog_t p) {

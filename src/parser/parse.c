@@ -24,7 +24,7 @@ static String_t convertOperator(char kind);
 static Ast_Type_t Parse_betaType(void);
 static Ast_Type_t Parse_type(void);
 static Ast_Lval_t Parse_lval(Token_t first);
-static Ast_Exp_t Parse_exp(void);
+static E Parse_exp(void);
 static Ast_Stm_t Parse_stm(void);
 static Ast_Block_t Parse_block(void);
 static void error(String_t msg, Region_t r) {
@@ -75,7 +75,7 @@ static String_t convertOperator(char kind) {
 
 static List_t Parse_parameters(void) {
     List_t list = List_new();
-    Ast_Exp_t e;
+    E e;
 
     if (current->kind == ')')
         return list;
@@ -89,7 +89,7 @@ static List_t Parse_parameters(void) {
     return list;
 }
 
-static Ast_Exp_t Parse_lvalOrCall(void) {
+static E Parse_lvalOrCall(void) {
     Token_t s;
     AstId_t id;
 
@@ -122,13 +122,13 @@ static Ast_Exp_t Parse_lvalOrCall(void) {
 // new \beta (e, e, ..., e)
 // new \beta [e]
 // "new" has been eaten.
-static Ast_Exp_t Parse_classOrArray(void) {
+static E Parse_classOrArray(void) {
     AstId_t id;
 
     Ast_Type_t t = Parse_betaType();
     switch ((int) current->kind) {
         case '[': {
-            Ast_Exp_t e;
+            E e;
             advance();
             e = Parse_exp();
             eatToken(']');
@@ -163,8 +163,8 @@ static Ast_Exp_t Parse_classOrArray(void) {
 }
 
 //
-static Ast_Exp_t Parse_factor(void) {
-    Ast_Exp_t e;
+static E Parse_factor(void) {
+    E e;
     String_t s;
 
     switch ((int) current->kind) {
@@ -202,8 +202,8 @@ static Ast_Exp_t Parse_factor(void) {
     Error_impossible();
 }
 
-static Ast_Exp_t Parse_unary(void) {
-    Ast_Exp_t e;
+static E Parse_unary(void) {
+    E e;
     List_t all = List_new();
 
     while (current->kind == '-' || current->kind == '!') {
@@ -229,8 +229,8 @@ static Ast_Exp_t Parse_unary(void) {
     return e;
 }
 
-static Ast_Exp_t Parse_term(void) {
-    Ast_Exp_t e1, e2;
+static E Parse_term(void) {
+    E e1, e2;
     char kind;
 
     e1 = Parse_unary();
@@ -244,8 +244,8 @@ static Ast_Exp_t Parse_term(void) {
     return e1;
 }
 
-static Ast_Exp_t Parse_expr(void) {
-    Ast_Exp_t e1, e2;
+static E Parse_expr(void) {
+    E e1, e2;
     char kind;
 
     e1 = Parse_term();
@@ -260,8 +260,8 @@ static Ast_Exp_t Parse_expr(void) {
 }
 
 
-static Ast_Exp_t Parse_rel(void) {
-    Ast_Exp_t e1, e2;
+static E Parse_rel(void) {
+    E e1, e2;
     char kind;
 
     e1 = Parse_expr();
@@ -276,8 +276,8 @@ static Ast_Exp_t Parse_rel(void) {
 }
 
 
-static Ast_Exp_t Parse_equality(void) {
-    Ast_Exp_t e1, e2;
+static E Parse_equality(void) {
+    E e1, e2;
     char kind;
 
     e1 = Parse_rel();
@@ -291,8 +291,8 @@ static Ast_Exp_t Parse_equality(void) {
     return e1;
 }
 
-static Ast_Exp_t Parse_join(void) {
-    Ast_Exp_t e1, e2;
+static E Parse_join(void) {
+    E e1, e2;
 
     e1 = Parse_equality();
     while (current->kind == TOKEN_AND) {
@@ -305,8 +305,8 @@ static Ast_Exp_t Parse_join(void) {
 }
 
 
-static Ast_Exp_t Parse_bool(void) {
-    Ast_Exp_t e1, e2;
+static E Parse_bool(void) {
+    E e1, e2;
 
     e1 = Parse_join();
     while (current->kind == TOKEN_OR) {
@@ -320,9 +320,9 @@ static Ast_Exp_t Parse_bool(void) {
 
 // e -> be = be = be = ... = be
 //   -> be
-static Ast_Exp_t Parse_assign(void) {
+static E Parse_assign(void) {
     Dlist_t dlist = Dlist_new();
-    Ast_Exp_t e1, e2;
+    E e1, e2;
     int flag = 0;
 
     e1 = Parse_bool();
@@ -353,7 +353,7 @@ static Ast_Exp_t Parse_assign(void) {
     return e2;
 }
 
-static Ast_Exp_t Parse_exp(void) {
+static E Parse_exp(void) {
     return Parse_assign();
 }
 
@@ -364,7 +364,7 @@ static Ast_Exp_t Parse_exp(void) {
 static Ast_Lval_t Parse_lval(Token_t first) {
     Ast_Lval_t lval;
     AstId_t id;
-    Ast_Exp_t exp;
+    E exp;
     Region_t r;
 
     if (!first) {
@@ -399,7 +399,7 @@ static Ast_Lval_t Parse_lval(Token_t first) {
 //   for (e; e; e)
 //     s
 static Ast_Stm_t Parse_for(void) {
-    Ast_Exp_t init, cond, tail;
+    E init, cond, tail;
     Ast_Stm_t body;
     Token_t t;
 
@@ -416,7 +416,7 @@ static Ast_Stm_t Parse_for(void) {
 }
 
 static Ast_Stm_t Parse_do(void) {
-    Ast_Exp_t condition;
+    E condition;
     Ast_Stm_t body;
     Token_t t;
 
@@ -431,7 +431,7 @@ static Ast_Stm_t Parse_do(void) {
 }
 
 static Ast_Stm_t Parse_while(void) {
-    Ast_Exp_t condition;
+    E condition;
     Ast_Stm_t body;
     Token_t t;
 
@@ -444,7 +444,7 @@ static Ast_Stm_t Parse_while(void) {
 }
 
 static Ast_Stm_t Parse_if(void) {
-    Ast_Exp_t condition;
+    E condition;
     Ast_Stm_t then, elsee =
                             Ast_Stm_new_block(Ast_Block_new(List_new(), List_new()));
     Token_t t;
@@ -462,7 +462,7 @@ static Ast_Stm_t Parse_if(void) {
 }
 
 static Ast_Stm_t Parse_stm(void) {
-    Ast_Exp_t e;
+    E e;
     Ast_Block_t b;
 
     switch ((int) current->kind) {
@@ -514,7 +514,7 @@ static Ast_Stm_t Parse_stm(void) {
             return Ast_Stm_new_block(b);
         }
         default: {
-            Ast_Exp_t ee;
+            E ee;
 
             ee = Parse_exp();
             eatToken(';');
@@ -580,7 +580,7 @@ static List_t Parse_decList(void) {
     Ast_Type_t type;
     Token_t name;
     AstId_t id;
-    Ast_Exp_t init = 0;
+    E init = 0;
 
     while (current->kind == TOKEN_INT || current->kind == TOKEN_STRING || current->kind == TOKEN_ID) {
         if (current->kind == TOKEN_ID && !Hash_lookup(tyTable, current->lexeme))

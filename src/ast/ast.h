@@ -13,7 +13,7 @@
 #define B Ast_Block_t
 #define C Ast_Class_t
 #define D Ast_Dec_t
-#define E Ast_Exp_t
+#define Ex Ast_Exp_t
 #define F Ast_Fun_t
 #define L Ast_Lval_t
 #define P Ast_Prog_t

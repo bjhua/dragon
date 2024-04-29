@@ -44,7 +44,7 @@ struct Lval_Result_t {
 
 struct Exp_Result_t {
     Type_t type;
-    Ast_Exp_t exp;
+    E exp;
 };
 
 static Ast_Type_t Elab_convertType(Ast_Type_t);
@@ -55,7 +55,7 @@ static Ast_Block_t Elab_block(Ast_Block_t);
 
 static struct Lval_Result_t Elab_lval(Ast_Lval_t);
 
-static struct Exp_Result_t Elab_exp(Ast_Exp_t);
+static struct Exp_Result_t Elab_exp(E);
 
 
 /////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ static struct Lval_Result_t Elab_lval(Ast_Lval_t l) {
 /////////////////////////////////////////////////////
 // expressions
 /////////////////////////////////////////////////////
-static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
+static struct Exp_Result_t Elab_exp(E e) {
     struct Exp_Result_t result = {Type_new_int(), e};
 
     assert(e);
@@ -241,7 +241,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
 
                 while (ptr_field && ptr_arg) {
                     AstId_t fid = (AstId_t) ptr_field->data;
-                    Ast_Exp_t ae = (Ast_Exp_t) ptr_arg->data;
+                    E ae = (E) ptr_arg->data;
                     struct Exp_Result_t re = Elab_exp(ae);
                     Env_Binding_t bd =
                             Senv_lookupMustExist(oldClassName,
@@ -302,13 +302,14 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             args = List_getFirst(e->u.call.args);
             argsResult = List_new();
             while (argsTy && args) {
-                Type_t ty;
+                Type_t ty_;
                 struct Exp_Result_t r;
 
-                ty = (Type_t) argsTy->data;
+                ty_ = (Type_t) argsTy->data;
                 r = Elab_exp(args->data);
                 List_insertLast(argsResult, r.exp);
-                checkType(ty, r.type,
+                checkType(ty_,
+                          r.type,
                           AstId_dest(e->u.call.f));
                 argsTy = argsTy->next;
                 args = args->next;
@@ -431,7 +432,7 @@ static Ast_Dec_t Elab_dec(Ast_Dec_t t) {
     Ast_Type_t newty;
     Type_t ty;
     AstId_t newName;
-    Ast_Exp_t newInit = 0;
+    E newInit = 0;
 
     assert(t);
 

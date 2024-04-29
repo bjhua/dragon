@@ -2,7 +2,7 @@
 
 #define T Plist_t
 
-T Plist_new() {
+T Plist_new(void) {
     return List_new();
 }
 

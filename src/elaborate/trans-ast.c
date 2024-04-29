@@ -16,7 +16,7 @@
 static Stack_t labels = 0;
 static Stack_t exnLabels = 0;
 
-static Tuple_t pushLabel() {
+static Tuple_t pushLabel(void) {
     Label_t entryLabel = Label_new(),
             exitLabel = Label_new();
 
@@ -25,17 +25,17 @@ static Tuple_t pushLabel() {
     return Tuple_new(entryLabel, exitLabel);
 }
 
-static void popLabel() {
+static void popLabel(void) {
     assert(labels);
     Stack_pop(labels);
 }
 
-static Tuple_t peekLabel() {
+static Tuple_t peekLabel(void) {
     assert(labels);
     return Stack_getTop(labels);
 }
 
-static Label_t pushExnLabel() {
+static Label_t pushExnLabel(void) {
     Label_t label = Label_new();
 
     assert(exnLabels);
@@ -43,12 +43,12 @@ static Label_t pushExnLabel() {
     return label;
 }
 
-static void popExnLabel() {
+static void popExnLabel(void) {
     assert(exnLabels);
     Stack_pop(exnLabels);
 }
 
-static Label_t peekExnLabel() {
+static Label_t peekExnLabel(void) {
     assert(exnLabels);
     return Stack_getTop(exnLabels);
 }
@@ -69,7 +69,7 @@ static List_t Elab_block(Ast_Block_t);
 
 static struct Lval_Result_t Elab_lval(Ast_Lval_t);
 
-static struct Exp_Result_t Elab_exp(Ast_Exp_t);
+static struct Exp_Result_t Elab_exp(E);
 
 static List_t Elab_stm(Ast_Stm_t);
 
@@ -200,7 +200,7 @@ static struct Lval_Result_t Elab_lval(Ast_Lval_t l) {
 
 ///////////////////////////////////////////////////////
 // translation of expressions
-static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
+static struct Exp_Result_t Elab_exp(E e) {
     struct Exp_Result_t result = {0, 0};
 
     assert(e);
@@ -263,8 +263,8 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
 
             args = List_getFirst(args);
             while (args) {
-                Ast_Exp_t e = (Ast_Exp_t) args->data;
-                struct Exp_Result_t temp = Elab_exp(e);
+                E e_ = (E) args->data;
+                struct Exp_Result_t temp = Elab_exp(e_);
 
                 List_insertLast(newArgs, temp.exp);
                 List_insertLast(stms, temp.list);
@@ -302,7 +302,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             Label_t leave = 0, normal = 0;
 
             while (args) {
-                Ast_Exp_t arg = (Ast_Exp_t) args->data;
+                E arg = (E) args->data;
 
                 temp = Elab_exp(arg);
                 List_insertLast(tempExps, temp.exp);
@@ -387,7 +387,7 @@ static List_t Elab_stm(Ast_Stm_t s) {
             List_t newCondx = AppList_toList(newCond.list);
             struct Exp_Result_t newTail;
             List_t newTailx;
-            List_t result = List_new();
+            List_t result_ = List_new();
 
             newBody = Elab_stm(s->u.forr.body);
             newTail = Elab_exp(s->u.forr.tail);
@@ -395,13 +395,13 @@ static List_t Elab_stm(Ast_Stm_t s) {
             List_insertLast(newTailx, Hil_Stm_new_exp(newTail.exp));
             List_append(newTailx, newCondx);
 
-            List_append(result, AppList_toList(newHeader.list));
-            List_insertLast(result, Hil_Stm_new_exp(newHeader.exp));
-            List_append(result, AppList_toList(newCond.list));
-            List_insertLast(result, Hil_Stm_new_if(newCond.exp, List_list(Hil_Stm_new_do(newCond.exp, newBody, Tuple_first(tuple), Tuple_second(tuple), newTailx), 0),
-                                                   List_new()));
+            List_append(result_, AppList_toList(newHeader.list));
+            List_insertLast(result_, Hil_Stm_new_exp(newHeader.exp));
+            List_append(result_, AppList_toList(newCond.list));
+            List_insertLast(result_, Hil_Stm_new_if(newCond.exp, List_list(Hil_Stm_new_do(newCond.exp, newBody, Tuple_first(tuple), Tuple_second(tuple), newTailx), 0),
+                                                    List_new()));
             popLabel();
-            return result;
+            return result_;
         }
         case AST_STM_BREAK: {
             Tuple_t tuple = peekLabel();

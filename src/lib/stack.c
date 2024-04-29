@@ -10,7 +10,7 @@
 #define T Stack_t
 #define P Poly_t
 
-T Stack_new() {
+T Stack_new(void) {
     return List_new();
 }
 

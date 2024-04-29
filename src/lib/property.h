@@ -20,13 +20,9 @@ T Property_new(Poly_tyPlist);
 // generated
 // "V" will be set on that item "k".
 T Property_newInitFun(Poly_tyPlist, V (*init)(K));
-
 void Property_set(T prop, K k, V v);
-
 V Property_get(T, K k);
-
 void Property_clear(T prop);
-
 String_t Property_status(void);
 
 #undef T

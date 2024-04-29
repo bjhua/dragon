@@ -198,46 +198,6 @@ static struct Lval_Result_t Elab_lval(Ast_Lval_t l) {
     return result;
 }
 
-static Operator_t convertOperator(Ast_Exp_Kind_t k) {
-    switch (k) {
-        case AST_EXP_ADD:
-            return OP_ADD;
-        case AST_EXP_SUB:
-            return OP_SUB;
-        case AST_EXP_TIMES:
-            return OP_TIMES;
-        case AST_EXP_DIVIDE:
-            return OP_DIVIDE;
-        case AST_EXP_MODUS:
-            return OP_MODUS;
-        case AST_EXP_OR:
-            return OP_OR;
-        case AST_EXP_AND:
-            return OP_AND;
-        case AST_EXP_EQ:
-            return OP_EQ;
-        case AST_EXP_NE:
-            return OP_NE;
-        case AST_EXP_LT:
-            return OP_LT;
-        case AST_EXP_LE:
-            return OP_LE;
-        case AST_EXP_GT:
-            return OP_GT;
-        case AST_EXP_GE:
-            return OP_GE;
-        case AST_EXP_NOT:
-            return OP_NOT;
-        case AST_EXP_NEGATIVE:
-            return OP_NEG;
-        default:
-            Error_impossible();
-            return 0;
-    };
-    Error_impossible();
-    return 0;
-}
-
 ///////////////////////////////////////////////////////
 // translation of expressions
 static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
@@ -260,25 +220,13 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
                     AppList_new_list(List_list(newRight.list, newLeft.list, AppList_fromItem(newAssign), 0));
             return result;
         }
-        case AST_EXP_ADD:
-        case AST_EXP_SUB:
-        case AST_EXP_TIMES:
-        case AST_EXP_DIVIDE:
-        case AST_EXP_MODUS:
-        case AST_EXP_OR:
-        case AST_EXP_AND:
-        case AST_EXP_LT:
-        case AST_EXP_LE:
-        case AST_EXP_GT:
-        case AST_EXP_GE:
-        case AST_EXP_EQ:
-        case AST_EXP_NE: {
+        case AST_EXP_BOP: {
             struct Exp_Result_t newLeft, newRight;
             newLeft = Elab_exp(e->u.bop.left);
             newRight = Elab_exp(e->u.bop.right);
 
             result.exp =
-                    Hil_Exp_new_bop(convertOperator(e->kind), newLeft.exp, newRight.exp, type2atype(e->ty));
+                    Hil_Exp_new_bop(e->u.bop.bop, newLeft.exp, newRight.exp, type2atype(e->ty));
             result.list = AppList_concat(newLeft.list, newRight.list);
             return result;
         }
@@ -288,7 +236,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
 
             new = Elab_exp(e->u.unary.e);
 
-            result.exp = Hil_Exp_new_unary(convertOperator(e->kind), new.exp, type2atype(e->ty));
+            result.exp = Hil_Exp_new_unary(e->u.unary.op, new.exp, type2atype(e->ty));
             result.list = new.list;
             return result;
         }

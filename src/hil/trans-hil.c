@@ -18,10 +18,12 @@ struct FunInfo_t {
     Label_t exitLabel;
 };
 
-static struct FunInfo_t fun = {0, 0, 0};
+static struct FunInfo_t fun = {0,
+                               0,
+                               0};
 
 //////////////////////////////////////////////////////
-// some dubugging utilities for control flow
+// some debugging utilities for control flow
 
 #define S_IF_TRUE ("IF_TRUE")
 #define S_IF_FALSE ("IF_FALSE")
@@ -47,12 +49,12 @@ static List_t fieldPropInitFun(Id_t id) {
 // Label_t -> String_t
 static Property_t labelInfoProp = 0;
 
-static void LabelInfo_init() {
+static void LabelInfo_init(void) {
     if (Control_labelInfo)
         labelInfoProp = Property_new((Poly_tyPlist) Label_plist);
 }
 
-static void LabelInfo_clear() {
+static void LabelInfo_clear(void) {
     if (Control_labelInfo)
         Property_clear(labelInfoProp);
 }
@@ -132,7 +134,7 @@ static void emitTrans(Ssa_Transfer_t s) {
 //    return t;
 //}
 
-static void Cache_log() {
+static void Cache_log(void) {
     assert(caches);
 
     List_t p = List_getFirst(caches);
@@ -179,7 +181,7 @@ static Id_t genDec(Atype_t ty) {
     return id;
 }
 
-static List_t getDecs() {
+static List_t getDecs(void) {
     List_t t = allDecs;
     allDecs = List_new();
     return t;
@@ -581,7 +583,7 @@ static void Trans_stm(Hil_Stm_t s) {
 static Property_t substProp = 0;
 static List_t labelCache = 0;
 
-static void LabelCache_init() {
+static void LabelCache_init(void) {
     substProp = Property_new((Poly_tyPlist) Label_plist);
     labelCache = List_new();
 }
@@ -591,7 +593,7 @@ static void pushLabel(Label_t l) {
 }
 
 // call this only there is no other labels
-static Label_t polluteLabel() {
+static Label_t polluteLabel(void) {
     List_t p;
     Label_t first, other;
 
@@ -621,7 +623,7 @@ struct Block_Result_t {
 };
 
 // cook blocks
-static struct Block_Result_t cookBlocks() {
+static struct Block_Result_t cookBlocks(void) {
     struct Block_Result_t result = {0, 0};
     List_t p = List_getFirst(caches);
     // List<Ssa_Stm_t>

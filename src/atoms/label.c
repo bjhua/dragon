@@ -16,7 +16,7 @@ struct T {
     Plist_t plist;
 };
 
-T Label_new() {
+T Label_new(void) {
     T x;
 
     Mem_NEW(x);

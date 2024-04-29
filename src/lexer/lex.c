@@ -100,7 +100,10 @@ static Token_t cookNum(int c, Coordinate_t leftPos) {
         c = get_char();
     }
     unget_char(c);
-    return Token_new(TOKEN_INTLIT, CharBuffer_toStringBeforeClear(numBuffer), leftPos, getPos());
+    return Token_new(TOKEN_INTLIT,
+                     CharBuffer_toStringBeforeClear(numBuffer),
+                     leftPos,
+                     getPos());
 }
 
 static Token_t cookString(Coordinate_t leftPos) {
@@ -122,7 +125,10 @@ static Token_t cookString(Coordinate_t leftPos) {
         error2("unclosed string", fname, line, column);
     else if (c == '\n')
         error("don't allow newLine in strings");
-    return Token_new(TOKEN_STRINGLIT, CharBuffer_toStringBeforeClear(strBuffer), leftPos, getPos());
+    return Token_new(TOKEN_STRINGLIT,
+                     CharBuffer_toStringBeforeClear(strBuffer),
+                     leftPos,
+                     getPos());
 }
 
 static int escape(int c) {
@@ -239,7 +245,9 @@ static Token_t Lex_getTokenTraced(void) {
         case '!': {
             int second_char = get_char();
             if (second_char == '=')
-                return Token_new(TOKEN_NEQ, 0, leftPos, getPos());
+                return Token_new(TOKEN_NEQ,
+                                 0,
+                                 leftPos, getPos());
             unget_char(second_char);
             return Token_new((Token_Kind_t) '!', 0, leftPos, getPos());
         }
@@ -258,33 +266,74 @@ static Token_t Lex_getTokenTraced(void) {
             exit(1);
         }
         case '+':
-            return Token_new((Token_Kind_t) '+', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '+',
+                             0,
+                             leftPos,
+                             getPos());
         case ';':
-            return Token_new((Token_Kind_t) ';', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ';',
+                             0,
+                             leftPos,
+                             getPos());
         case ',':
-            return Token_new((Token_Kind_t) ',', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ',',
+                             0,
+                             leftPos,
+                             getPos());
         case '*':
-            return Token_new((Token_Kind_t) '*', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '*',
+                             0,
+                             leftPos,
+                             getPos());
         case '%':
-            return Token_new((Token_Kind_t) '%', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '%',
+                             0,
+                             leftPos,
+                             getPos());
         case '[':
-            return Token_new((Token_Kind_t) '[', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '[',
+                             0,
+                             leftPos,
+                             getPos());
         case ']':
-            return Token_new((Token_Kind_t) ']', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ']',
+                             0,
+                             leftPos,
+                             getPos());
         case '{':
-            return Token_new((Token_Kind_t) '{', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '{',
+                             0,
+                             leftPos,
+                             getPos());
         case '}':
-            return Token_new((Token_Kind_t) '}', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '}',
+                             0,
+                             leftPos,
+                             getPos());
         case '(':
-            return Token_new((Token_Kind_t) '(', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '(',
+                             0,
+                             leftPos,
+                             getPos());
         case ')':
-            return Token_new((Token_Kind_t) ')', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) ')',
+                             0,
+                             leftPos,
+                             getPos());
         case '.':
-            return Token_new((Token_Kind_t) '.', 0, leftPos, getPos());
+            return Token_new((Token_Kind_t) '.',
+                             0,
+                             leftPos,
+                             getPos());
         case EOF:
-            return Token_new((Token_Kind_t) 0, 0, leftPos, leftPos);
+            return Token_new((Token_Kind_t) 0,
+                             0,
+                             leftPos,
+                             leftPos);
         default:
-            error(String_concat("illegal character: ", Char_toString(firstChar), 0));
+            error(String_concat("illegal character: ",
+                                Char_toString(firstChar),
+                                0));
             return 0;
     }
     Error_impossible();

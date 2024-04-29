@@ -40,11 +40,8 @@ struct L {
 };
 
 L Hil_Lval_new_var(Id_t, Atype_t ty);
-
 L Hil_Lval_new_dot(L, Id_t, Atype_t ty);
-
 L Hil_Lval_new_array(L, E, Atype_t ty);
-
 File_t Hil_Lval_print(File_t file, L);
 
 //////////////////////////////////////////////////////
@@ -101,27 +98,19 @@ struct E {
     Atype_t ty;
 };
 
-E Hil_Exp_new_bop(Operator_t op,
+E Hil_Exp_new_bop(String_t op,
                   E left,
                   E right,
                   Atype_t ty);
-
-E Hil_Exp_new_unary(Operator_t op,
+E Hil_Exp_new_unary(String_t op,
                     E e,
                     Atype_t ty);
-
 E Hil_Exp_new_intlit(long, Atype_t ty);
-
 E Hil_Exp_new_stringlit(String_t s, Atype_t ty);
-
 E Hil_Exp_new_newArray(Atype_t ty, E size);
-
 E Hil_Exp_new_newClass(Id_t name, List_t args);
-
 E Hil_Exp_new_call(Id_t, List_t, Atype_t, Label_t leave, Label_t normal);
-
 E Hil_Exp_new_lval(L, Atype_t ty);
-
 File_t Hil_Exp_print(File_t file, E);
 
 //////////////////////////////////////////////////////
@@ -174,23 +163,14 @@ struct S {
 };
 
 S Hil_Stm_new_assign(L, E);
-
 S Hil_Stm_new_exp(E);
-
 S Hil_Stm_new_if(E, List_t, List_t);
-
 S Hil_Stm_new_do(E cond, List_t stms, Label_t entryLabel, Label_t exitLabel, List_t padding);
-
 S Hil_Stm_new_jump(Label_t jump);
-
 S Hil_Stm_new_localThrow(Label_t label);
-
 S Hil_Stm_new_throw(void);
-
 S Hil_Stm_new_tryCatch(List_t tryy, List_t catchh, Label_t label, Label_t end);
-
 S Hil_Stm_new_return(E);
-
 File_t Hil_Stm_print(File_t file, S);
 
 //////////////////////////////////////////////////////
@@ -207,7 +187,6 @@ struct F {
 };
 
 F Hil_Fun_new(Atype_t, Id_t, List_t, List_t, List_t);
-
 File_t Hil_Fun_print(File_t file, F);
 
 //////////////////////////////////////////////////////
@@ -219,7 +198,6 @@ struct P {
 };
 
 P Hil_Prog_new(List_t classes, List_t funcs);
-
 File_t Hil_Prog_print(File_t file, P x);
 
 #undef E

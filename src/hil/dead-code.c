@@ -11,7 +11,7 @@
  *        s1;
  *        s2;
  *   2. delete singleton variable-based expression-stm,
- *      as in these ones:
+ *      as in these:
  *        x;
  *        y;
  */
@@ -102,7 +102,6 @@ static Hil_Prog_t Hil_deadCodeTraced(Hil_Prog_t p) {
 static void Trace_arg(Hil_Prog_t p) {
     assert(p);
     Hil_Prog_print(stdout, p);
-    return;
 }
 
 Hil_Prog_t Hil_deadCode(Hil_Prog_t p) {

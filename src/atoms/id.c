@@ -26,7 +26,7 @@ static T Id_create(String_t s) {
     T x;
 
     assert(s);
-    Mem_NEW (x);
+    Mem_NEW(x);
     x->name = s;
     x->newName = 0;
     x->hashCode = String_hashCode(s);
@@ -34,7 +34,7 @@ static T Id_create(String_t s) {
     return x;
 }
 
-T Id_bogus() {
+T Id_bogus(void) {
     return Id_create("<bogus>");
 }
 
@@ -46,9 +46,9 @@ T Id_fromString(String_t s) {
     return x;
 }
 
-T Id_newNoName() {
+T Id_newNoName(void) {
     T x;
-    Mem_NEW (x);
+    Mem_NEW(x);
     x->name = 0;
     x->newName = String_concat("x_",
                                Int_toString(counter++),
@@ -64,15 +64,16 @@ long Id_hashCode(T x) {
 }
 
 String_t Id_toString(T x) {
-    assert (x);
+    assert(x);
     assert(((x->name == 0) && (x->newName == 0)));
     return (x->name) ? (x->name) : (x->newName);
 }
 
-void Id_init() {
+void Id_init(void) {
     table = Hash_new((tyHashCode) String_hashCode, (Poly_tyEquals) String_equals
-            // should never call this function.
-            , 0);
+                     // should never call this function.
+                     ,
+                     0);
 }
 
 long Id_equals(T x, T y) {
@@ -87,7 +88,7 @@ Plist_t Id_plist(T x) {
 }
 
 void Id_print(T x) {
-    assert (x);
+    assert(x);
     assert((x->name == 0) && (x->newName == 0));
     printf("%s", (x->name) ? (x->name) : (x->newName));
 }

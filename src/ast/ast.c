@@ -101,10 +101,14 @@ E Ast_Exp_new_assign(E left, E right, Type_t ty,
     return e;
 }
 
-E Ast_Exp_new_bop(Ast_Exp_Kind_t kind, E left, E right, Type_t ty, Region_t r) {
+E Ast_Exp_new_bop(String_t bop,
+                  E left,
+                  E right,
+                  Type_t ty,
+                  Region_t r) {
     E e;
     Mem_NEW(e);
-    e->kind = kind;
+    e->u.bop.bop = bop;
     e->u.bop.left = left;
     e->u.bop.right = right;
     e->ty = ty;
@@ -200,29 +204,9 @@ File_t Ast_Exp_print(File_t file, E e) {
             Ast_Exp_print(file, e->u.assign.right);
             fprintf(file, "%s", ")");
             break;
-        case AST_EXP_ADD:
+        case AST_EXP_BOP:
             Ast_Exp_print(file, e->u.bop.left);
-            fprintf(file, "%s", " + ");
-            Ast_Exp_print(file, e->u.bop.right);
-            break;
-        case AST_EXP_SUB:
-            Ast_Exp_print(file, e->u.bop.left);
-            fprintf(file, "%s", " - ");
-            Ast_Exp_print(file, e->u.bop.right);
-            break;
-        case AST_EXP_TIMES:
-            Ast_Exp_print(file, e->u.bop.left);
-            fprintf(file, "%s", " * ");
-            Ast_Exp_print(file, e->u.bop.right);
-            break;
-        case AST_EXP_DIVIDE:
-            Ast_Exp_print(file, e->u.bop.left);
-            fprintf(file, "%s", " / ");
-            Ast_Exp_print(file, e->u.bop.right);
-            break;
-        case AST_EXP_MODUS:
-            Ast_Exp_print(file, e->u.bop.left);
-            fprintf(file, "%s", " %% ");
+            fprintf(file, "%s", e->u.bop.bop);
             Ast_Exp_print(file, e->u.bop.right);
             break;
         case AST_EXP_OR:

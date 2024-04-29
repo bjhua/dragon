@@ -50,12 +50,12 @@ struct T {
     Region_t region;
 };
 
-T Token_new(Token_Kind_t kind, String_t lexeme, Coordinate_t left, Coordinate_t right);
-
+T Token_new(Token_Kind_t kind,
+            String_t lexeme,
+            Coordinate_t left,
+            Coordinate_t right);
 String_t Token_Kind_toString(Token_Kind_t kind);
-
 String_t Token_toString(T t);
-
 String_t Token_toStringWithPos(T t);
 
 #undef T

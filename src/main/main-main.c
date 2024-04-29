@@ -15,7 +15,7 @@
 
 //static String_t firstFile = 0;
 
-static void show_banner() {
+static void show_banner(void) {
     time_t now;
     String_t timex, banner;
 

@@ -1,6 +1,6 @@
-#include <assert.h>
-#include "../lib/mem.h"
 #include "ast-id.h"
+#include "../lib/mem.h"
+#include <assert.h>
 
 #define T AstId_t
 
@@ -11,7 +11,7 @@ struct T {
 
 static T AstId_new(Id_t id, Region_t r) {
     T t;
-    Mem_NEW (t);
+    Mem_NEW(t);
     t->id = id;
     t->region = r;
     return t;
@@ -21,11 +21,11 @@ T AstId_fromString(String_t s, Region_t r) {
     return AstId_new(Id_fromString(s), r);
 }
 
-T AstId_bogus() {
+T AstId_bogus(void) {
     return AstId_new(Id_bogus(), Region_bogus());
 }
 
-T AstId_newNoName() {
+T AstId_newNoName(void) {
     return AstId_new(Id_newNoName(), Region_bogus());
 }
 
@@ -41,7 +41,7 @@ long AstId_equals(T id1, T id2) {
 }
 
 long AstId_hashCode(T t) {
-    assert (t);
+    assert(t);
     return Id_hashCode(t->id);
 }
 

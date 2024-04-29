@@ -18,7 +18,7 @@
 #define printf noop
 #define dprintf noop
 
-static int noop(char *s, ...) {
+static int noop(const char *s, ...) {
     UNUSED(s);
     return 0;
 }
@@ -35,10 +35,10 @@ struct T {
 };
 
 #define V Vertex_t
-#define E Edge_t
+#define EE Edge_t
 
 typedef struct V *V;
-typedef struct E *E;
+typedef struct EE *EE;
 
 ///////////////////////////////////////////////////////
 // vertex
@@ -74,14 +74,14 @@ static int Vertex_equals(V v1, V v2) {
 
 ////////////////////////////////////////////////////////
 // edge
-struct E {
+struct EE {
     V from;
     V to;
     Plist_t plist;
 };
 
-static E Edge_new(V from, V to) {
-    E e;
+static EE Edge_new(V from, V to) {
+    EE e;
 
     Mem_NEW(e);
     e->from = from;
@@ -172,7 +172,7 @@ void Graph_insertVertex(T g, Poly_t x) {
 void Graph_insertEdge(T g, Poly_t from, Poly_t to) {
     V fv = searchVertex(g, from);
     V tv = searchVertex(g, to);
-    E e = Edge_new(fv, tv);
+    EE e = Edge_new(fv, tv);
     List_insertLast(fv->edges, e);
     return;
 }
@@ -200,7 +200,7 @@ void Graph_toJpgWithName(T g, Poly_tyPrint printer, String_t fname) {
         List_t es = List_getFirst(v->edges);
 
         while (es) {
-            E e = (E) (es->data);
+            EE e = (EE) (es->data);
             Poly_t sto = e->to->data;
             Dot_insert(d, sfrom, sto, 0);
             es = es->next;
@@ -223,7 +223,7 @@ static void Graph_dfsDoit(T g, V v, Poly_tyVoid f, Property_t visited) {
     Property_set(visited, v, (Poly_t) 1);
     edges = List_getFirst(v->edges);
     while (edges) {
-        E e = (E) edges->data;
+        EE e = (EE) edges->data;
         V to = e->to;
         Poly_t visitedTo = Property_get(visited, to);
         if (!visitedTo) {
@@ -265,7 +265,7 @@ static void markPreds(T g, Property_t preds) {
         V from = (V) vs->data;
         List_t edges = List_getFirst(from->edges);
         while (edges) {
-            E e = (E) edges->data;
+            EE e = (EE) edges->data;
             V to = e->to;
 
             // "from" is a predecesor for "to"
@@ -581,7 +581,7 @@ static Set_t Graph_dfDoit(T g, V n, Tree_t domTree, Property_t dom, Property_t i
     List_t children = List_getFirst(Tree_children(domTree, n));
 
     while (nedges) {
-        E e = nedges->data;
+        EE e = nedges->data;
         V y = e->to;
         Set_t idomy = Property_get(idom, y);
 
@@ -677,7 +677,7 @@ List_t Graph_successors(T g, Poly_t k) {
     List_t edges = List_getFirst(v->edges);
 
     while (edges) {
-        E e = (E) edges->data;
+        EE e = (EE) edges->data;
         V to = e->to;
 
         List_insertLast(result, to->data);
@@ -695,7 +695,7 @@ List_t Graph_predessors(T g, Poly_t k) {
         V which = (V) vs->data;
         List_t edges = List_getFirst(which->edges);
         while (edges) {
-            E e = (E) edges->data;
+            EE e = (EE) edges->data;
             V to = e->to;
             if (Vertex_equals(to, v))
                 Set_insert(set, which->data);
@@ -710,6 +710,6 @@ List_t Graph_predessors(T g, Poly_t k) {
 
 #undef T
 #undef V
-#undef E
+#undef EE
 
 #undef dprintf

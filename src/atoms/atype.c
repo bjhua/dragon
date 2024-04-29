@@ -5,7 +5,7 @@
 
 #define T Atype_t
 
-T Atype_new_int() {
+T Atype_new_int(void) {
     T p;
 
     Mem_NEW(p);
@@ -14,7 +14,7 @@ T Atype_new_int() {
     return p;
 }
 
-T Atype_new_int_array() {
+T Atype_new_int_array(void) {
     T p;
 
     Mem_NEW(p);
@@ -22,7 +22,7 @@ T Atype_new_int_array() {
     return p;
 }
 
-T Atype_new_string(String_t x) {
+T Atype_new_string(const String_t x) {
     UNUSED(x);
 
     T p;
@@ -32,7 +32,7 @@ T Atype_new_string(String_t x) {
     return p;
 }
 
-T Atype_new_string_array() {
+T Atype_new_string_array(void) {
     T p;
 
     Mem_NEW(p);

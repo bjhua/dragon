@@ -79,11 +79,7 @@ static void Check_exp(Ast_Exp_t e) {
             Check_exp(e->u.assign.right);
             return;
         }
-        case AST_EXP_ADD:
-        case AST_EXP_SUB:
-        case AST_EXP_TIMES:
-        case AST_EXP_DIVIDE:
-        case AST_EXP_MODUS:
+        case AST_EXP_BOP:
         case AST_EXP_OR:
         case AST_EXP_AND:
         case AST_EXP_LT:

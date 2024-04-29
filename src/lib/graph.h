@@ -2,9 +2,9 @@
 #define GRAPH_H
 
 #include "poly.h"
-#include "tree.h"
-#include "string.h"
 #include "property.h"
+#include "string.h"
+#include "tree.h"
 //#include "weight.h"
 #include "list.h"
 #include "set.h"
@@ -34,13 +34,15 @@ void Graph_toJpgWithName(T g, Poly_tyPrint printer, String_t fname);
 //                    , String_t fname
 //                    , Property_t edgeProp);
 
-void Graph_dfs(T g, Poly_t start, void (*visit)(Poly_t));
+void Graph_dfs(T g,
+               Poly_t start,
+               void (*visit)(Poly_t));
 
 // Tree<Poly_t>
 Tree_t Graph_domTree(T g, Poly_t start);
 
 // Each vertex's dominance frontier. Note that this
-// property is set by "dfProp);
+// property is set by "dfProp";
 Tree_t Graph_df(T g, Poly_t start, void (*markDf)(Poly_t, Set_t));
 
 

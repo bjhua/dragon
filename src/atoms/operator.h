@@ -22,9 +22,8 @@ typedef enum {
 } Operator_t;
 
 String_t Operator_toString(Operator_t);
-
+Operator_t Operator_fromString(String_t);
 long Operator_binary(long, Operator_t, long);
-
 long Operator_unary(Operator_t, long);
 
 #undef T

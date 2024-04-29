@@ -58,7 +58,7 @@ static void error_dupClassName(Id_t old, AstId_t current) {
 // class name env
 static Cenv_t cenv = 0;
 
-void Cenv_init() {
+void Cenv_init(void) {
     cenv = Hash_new((tyHashCode) AstId_hashCode,
                     (Poly_tyEquals) AstId_equals,
                     (tyDup) error_dupClassName);
@@ -118,7 +118,7 @@ static void error_dupVar(AstId_t old, AstId_t cur) {
     return;
 }
 
-void Venv_init() {
+void Venv_init(void) {
     Hash_t h;
 
     venv = Stack_new();
@@ -195,7 +195,7 @@ Env_Binding_t Venv_lookupMustExist(AstId_t id) {
     return b;
 }
 
-void Venv_enterScope() {
+void Venv_enterScope(void) {
     Hash_t h;
 
     h = Hash_new((tyHashCode) AstId_hashCode,
@@ -204,7 +204,7 @@ void Venv_enterScope() {
     Stack_push(venv, h);
 }
 
-void Venv_exitScope() {
+void Venv_exitScope(void) {
     Stack_pop(venv);
 }
 

@@ -56,22 +56,15 @@ struct L {
 };
 
 L Ast_Lval_new_var(Id_t, Type_t ty, Region_t);
-
 L Ast_Lval_new_dot(L, Id_t, Type_t ty, Region_t);
-
 L Ast_Lval_new_array(L, E, Type_t ty, Region_t);
-
 File_t Ast_Lval_print(File_t, L);
 
 /////////////////////////////////////////////
 // expressions.
 typedef enum {
     AST_EXP_ASSIGN,
-    AST_EXP_ADD,
-    AST_EXP_SUB,
-    AST_EXP_TIMES,
-    AST_EXP_DIVIDE,
-    AST_EXP_MODUS,
+    AST_EXP_BOP,
     AST_EXP_OR,
     AST_EXP_AND,
     AST_EXP_EQ,
@@ -100,10 +93,12 @@ struct E {
             E right;
         } assign;
         struct {
+            char *bop;
             E left;
             E right;
         } bop;
         struct {
+            String_t op;
             E e;
         } unary;
         struct {
@@ -132,27 +127,28 @@ E Ast_Exp_new_assign(E left,
                      E right,
                      Type_t ty,
                      Region_t r);
-
-E Ast_Exp_new_bop(Ast_Exp_Kind_t kind, E left, E right, Type_t ty, Region_t r);
-
+E Ast_Exp_new_bop(String_t bop,
+                  E left,
+                  E right,
+                  Type_t ty,
+                  Region_t r);
 E Ast_Exp_new_unary(Ast_Exp_Kind_t kind,
-                    E e, Type_t ty, Region_t r);
-
+                    E e,
+                    Type_t ty,
+                    Region_t r);
 E Ast_Exp_new_null(void);
-
 E Ast_Exp_new_intlit(String_t);
-
 E Ast_Exp_new_stringlit(String_t);
-
-E Ast_Exp_new_newClass(Id_t id, List_t, Type_t ty);
+E Ast_Exp_new_newClass(Id_t id,
+                       List_t,
+                       Type_t ty);
 // "type" is source type and is the element type.
 // "ty" is semantic type and is the expression type.
-E Ast_Exp_new_newArray(T type, Type_t ty, E size);
-
+E Ast_Exp_new_newArray(T type,
+                       Type_t ty,
+                       E size);
 E Ast_Exp_new_call(AstId_t f, List_t, Type_t ty);
-
 E Ast_Exp_new_lval(L, Type_t ty);
-
 File_t Ast_Exp_print(File_t file, E);
 
 //=================================================
@@ -203,29 +199,17 @@ struct S {
 };
 
 S Ast_Stm_new_exp(E);
-
 S Ast_Stm_new_if(E, S, S, Region_t);
-
 S Ast_Stm_new_while(E, S, Region_t);
-
 S Ast_Stm_new_do(E, S, Region_t);
-
 S Ast_Stm_new_for(E, E, E, S, Region_t);
-
 S Ast_Stm_new_break(Region_t);
-
 S Ast_Stm_new_continue(Region_t);
-
 S Ast_Stm_new_throw(Region_t);
-
 S Ast_Stm_new_tryCatch(S, S, Region_t);
-
 S Ast_Stm_new_return(E, Region_t);
-
 S Ast_Stm_new_block(B);
-
 Box_t Ast_Stm_box(S);
-
 File_t Ast_Stm_print(File_t file, S);
 
 /////////////////////////////////////////////////////
@@ -234,7 +218,7 @@ File_t Ast_Stm_print(File_t file, S);
 //   * local dec, and
 //   * function argument declaration.
 //
-// There is a subty here: the "init" field is only
+// There is a subtlety here: the "init" field is only
 // meaningful for local dec. otherwise 0.
 struct D {
     T type;
@@ -243,9 +227,7 @@ struct D {
 };
 
 D Ast_Dec_new(T type, AstId_t var, E init);
-
 File_t Ast_Dec_print(File_t, D);
-
 
 /////////////////////////////////////////////////////
 // block
@@ -257,7 +239,6 @@ struct B {
 };
 
 B Ast_Block_new(List_t, List_t);
-
 File_t Ast_Block_print(File_t file, B);
 
 //////////////////////////////////////////////////
@@ -271,10 +252,12 @@ struct F {
     Region_t region;
 };
 
-F Ast_Fun_new(T type, Id_t name, List_t args, B b, Region_t r);
-
+F Ast_Fun_new(T type,
+              Id_t name,
+              List_t args,
+              B b,
+              Region_t r);
 Box_t Ast_Fun_box(F);
-
 File_t Ast_Fun_print(File_t file, F);
 
 ////////////////////////////////////////////////////
@@ -290,18 +273,12 @@ struct T {
 };
 
 T Ast_Type_new_int(void);
-
 T Ast_Type_new_string(void);
-
 T Ast_Type_new_id(Id_t id);
-
 // set the "isArray" field
 void Ast_Type_setArray(T);
-
 File_t Ast_Type_print(File_t, T);
-
 Box_t Ast_Type_box(T);
-
 String_t Ast_Type_toString(T);
 
 ///////////////////////////////////////////////
@@ -313,9 +290,7 @@ struct C {
 };
 
 C Ast_Class_new(AstId_t, List_t);
-
 Box_t Ast_Class_box(C);
-
 File_t Ast_Class_print(File_t, C);
 
 ////////////////////////////////////////////
@@ -328,9 +303,7 @@ struct P {
 };
 
 P Ast_Prog_new(List_t, List_t);
-
 Box_t Ast_Prog_box(P x);
-
 void Ast_Prog_print(File_t file, P x);
 
 #undef B

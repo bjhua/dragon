@@ -150,17 +150,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             result.type = r1.type;
             return result;
         }
-        case AST_EXP_ADD:
-        case AST_EXP_SUB:
-        case AST_EXP_TIMES:
-        case AST_EXP_DIVIDE:
-        case AST_EXP_MODUS:
-        case AST_EXP_OR:
-        case AST_EXP_AND:
-        case AST_EXP_LT:
-        case AST_EXP_LE:
-        case AST_EXP_GT:
-        case AST_EXP_GE: {
+        case AST_EXP_BOP: {
             struct Exp_Result_t r1, r2;
             Type_t tint = Type_new_int();
 
@@ -168,9 +158,11 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             checkType(tint, r1.type, e->region);
             r2 = Elab_exp(e->u.bop.right);
             checkType(tint, r2.type, e->region);
-            result.exp = Ast_Exp_new_bop(e->kind,
+            result.exp = Ast_Exp_new_bop(e->u.bop.bop,
                                          r1.exp,
-                                         r2.exp, tint, e->region);
+                                         r2.exp,
+                                         tint,
+                                         e->region);
             result.type = tint;
             return result;
         }
@@ -194,7 +186,7 @@ static struct Exp_Result_t Elab_exp(Ast_Exp_t e) {
             if (ty1->kind == TYPE_A_NS && ty2->kind == TYPE_A_NS)
                 return result;
             checkType(ty1, ty2, e->region);
-            result.exp = Ast_Exp_new_bop(e->kind, r1.exp, r2.exp, tint, e->region);
+            result.exp = Ast_Exp_new_bop(e->u.bop.bop, r1.exp, r2.exp, tint, e->region);
             return result;
         }
         case AST_EXP_NOT:

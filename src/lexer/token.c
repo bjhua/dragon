@@ -136,7 +136,9 @@ String_t Token_toString(T t) {
         case TOKEN_WHILE:
             break;
     }
-    return String_concat(Token_Kind_toString(t->kind), extra, 0);
+    return String_concat(Token_Kind_toString(t->kind),
+                         extra,
+                         0);
 }
 
 String_t Token_toStringWithPos(T t) {

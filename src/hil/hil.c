@@ -76,24 +76,26 @@ File_t Hil_Lval_print(File_t file, L l) {
 
 //////////////////////////////////////////////////////
 /* expressions */
-E Hil_Exp_new_bop(Operator_t op,
-                  E left, E right, Atype_t ty) {
+E Hil_Exp_new_bop(String_t bop,
+                  E left,
+                  E right,
+                  Atype_t ty) {
     E e;
     Mem_NEW(e);
     e->kind = HIL_EXP_BOP;
     e->u.bop.left = left;
     e->u.bop.right = right;
-    e->u.bop.op = op;
+    e->u.bop.op = Operator_fromString(bop);
     e->ty = ty;
     return e;
 }
 
-E Hil_Exp_new_unary(Operator_t op, E x, Atype_t ty) {
+E Hil_Exp_new_unary(String_t op, E x, Atype_t ty) {
     E e;
     Mem_NEW(e);
     e->kind = HIL_EXP_UOP;
     e->u.unary.e = x;
-    e->u.unary.op = op;
+    e->u.unary.op = Operator_fromString(op);
     e->ty = ty;
     return e;
 }
@@ -275,7 +277,7 @@ S Hil_Stm_new_localThrow(Label_t label) {
     return s;
 }
 
-S Hil_Stm_new_throw() {
+S Hil_Stm_new_throw(void) {
     S s;
 
     Mem_NEW(s);
@@ -305,11 +307,11 @@ S Hil_Stm_new_return(E e) {
 
 static int current = 0;
 
-static void indent() {
+static void indent(void) {
     current += 2;
 }
 
-static void unindent() {
+static void unindent(void) {
     current -= 2;
 }
 

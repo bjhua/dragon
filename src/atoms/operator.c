@@ -1,5 +1,6 @@
 #include "operator.h"
 #include "../lib/error.h"
+#include <string.h>
 
 #define T Operator_t
 
@@ -40,6 +41,23 @@ String_t Operator_toString(T t) {
             Error_impossible();
             return 0;
     }
+    Error_impossible();
+    return 0;
+}
+
+Operator_t Operator_fromString(String_t op) {
+    if (strcmp(op, "+") == 0)
+        return OP_ADD;
+    if (strcmp(op, "-") == 0)
+        return OP_SUB;
+    if (strcmp(op, "*") == 0)
+        return OP_TIMES;
+    if (strcmp(op, "/") == 0)
+        return OP_DIVIDE;
+    if (strcmp(op, "%") == 0)
+        return OP_MODUS;
+    if (strcmp(op, "&&") == 0)
+        return OP_AND;
     Error_impossible();
     return 0;
 }

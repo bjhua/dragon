@@ -1,7 +1,5 @@
 #include "trans-ssa.h"
 #include "../lib/error.h"
-#include "../lib/list.h"
-#include "../lib/property.h"
 #include "../lib/trace.h"
 #include <assert.h>
 
@@ -16,7 +14,7 @@ static Id_t genStr(String_t s) {
     return id;
 }
 
-static List_t getStrings() {
+static List_t getStrings(void) {
     List_t t = strings;
     strings = 0;
     return t;
@@ -41,7 +39,6 @@ static Machine_Operand_t Trans_operand(Ssa_Operand_t o) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 /////////////////////////////////////////////////////
@@ -58,7 +55,6 @@ static Machine_Mem_t Trans_mem(Ssa_Mem_t m) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 /////////////////////////////////////////////////////
@@ -108,7 +104,6 @@ static Machine_Stm_t Trans_stmEach(Ssa_Stm_t s) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 /////////////////////////////////////////////////////
@@ -134,7 +129,6 @@ static Machine_Transfer_t Trans_transfer(Ssa_Transfer_t t) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 /////////////////////////////////////////////////////
@@ -181,12 +175,10 @@ static Machine_Prog_t Trans_ssaTraced(Ssa_Prog_t p) {
 static void outArg(Ssa_Prog_t p) {
     Ssa_Prog_toDot(p, "transSsa");
     File_saveToFile("trans_ssa.arg", (Poly_tyPrint) Ssa_Prog_print, p);
-    return;
 }
 
 static void outResult(Machine_Prog_t p) {
     File_saveToFile("trans_ssa.result", (Poly_tyPrint) Machine_Prog_print, p);
-    return;
 }
 
 Machine_Prog_t Trans_ssa(Ssa_Prog_t p) {

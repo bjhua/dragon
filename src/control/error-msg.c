@@ -53,11 +53,11 @@ void ErrorMsg_elabError(char *s, Region_t r) {
                 s);
 }
 
-void ErrorMsg_init() {
+void ErrorMsg_init(void) {
     numErrors = 0;
 }
 
-void ErrorMsg_errorExit() {
+void ErrorMsg_errorExit(void) {
     if (numErrors) {
         numErrors = 0;
         exit(0);

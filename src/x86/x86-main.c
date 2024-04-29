@@ -1,21 +1,20 @@
-#include "../lib/int.h"
-#include "../control/pass.h"
-#include "../control/control.h"
-#include "x86.h"
-#include "x86-codegen.h"
-#include "peep-hole.h"
 #include "x86-main.h"
+#include "../control/control.h"
+#include "../control/pass.h"
+#include "../lib/int.h"
+#include "peep-hole.h"
+#include "x86-codegen.h"
+#include "x86.h"
 
 static int counter = 0;
 
-static String_t genFileName() {
-    String_t f = String_concat
-            ("",
-             Control_asmDirectory,
-             "files-",
-             Int_toString(counter++),
-             ".s",
-             0);
+static String_t genFileName(void) {
+    String_t f = String_concat("",
+                               Control_asmDirectory,
+                               "files-",
+                               Int_toString(counter++),
+                               ".s",
+                               0);
     return f;
 }
 
@@ -45,7 +44,7 @@ Tuple_t X86_main(Machine_Prog_t p) {
                         p1,
                         (Poly_tyId) PeepHole_shrink);
     p2 = Pass_doit(&peepHole);
-    p1 = 0;
+    //    p1 = 0;
 
     output = Pass_new("output",
                       VERBOSE_SUBPASS,

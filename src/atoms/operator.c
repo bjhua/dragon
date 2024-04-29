@@ -42,7 +42,6 @@ String_t Operator_toString(T t) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 Operator_t Operator_fromString(String_t op) {
@@ -105,7 +104,6 @@ long Operator_binary(long left, T t, long right) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 long Operator_unary(Operator_t t, long x) {
@@ -118,35 +116,34 @@ long Operator_unary(Operator_t t, long x) {
             fprintf(stderr, "%d", t);
             Error_impossible();
             return 0;
-        case OP_ADD:
-            break;
-        case OP_SUB:
-            break;
-        case OP_TIMES:
-            break;
-        case OP_DIVIDE:
-            break;
-        case OP_MODUS:
-            break;
-        case OP_OR:
-            break;
-        case OP_AND:
-            break;
-        case OP_EQ:
-            break;
-        case OP_NE:
-            break;
-        case OP_LT:
-            break;
-        case OP_LE:
-            break;
-        case OP_GT:
-            break;
-        case OP_GE:
-            break;
+            //        case OP_ADD:
+            ////            break;
+            //        case OP_SUB:
+            ////            break;
+            //        case OP_TIMES:
+            //            break;
+            //        case OP_DIVIDE:
+            //            break;
+            //        case OP_MODUS:
+            //            break;
+            //        case OP_OR:
+            //            break;
+            //        case OP_AND:
+            //            break;
+            //        case OP_EQ:
+            //            break;
+            //        case OP_NE:
+            //            break;
+            //        case OP_LT:
+            //            break;
+            //        case OP_LE:
+            //            break;
+            //        case OP_GT:
+            //            break;
+            //        case OP_GE:
+            //            break;
     }
     Error_impossible();
-    return 0;
 }
 
 #undef T

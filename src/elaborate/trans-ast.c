@@ -246,12 +246,12 @@ static struct Exp_Result_t Elab_exp(E e) {
             return result;
         }
         case AST_EXP_INTLIT: {
-            result.exp = Hil_Exp_new_intlit(e->u.intlit, Atype_new_int());
+            result.exp = Hil_Exp_new_intlit(e->u.int_lit, Atype_new_int());
             result.list = AppList_new_empty();
             return result;
         }
         case AST_EXP_STRINGLIT: {
-            result.exp = Hil_Exp_new_stringlit(e->u.stringlit, Atype_new_string(""));
+            result.exp = Hil_Exp_new_stringlit(e->u.string_lit, Atype_new_string(""));
             result.list = AppList_new_empty();
             return result;
         }
@@ -287,8 +287,8 @@ static struct Exp_Result_t Elab_exp(E e) {
         case AST_EXP_LVAL: {
             struct Lval_Result_t newLeft;
 
-            newLeft = Elab_lval(e->u.lval);
-            result.exp = Hil_Exp_new_lval(newLeft.lval, type2atype(e->u.lval->ty));
+            newLeft = Elab_lval(e->u.left_val);
+            result.exp = Hil_Exp_new_lval(newLeft.lval, type2atype(e->u.left_val->ty));
             result.list = newLeft.list;
             return result;
         }

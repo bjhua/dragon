@@ -1,8 +1,6 @@
 #include "label.h"
-#include "../lib/hash.h"
 #include "../lib/int.h"
 #include "../lib/mem.h"
-#include "../lib/property-list.h"
 #include "../lib/random.h"
 #include <assert.h>
 

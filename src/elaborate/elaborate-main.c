@@ -1,11 +1,10 @@
+#include "elaborate-main.h"
 #include "../control/pass.h"
 #include "check-ast.h"
-#include "elaborate.h"
 #include "combine-stm.h"
+#include "elaborate.h"
 #include "lift-dec.h"
 #include "trans-ast.h"
-#include "../hil/hil.h"
-#include "elaborate-main.h"
 
 Hil_Prog_t Elaborate_main(Ast_Prog_t p) {
     Pass_t elab, check, combine, lift, trans;

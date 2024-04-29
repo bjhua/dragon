@@ -1,6 +1,5 @@
 #include "ast.h"
 #include "../control/control.h"
-#include "../lib/int.h"
 #include "../lib/mem.h"
 #include "../lib/unused.h"
 #include <assert.h>
@@ -31,7 +30,9 @@ L Ast_Lval_new_var(Id_t var, Type_t ty, Region_t r) {
     return l;
 }
 
-L Ast_Lval_new_dot(L lval, Id_t var, Type_t ty,
+L Ast_Lval_new_dot(L lval,
+                   Id_t var,
+                   Type_t ty,
                    Region_t r) {
     L l;
     Mem_NEW(l);
@@ -138,7 +139,7 @@ E Ast_Exp_new_intlit(String_t s) {
     E e;
     Mem_NEW(e);
     e->kind = AST_EXP_INTLIT;
-    e->u.intlit = strtol(s, 0, 10);
+    e->u.int_lit = strtol(s, 0, 10);
     return e;
 }
 
@@ -146,7 +147,7 @@ E Ast_Exp_new_stringlit(String_t s) {
     E e;
     Mem_NEW(e);
     e->kind = AST_EXP_STRINGLIT;
-    e->u.stringlit = s;
+    e->u.string_lit = s;
     return e;
 }
 
@@ -177,7 +178,7 @@ E Ast_Exp_new_lval(L lval, Type_t ty) {
 
     Mem_NEW(e);
     e->kind = AST_EXP_LVAL;
-    e->u.lval = lval;
+    e->u.left_val = lval;
     e->ty = ty;
     return e;
 }
@@ -261,11 +262,11 @@ File_t Ast_Exp_print(File_t file, E e) {
             fprintf(file, "%s", " null ");
             break;
         case AST_EXP_INTLIT:
-            fprintf(file, "%ld", e->u.intlit);
+            fprintf(file, "%ld", e->u.int_lit);
             break;
         case AST_EXP_STRINGLIT:
             fprintf(file, "%s", "\"");
-            fprintf(file, "%s", e->u.stringlit);
+            fprintf(file, "%s", e->u.string_lit);
             fprintf(file, "%s", "\"");
             break;
         case AST_EXP_NEW_CLASS: {
@@ -298,7 +299,7 @@ File_t Ast_Exp_print(File_t file, E e) {
             fprintf(file, "%s", ")");
             break;
         case AST_EXP_LVAL:
-            Ast_Lval_print(file, e->u.lval);
+            Ast_Lval_print(file, e->u.left_val);
             break;
         default:
             fprintf(stderr, "%d", e->kind);

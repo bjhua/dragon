@@ -1,11 +1,11 @@
-#include "../lib/int.h"
-#include "../control/pass.h"
-#include "c-codegen.h"
 #include "c-codegen-main.h"
+#include "../control/pass.h"
+#include "../lib/int.h"
+#include "c-codegen.h"
 
 static int counter = 0;
 
-static String_t genFileName() {
+static String_t genFileName(void) {
     String_t f;
 
     if (Control_dump_lookup(DUMP_C)) {

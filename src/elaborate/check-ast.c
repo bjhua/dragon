@@ -69,7 +69,7 @@ static void Check_exp(E e) {
     switch (e->kind) {
         case AST_EXP_ASSIGN: {
             if (AST_EXP_LVAL == e->u.assign.left->kind) {
-                Check_lval(e->u.assign.left->u.lval);
+                Check_lval(e->u.assign.left->u.left_val);
             } else {
                 error(String_concat("left-value expected in"
                                     " assignment: ",
@@ -116,7 +116,7 @@ static void Check_exp(E e) {
             return;
         }
         case AST_EXP_LVAL: {
-            Check_lval(e->u.lval);
+            Check_lval(e->u.left_val);
             return;
         }
         case AST_EXP_CALL: {

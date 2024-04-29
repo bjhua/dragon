@@ -1,6 +1,5 @@
 #include "combine-stm.h"
 #include "../lib/error.h"
-#include "../lib/list.h"
 #include "../lib/trace.h"
 #include <assert.h>
 
@@ -25,12 +24,11 @@ static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
                                    s->region);
         }
         case AST_STM_BREAK:
-            return s;
+            //            return s;
         case AST_STM_CONTINUE:
-            return s;
-        case AST_STM_RETURN: {
-            return s;
-        }
+            //            return s;
+        case AST_STM_RETURN:
+            //            return s;
         case AST_STM_THROW: {
             return s;
         }
@@ -44,7 +42,6 @@ static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
             return s;
     }
     Error_impossible();
-    return s;
 }
 
 struct Dec_Result_t {
@@ -119,12 +116,10 @@ static Ast_Prog_t Combine_stm_traced(Ast_Prog_t p) {
 
 static void Trace_arg(Ast_Prog_t p) {
     File_saveToFile("Combine-stm.arg", (Poly_tyPrint) Ast_Prog_print, p);
-    return;
 }
 
 static void Trace_result(Ast_Prog_t p) {
     File_saveToFile("Combine-stm.result", (Poly_tyPrint) Ast_Prog_print, p);
-    return;
 }
 
 Ast_Prog_t Combine_stm(Ast_Prog_t p) {

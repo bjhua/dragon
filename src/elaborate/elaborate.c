@@ -275,7 +275,7 @@ static struct Exp_Result_t Elab_exp(E e) {
         case AST_EXP_LVAL: {
             struct Lval_Result_t r;
 
-            r = Elab_lval(e->u.lval);
+            r = Elab_lval(e->u.left_val);
             result.type = r.type;
             result.exp = Ast_Exp_new_lval(r.lval, r.type);
             return result;

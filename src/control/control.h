@@ -4,20 +4,26 @@
 #include "../lib/list.h"
 #include "../lib/string.h"
 
-typedef enum { VERBOSE_SILENT,
-               VERBOSE_PASS,
-               VERBOSE_SUBPASS,
-               VERBOSE_DETAIL } Verbose_t;
+typedef enum {
+    VERBOSE_SILENT,
+    VERBOSE_PASS,
+    VERBOSE_SUBPASS,
+    VERBOSE_DETAIL
+} Verbose_t;
 
-typedef enum { EXPERT_NORMAL,
-               EXPERT_EXPERT } Expert_t;
+typedef enum {
+    EXPERT_NORMAL,
+    EXPERT_EXPERT
+} Expert_t;
 
-typedef enum { DUMP_AST,
-               DUMP_HIL,
-               DUMP_TAC,
-               DUMP_MACHINE,
-               DUMP_C,
-               DUMP_X86 } Dump_t;
+typedef enum {
+    DUMP_AST,
+    DUMP_HIL,
+    DUMP_TAC,
+    DUMP_MACHINE,
+    DUMP_C,
+    DUMP_X86
+} Dump_t;
 
 typedef enum {
     CODEGEN_C,

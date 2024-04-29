@@ -1,7 +1,6 @@
 #include "const-prop.h"
 #include "../control/log.h"
 #include "../lib/error.h"
-#include "../lib/list.h"
 #include "../lib/trace.h"
 
 // This module performs const propagation and const
@@ -283,14 +282,12 @@ static void printArg(Ssa_Prog_t p) {
     File_t file = File_open("constProp.arg", "w+");
     Ssa_Prog_print(file, p);
     File_close(file);
-    return;
 }
 
 static void printResult(Ssa_Prog_t p) {
     File_t file = File_open("constProp.result", "w+");
     Ssa_Prog_print(file, p);
     File_close(file);
-    return;
 }
 
 Ssa_Prog_t Ssa_constProp(Ssa_Prog_t p) {

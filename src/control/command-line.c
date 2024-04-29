@@ -5,7 +5,6 @@
 #include "../lib/trace.h"
 #include "../lib/unused.h"
 #include "control.h"
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,7 +37,6 @@ static void Arg_setCodegen(String_t s) {
         Control_codegen = CODEGEN_X86;
     else
         errorWrongArg("-codegen", "{C|x86}", s);
-    return;
 }
 
 static void Arg_setDump(String_t s) {
@@ -236,7 +234,6 @@ static void Arg_print(void) {
             Io_printSpaces(LEFT_SIZE - left);
         printf(" %s\n", allArgs[i].desc);
     }
-    return;
 }
 
 static void errorNoName(String_t s) {
@@ -298,7 +295,7 @@ List_t CommandLine_doarg(int argc, char **argv) {
             switch (allArgs[i].argtype) {
                 case ARGTYPE_BOOL: {
                     long b = 0;
-                    char *arg = 0;
+                    char *arg;
 
                     if (index >= argc)
                         errorNoArg(allArgs[i].name,

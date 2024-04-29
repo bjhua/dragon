@@ -20,7 +20,7 @@ O Machine_Operand_new_int(long i) {
 
     Mem_NEW(e);
     e->kind = MACHINE_OP_INT;
-    e->u.intlit = i;
+    e->u.int_lit = i;
     return e;
 }
 
@@ -47,7 +47,7 @@ File_t Machine_Operand_print(File_t file, O o) {
     assert(o);
     switch (o->kind) {
         case MACHINE_OP_INT:
-            fprintf(file, "%ld", o->u.intlit);
+            fprintf(file, "%ld", o->u.int_lit);
             break;
         case MACHINE_OP_GLOBAL:
             fprintf(file, "G_%s", Id_toString(o->u.id));
@@ -460,8 +460,15 @@ File_t Machine_Block_print(File_t file, B b) {
 
 /////////////////////////////////////////////////////
 /* function */
-F Machine_Fun_new(Atype_t type, Id_t name, List_t args, List_t decs, List_t blocks, Id_t retId, Label_t entry,
-                  Label_t exitt, int frameIndex) {
+F Machine_Fun_new(Atype_t type,
+                  Id_t name,
+                  List_t args,
+                  List_t decs,
+                  List_t blocks,
+                  Id_t retId,
+                  Label_t entry,
+                  Label_t exitt,
+                  int frameIndex) {
     F f;
 
     Mem_NEW(f);

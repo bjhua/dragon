@@ -22,7 +22,7 @@ T Atype_new_int_array(void) {
     return p;
 }
 
-T Atype_new_string(const String_t x) {
+T Atype_new_string(String_t x) {
     UNUSED(x);
 
     T p;

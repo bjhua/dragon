@@ -110,14 +110,14 @@ struct E {
             /* List_t<E> */
             List_t args;
         } newClass;
-        long intlit;
-        String_t stringlit;
+        long int_lit;
+        String_t string_lit;
         struct {
             AstId_t f;
             /* List<E> */
             List_t args;
         } call;
-        L lval;
+        L left_val;
     } u;
     Type_t ty;
     Region_t region;

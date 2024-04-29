@@ -30,7 +30,7 @@ struct T {
 
 T Atype_new_int(void);
 T Atype_new_int_array(void);
-T Atype_new_string(String_t);
+T Atype_new_string(const String_t);
 T Atype_new_string_array(void);
 T Atype_new_class(Id_t);
 T Atype_new_class_array(Id_t);

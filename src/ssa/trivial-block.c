@@ -1,6 +1,5 @@
 #include "trivial-block.h"
 #include "../lib/error.h"
-#include "../lib/property.h"
 #include "../lib/trace.h"
 #include "dead-block.h"
 #include <assert.h>
@@ -23,7 +22,6 @@ static void analyzeOneBlock(Ssa_Block_t b) {
             ;
     } else
         ;
-    return;
 }
 
 //////////////////////////////////////////////////////
@@ -32,24 +30,26 @@ static Ssa_Block_t transOne(Ssa_Block_t b) {
 
     switch (b->transfer->kind) {
         case SSA_TRANS_IF: {
-            Label_t newt = 0, newf = 0;
+            Label_t newt, newf;
 
             newt = Property_get(jumpto, b->transfer->u.iff.truee);
-            newf =
-                    Property_get(jumpto, b->transfer->u.iff.falsee);
+            newf = Property_get(jumpto, b->transfer->u.iff.falsee);
 
             return Ssa_Block_new(b->label, b->stms, Ssa_Transfer_renameLabels_if(b->transfer, newt, newf));
         }
         case SSA_TRANS_JUMP: {
-            Label_t newj = 0;
+            Label_t newj;
 
             newj = Property_get(jumpto, b->transfer->u.jump);
-            return Ssa_Block_new(b->label, b->stms, Ssa_Transfer_renameLabels_jump(b->transfer, newj));
+            return Ssa_Block_new(b->label,
+                                 b->stms,
+                                 Ssa_Transfer_renameLabels_jump(b->transfer,
+                                                                newj));
         }
         case SSA_TRANS_RETURN:
-            return b;
+            //            return b;
         case SSA_TRANS_THROW:
-            return b;
+            //            return b;
         case SSA_TRANS_CALL:
             return b;
         default:
@@ -57,7 +57,6 @@ static Ssa_Block_t transOne(Ssa_Block_t b) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 //////////////////////////////////////////////////////
@@ -107,12 +106,10 @@ static Ssa_Prog_t Ssa_trivialBlockTraced(Ssa_Prog_t p) {
 // main functions
 static void printArg(Ssa_Prog_t p) {
     Ssa_Prog_toDot(p, "beforeSsaTrivialBlock");
-    return;
 }
 
 static void printResult(Ssa_Prog_t p) {
     Ssa_Prog_toDot(p, "afterSsaTrivialBlock");
-    return;
 }
 
 static Ssa_Prog_t Ssa_trivialBlock2(Ssa_Prog_t p) {

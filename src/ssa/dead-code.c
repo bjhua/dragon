@@ -55,7 +55,7 @@ static void incUse(Id_t id) {
     r++;
     Property_set(usedProp, id, (Poly_t) r);
     Log_strs("\n", Id_toString(id), " ===> ", Int_toString(r), " times", 0);
-    return;
+    //    return;
 }
 
 static void analyzeBlockUsed(Ssa_Block_t b) {
@@ -104,7 +104,7 @@ static void decUse(Id_t id) {
         mark();
         Property_set(deadProp, id, (Poly_t) DEAD);
     }
-    return;
+    //    return;
 }
 
 static void analyzeStm(Ssa_Stm_t s) {
@@ -215,18 +215,17 @@ static void analyzeStm(Ssa_Stm_t s) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 static void analyzeTransfer(Ssa_Transfer_t t) {
     assert(t);
     switch (t->kind) {
         case SSA_TRANS_IF:
-            return;
+            //            return;
         case SSA_TRANS_JUMP:
-            return;
+            //            return;
         case SSA_TRANS_RETURN:
-            return;
+            //            return;
         case SSA_TRANS_THROW:
             return;
         case SSA_TRANS_CALL: {
@@ -249,13 +248,11 @@ static void analyzeTransfer(Ssa_Transfer_t t) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 static void analyzeBlock(Ssa_Block_t b) {
     List_foreach(b->stms, (Poly_tyVoid) analyzeStm);
     analyzeTransfer(b->transfer);
-    return;
 }
 
 static void analyzeFun(Ssa_Fun_t f) {
@@ -305,7 +302,7 @@ static Ssa_Stm_t doit(Ssa_Stm_t s) {
                 return 0;
             return s;
         case SSA_STM_TRY:
-            return s;
+            //            return s;
         case SSA_STM_TRY_END:
             return s;
         default:
@@ -314,18 +311,17 @@ static Ssa_Stm_t doit(Ssa_Stm_t s) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 static Ssa_Transfer_t rewriteTransfer(Ssa_Transfer_t t) {
     assert(t);
     switch (t->kind) {
         case SSA_TRANS_IF:
-            return t;
+            //            return t;
         case SSA_TRANS_JUMP:
-            return t;
+            //            return t;
         case SSA_TRANS_RETURN:
-            return t;
+            //            return t;
         case SSA_TRANS_THROW:
             return t;
         case SSA_TRANS_CALL: {
@@ -342,7 +338,6 @@ static Ssa_Transfer_t rewriteTransfer(Ssa_Transfer_t t) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 static Ssa_Block_t rewriteBlock(Ssa_Block_t b) {
@@ -375,13 +370,10 @@ static int decFilter(Dec_t dec) {
 }
 
 static Ssa_Fun_t rewriteFun(Ssa_Fun_t f) {
-    List_t newBlocks;
-    List_t newDecs;
+    List_t newBlocks, newDecs;
 
     newBlocks = List_map(f->blocks, (Poly_tyId) rewriteBlock);
-
     newDecs = List_filter(f->decs, (Poly_tyPred) decFilter);
-
     return Ssa_Fun_new(f->type, f->name, f->args, newDecs, newBlocks, f->retId, f->entry, f->exitt);
 }
 
@@ -426,21 +418,20 @@ static void printArg(Ssa_Prog_t p) {
     File_t file = File_open("ssa_deadCode.arg", "w+");
     Ssa_Prog_print(file, p);
     File_close(file);
-    return;
+    //    return;
 }
 
 static void printResult(Ssa_Prog_t p) {
     File_t file = File_open("ssa_deadCode.result", "w+");
     Ssa_Prog_print(file, p);
     File_close(file);
-    return;
+    //    return;
 }
 
 Ssa_Prog_t Ssa_deadCode(Ssa_Prog_t p) {
     Ssa_Prog_t r;
 
     Log_POS();
-
     Trace_TRACE("Ssa_deadCode", Ssa_deadCodeTraced, (p), printArg, r, printResult);
     return r;
 }

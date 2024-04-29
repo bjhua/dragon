@@ -37,7 +37,7 @@ struct O {
         MACHINE_OP_ID,
     } kind;
     union {
-        long intlit;
+        long int_lit;
         Id_t id;
     } u;
 };
@@ -151,7 +151,7 @@ struct S {
             int isPtr;
             O size;
             // the above "size" is the number of the elements
-            // and thus we need this scale.
+            // thus we need this scale.
             int scale;
             // runtime name of this function
             Id_t fname;
@@ -325,7 +325,7 @@ struct P {
     // List<Mahine_Str_t>
     List_t strings;// a list of all strings
     // List<I>
-    List_t frameInfo;// frame informations for each func
+    List_t frameInfo;// frame information for each func
     // List<J>
     List_t layoutInfo;
     // List<F>

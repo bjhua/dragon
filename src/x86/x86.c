@@ -1,5 +1,4 @@
 #include "x86.h"
-#include "../control/control.h"
 #include "../lib/char-buffer.h"
 #include "../lib/int.h"
 #include "../lib/mem.h"
@@ -25,14 +24,14 @@ static char buffer[16 * ONEM];
 
 static int writeNums = 0;
 
-static void buffer_init() {
+static void buffer_init(void) {
     /* int n = (Control_bufferSize>0) */
     /*   ? (Control_bufferSize): NUM; */
     /* n *= ONEM; */
     /* Mem_NEW_SIZE (buffer, n); */
 }
 
-static void buffer_final() {
+static void buffer_final(void) {
     /* buffer = 0; */
 }
 
@@ -42,7 +41,6 @@ static File_t file = 0;
 static void file_init(File_t f) {
     file = f;
     setbuf(file, buffer);
-    return;
 }
 
 static void print(String_t s) {
@@ -52,7 +50,6 @@ static void print(String_t s) {
         fflush(file);
         writeNums = 0;
     }
-    return;
 }
 
 int X86_Register_equals(R r1, R r2) {
@@ -93,7 +90,6 @@ void X86_Register_print(R r) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 O X86_Operand_new_int(int i) {
@@ -172,7 +168,6 @@ void X86_Operand_print(O o) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 S X86_Stm_new_moverr(R dest, R src) {
@@ -345,21 +340,21 @@ S X86_Stm_new_setne(X86_Register_t r) {
     return s;
 }
 
-S X86_Stm_new_extendAl() {
+S X86_Stm_new_extendAl(void) {
     S s;
     Mem_NEW(s);
     s->kind = X86_STM_EXTENDAL;
     return s;
 }
 
-S X86_Stm_new_return() {
+S X86_Stm_new_return(void) {
     S s;
     Mem_NEW(s);
     s->kind = X86_STM_RETURN;
     return s;
 }
 
-S X86_Stm_new_cltd() {
+S X86_Stm_new_cltd(void) {
     S s;
     Mem_NEW(s);
     s->kind = X86_STM_CLTD;
@@ -408,16 +403,11 @@ static void X86_Operator_print(Operator_t o) {
         default:
             TODO;
             Error_impossible();
-            return;
     }
     Error_impossible();
-    return;
 }
 
-static void space2() {
-}
-
-static void space4() {
+static void space4(void) {
     print("\t");
 }
 
@@ -477,7 +467,6 @@ void X86_Stm_print(S s) {
             X86_Register_print(s->u.cmp.dest);
             break;
         case X86_STM_LABEL:
-            space2();
             print(Label_toString(s->u.label));
             print(":");
             break;
@@ -573,7 +562,6 @@ void X86_Stm_print(S s) {
             break;
     }
     print("\n");
-    return;
 }
 
 F X86_Fun_new(Id_t type, Id_t name, List_t args,
@@ -617,7 +605,6 @@ void X86_Fun_print(F f) {
     List_foreach(f->stms,
                  (Poly_tyVoid) X86_Stm_print);
     print("\n\n");
-    return;
 }
 
 
@@ -656,34 +643,34 @@ Str X86_Str_new(Id_t name, String_t value) {
 }
 
 static String_t convert(String_t s) {
-    CharBuffer_t buffer = CharBuffer_new();
+    CharBuffer_t buffer_ = CharBuffer_new();
 
     while (*s) {
         char c = *s;
         switch (c) {
             case '\n':
-                CharBuffer_append(buffer, '\\');
-                CharBuffer_append(buffer, 'n');
+                CharBuffer_append(buffer_, '\\');
+                CharBuffer_append(buffer_, 'n');
                 break;
             case '\t':
-                CharBuffer_append(buffer, '\\');
-                CharBuffer_append(buffer, 't');
+                CharBuffer_append(buffer_, '\\');
+                CharBuffer_append(buffer_, 't');
                 break;
             case '\\':
-                CharBuffer_append(buffer, '\\');
-                CharBuffer_append(buffer, '\\');
+                CharBuffer_append(buffer_, '\\');
+                CharBuffer_append(buffer_, '\\');
                 break;
             case '\"':
-                CharBuffer_append(buffer, '\\');
-                CharBuffer_append(buffer, '\"');
+                CharBuffer_append(buffer_, '\\');
+                CharBuffer_append(buffer_, '\"');
                 break;
             default:
-                CharBuffer_append(buffer, c);
+                CharBuffer_append(buffer_, c);
                 break;
         }
         s++;
     }
-    return CharBuffer_toStringBeforeClear(buffer);
+    return CharBuffer_toStringBeforeClear(buffer_);
 }
 
 void X86_Str_print(Str s) {
@@ -691,7 +678,6 @@ void X86_Str_print(Str s) {
     print(":\n\t.string \"");
     print(convert(s->value));
     print("\"\n");
-    return;
 }
 
 static void printStrs(List_t strings) {
@@ -711,36 +697,36 @@ M X86_Mask_new(Id_t name, int size, List_t index) {
     return m;
 }
 
-File_t X86_Mask_print(File_t file, M m) {
+File_t X86_Mask_print(File_t file_, M m) {
     List_t p;
 
     assert(m);
-    fprintf(file, "%s", Id_toString(m->name));
-    fprintf(file, ":\n\t.int ");
-    fprintf(file, "%s", Int_toString(m->size));
+    fprintf(file_, "%s", Id_toString(m->name));
+    fprintf(file_, ":\n\t.int ");
+    fprintf(file_, "%s", Int_toString(m->size));
     if (List_isEmpty(m->index)) {
-        fprintf(file, "\n");
-        return file;
+        fprintf(file_, "\n");
+        return file_;
     }
-    fprintf(file, ", ");
+    fprintf(file_, ", ");
     p = List_getFirst(m->index);
     while (p) {
-        fprintf(file, "%s", Int_toString((long) p->data));
+        fprintf(file_, "%s", Int_toString((long) p->data));
         if (p->next)
-            fprintf(file, ", ");
+            fprintf(file_, ", ");
         p = p->next;
     }
-    fprintf(file, "\n");
-    return file;
+    fprintf(file_, "\n");
+    return file_;
 }
 
-static void printMask(File_t file, List_t ms) {
+static void printMask(File_t file_, List_t ms) {
     if (List_isEmpty(ms))
         return;
 
-    fprintf(file, "\t.data\n"
-                  "\t.align 8\n");
-    List_foldl(ms, file, (Poly_tyFold) X86_Mask_print);
+    fprintf(file_, "\t.data\n"
+                   "\t.align 8\n");
+    List_foldl(ms, file_, (Poly_tyFold) X86_Mask_print);
 }
 
 P X86_Prog_new(List_t strings, List_t masks, List_t funcs) {
@@ -753,22 +739,22 @@ P X86_Prog_new(List_t strings, List_t masks, List_t funcs) {
     return p;
 }
 
-File_t X86_Prog_print(File_t file, P p) {
-    assert(file);
+File_t X86_Prog_print(File_t file_, P p) {
+    assert(file_);
     assert(p);
 
-    file_init(file);
+    file_init(file_);
     buffer_init();
 
     printStrs(p->strings);
 
-    fprintf(file, "%s", "\n");
-    printMask(file, p->masks);
+    fprintf(file_, "%s", "\n");
+    printMask(file_, p->masks);
 
-    fprintf(file, "%s", "\n");
-    List_foldl(p->funcs, file, (Poly_tyFold) X86_Fun_print);
+    fprintf(file_, "%s", "\n");
+    List_foldl(p->funcs, file_, (Poly_tyFold) X86_Fun_print);
     buffer_final();
-    return file;
+    return file_;
 }
 
 #undef P

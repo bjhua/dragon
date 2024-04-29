@@ -1,6 +1,5 @@
 #include "dead-block.h"
 #include "../lib/error.h"
-#include "../lib/property.h"
 #include "../lib/trace.h"
 #include <assert.h>
 
@@ -10,7 +9,6 @@ static void visitBlock(Ssa_Block_t b) {
     assert(b);
 
     Property_set(visited, b, (Poly_t) 1);
-    return;
 }
 
 //////////////////////////////////////////////////////
@@ -50,6 +48,7 @@ static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
     Graph_dfs(g, eb, (Poly_tyVoid) visitBlock);
 
     // now the properties should be properly set
+    assert(f != 0);
     newBlocks = transBlocks(f->blocks);
 
     return Ssa_Fun_new(f->type, f->name, f->args, f->decs, newBlocks, f->retId, f->entry, f->exitt);
@@ -79,13 +78,11 @@ static Ssa_Prog_t Ssa_deadBlockTraced(Ssa_Prog_t p) {
 static void printArg(Ssa_Prog_t p) {
     File_saveToFile("ssa_deadBlock.arg", (Poly_tyPrint) Ssa_Prog_print, p);
     Ssa_Prog_toDot(p, "beforeSsaDeadBlock");
-    return;
 }
 
 static void printResult(Ssa_Prog_t p) {
     File_saveToFile("ssa_deadBlock.result", (Poly_tyPrint) Ssa_Prog_print, p);
     Ssa_Prog_toDot(p, "afterSsaDeadBlock");
-    return;
 }
 
 Ssa_Prog_t Ssa_deadBlock(Ssa_Prog_t p) {

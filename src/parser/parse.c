@@ -1,13 +1,10 @@
 #include "parse.h"
 #include "../control/error-msg.h"
 #include "../lexer/lex.h"
-#include "../lexer/token.h"
 #include "../lib/dlist.h"
 #include "../lib/error.h"
 #include "../lib/hash.h"
-#include "../lib/string.h"
 #include "../lib/trace.h"
-#include "../lib/tuple.h"
 #include <assert.h>
 
 static Token_t current;
@@ -47,7 +44,11 @@ static Token_t eatToken(int kind) {
 
     token = current;
     if (current->kind != kind)
-        error(String_concat("expects: ", Token_Kind_toString(kind), "\nbut got: ", Token_toString(current), 0),
+        error(String_concat("expects: ",
+                            Token_Kind_toString(kind),
+                            "\nbut got: ",
+                            Token_toString(current),
+                            0),
               current->region);
     region = current->region;
     advance();

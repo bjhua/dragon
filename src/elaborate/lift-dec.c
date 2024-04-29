@@ -1,6 +1,5 @@
 #include "lift-dec.h"
 #include "../lib/error.h"
-#include "../lib/list.h"
 #include "../lib/trace.h"
 #include <assert.h>
 
@@ -32,9 +31,9 @@ static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
                                    s->region);
         }
         case AST_STM_BREAK:
-            return s;
+            //            return s;
         case AST_STM_CONTINUE:
-            return s;
+            //            return s;
         case AST_STM_THROW: {
             return s;
         }
@@ -51,7 +50,6 @@ static Ast_Stm_t Elab_stm(Ast_Stm_t s) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 static Ast_Block_t Elab_block(Ast_Block_t b) {
@@ -92,12 +90,10 @@ static Ast_Prog_t Lift_dec_traced(Ast_Prog_t p) {
 
 static void Trace_arg(Ast_Prog_t p) {
     File_saveToFile("lift-dec.arg", (Poly_tyPrint) Ast_Prog_print, p);
-    return;
 }
 
 static void Trace_result(Ast_Prog_t p) {
     File_saveToFile("lift-dec.result", (Poly_tyPrint) Ast_Prog_print, p);
-    return;
 }
 
 Ast_Prog_t Lift_dec(Ast_Prog_t p) {

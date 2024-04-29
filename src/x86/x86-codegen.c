@@ -1,5 +1,4 @@
 #include "x86-codegen.h"
-#include "../lib/error.h"
 #include "../lib/trace.h"
 #include "../lib/unused.h"
 #include <assert.h>

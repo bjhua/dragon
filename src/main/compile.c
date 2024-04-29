@@ -39,7 +39,6 @@ static String_t Compile_one(String_t file) {
     if (Control_dump_lookup(DUMP_HIL)) {
         File_saveToFile(genFileName("gen", "hil"), (Poly_tyPrint) Hil_Prog_print, hil);
     }
-    ast = 0;
 
     flatten = Pass_new("hil", VERBOSE_SUBPASS, hil, (Poly_tyId) Hil_main);
     ssa = Pass_doit(&flatten);
@@ -47,14 +46,12 @@ static String_t Compile_one(String_t file) {
     if (Control_dump_lookup(DUMP_TAC)) {
         File_saveToFile(genFileName("gen", "ssa"), (Poly_tyPrint) Ssa_Prog_print, ssa);
     }
-    hil = 0;
 
     ssaPass = Pass_new("ssa", VERBOSE_SUBPASS, ssa, (Poly_tyId) Ssa_main);
     machine = Pass_doit(&ssaPass);
     if (Control_dump_lookup(DUMP_MACHINE)) {
         File_saveToFile(genFileName("gen", "machine"), (Poly_tyPrint) Machine_Prog_print, machine);
     }
-    ssa = 0;
 
     machinePass = Pass_new("machine", VERBOSE_SUBPASS, machine, (Poly_tyId) Machine_main);
     machine = Pass_doit(&machinePass);
@@ -70,7 +67,7 @@ static String_t Compile_one(String_t file) {
 
             CPass = Pass_new("genC", VERBOSE_SUBPASS, machine, (Poly_tyId) C_codegen_main);
             f = Pass_doit(&CPass);
-            machine = 0;
+            //            machine = 0;
             return f;
         }
         case CODEGEN_X86: {
@@ -81,18 +78,17 @@ static String_t Compile_one(String_t file) {
                 File_saveToFile(genFileName(file, "s"),
                                 (Poly_tyPrint) X86_Prog_print, x86);
             }
-            machine = 0;
-            x86 = 0;
+            //            machine = 0;
+            //            x86 = 0;
             return Tuple_second(tuple);
         }
         default:
             Error_impossible();
-            return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 List_t Compile_compile(List_t files) {
-    return List_map(files, (Poly_tyId) Compile_one);
+    return List_map(files,
+                    (Poly_tyId) Compile_one);
 }

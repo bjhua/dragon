@@ -2,7 +2,6 @@
 #include "../control/control.h"
 #include "../control/log.h"
 #include "../lib/error.h"
-#include "../lib/list.h"
 #include "../lib/property.h"
 #include "../lib/trace.h"
 #include "runtime.h"
@@ -36,7 +35,6 @@ static Machine_Mem_t genMem(Machine_Mem_t m) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 //
@@ -59,11 +57,23 @@ static Machine_Stm_t genStm(Machine_Stm_t s) {
 
             switch (ty->kind) {
                 case ATYPE_INT:
-                    return Machine_Stm_Runtime_array(s->u.newArray.dest, 0, s->u.newArray.size, Control_Target_size, Runtime_array);
+                    //                    return Machine_Stm_Runtime_array(s->u.newArray.dest,
+                    //                                                     0,
+                    //                                                     s->u.newArray.size,
+                    //                                                     Control_Target_size,
+                    //                                                     Runtime_array);
                 case ATYPE_STRING:
-                    return Machine_Stm_Runtime_array(s->u.newArray.dest, 0, s->u.newArray.size, Control_Target_size, Runtime_array);
+                    return Machine_Stm_Runtime_array(s->u.newArray.dest,
+                                                     0,
+                                                     s->u.newArray.size,
+                                                     Control_Target_size,
+                                                     Runtime_array);
                 case ATYPE_CLASS:
-                    return Machine_Stm_Runtime_array(s->u.newArray.dest, 1, s->u.newArray.size, Control_Target_size, Runtime_array);
+                    return Machine_Stm_Runtime_array(s->u.newArray.dest,
+                                                     1,
+                                                     s->u.newArray.size,
+                                                     Control_Target_size,
+                                                     Runtime_array);
                 default:
                     Error_impossible();
                     return 0;
@@ -73,16 +83,14 @@ static Machine_Stm_t genStm(Machine_Stm_t s) {
             return s;
     }
     Error_impossible();
-    return 0;
 }
 
 //
 static Machine_Block_t genBlock(Machine_Block_t b) {
-    List_t newStms;
+    List_t new_stms;
 
-    newStms = List_map(b->stms, (Poly_tyId) genStm);
-    return Machine_Block_new(b->label, newStms, b->transfer);
-    ;
+    new_stms = List_map(b->stms, (Poly_tyId) genStm);
+    return Machine_Block_new(b->label, new_stms, b->transfer);
 }
 
 static Machine_Fun_t genFunc(Machine_Fun_t f) {
@@ -161,18 +169,25 @@ Machine_genLayoutTraced(Machine_Prog_t p) {
 }
 
 static void printArg(Machine_Prog_t p) {
-    File_saveToFile("genLayout.arg", (Poly_tyPrint) Machine_Prog_print, p);
-    return;
+    File_saveToFile("genLayout.arg",
+                    (Poly_tyPrint) Machine_Prog_print,
+                    p);
 }
 
 static void printResult(Machine_Prog_t p) {
-    File_saveToFile("genLayout.result", (Poly_tyPrint) Machine_Prog_print, p);
-    return;
+    File_saveToFile("genLayout.result",
+                    (Poly_tyPrint) Machine_Prog_print,
+                    p);
 }
 
 Machine_Prog_t Machine_genLayout(Machine_Prog_t p) {
     Machine_Prog_t r;
 
-    Trace_TRACE("genLayout", Machine_genLayoutTraced, (p), printArg, r, printResult);
+    Trace_TRACE("genLayout",
+                Machine_genLayoutTraced,
+                (p),
+                printArg,
+                r,
+                printResult);
     return r;
 }

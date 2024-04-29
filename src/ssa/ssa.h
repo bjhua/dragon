@@ -45,7 +45,7 @@ O Ssa_Operand_new_id(Id_t id);
 long Ssa_Operand_equals(O, O);
 long Ssa_Operand_isConst(O o);
 // given a list of operands, are they all same constants?
-long Ssa_Operand_isSameConst(List_t os);
+//long Ssa_Operand_isSameConst(List_t os);
 File_t Ssa_Operand_print(File_t file, O);
 String_t Ssa_Operand_toString(O);
 
@@ -101,13 +101,9 @@ typedef struct {
 } *Ssa_Stm_PhiArg_t;
 
 Ssa_Stm_PhiArg_t Ssa_Stm_PhiArg_new(O, B pred);
-
 int Ssa_Stm_PhiArg_equals(Ssa_Stm_PhiArg_t, Ssa_Stm_PhiArg_t);
-
-int Ssa_Stm_PhiArg_isSameCosnt(List_t args);
-
+//int Ssa_Stm_PhiArg_isSameCosnt(List_t args);
 File_t Ssa_Stm_PhiArg_print(File_t, Ssa_Stm_PhiArg_t);
-
 String_t Ssa_Stm_PhiArg_toString(Ssa_Stm_PhiArg_t);
 
 struct S {
@@ -177,7 +173,7 @@ S Ssa_Stm_new_bop(Id_t dest,
                   Operator_t op,
                   O right);
 S Ssa_Stm_new_uop(Id_t dest, Operator_t opr, O src);
-S Ssa_Stm_new_call(Id_t dest, Id_t name, List_t args, int);
+//S Ssa_Stm_new_call(Id_t dest, Id_t name, List_t args, int);
 S Ssa_Stm_new_store(M, O);
 S Ssa_Stm_new_load(Id_t, M);
 S Ssa_Stm_new_newClass(Id_t, Id_t);
@@ -185,7 +181,7 @@ S Ssa_Stm_new_newArray(Id_t, Atype_t, O size);
 S Ssa_Stm_new_try(Label_t label);
 S Ssa_Stm_new_try_end(Label_t label);
 // preds: List<Block_t>, a list of predessors
-S Ssa_Stm_new_phi_preds(Id_t, List_t preds);
+//S Ssa_Stm_new_phi_preds(Id_t, List_t preds);
 // for every use of "id" in s, apply "f" to "id", if the
 // result "src" is nonzero, rewrite the "id" to "src".
 S Ssa_Stm_renameUse2Op(S, O (*f)(Id_t));
@@ -222,7 +218,7 @@ struct T {
             // if leave==0, then this call may leave the
             // current function.
             // otherwise (for nonzero values), this call may
-            // jumps to local handler.
+            // jump to local handler.
             Label_t leave;
             // normal indicates that
             Label_t normal;
@@ -244,7 +240,7 @@ T Ssa_Transfer_renameLabels_if(T, Label_t t, Label_t f);
 // rename labels only for non-zero label arguments.
 T Ssa_Transfer_renameLabels_jump(T, Label_t l);
 // rename labels only for non-zero label arguments.
-T Ssa_Transfer_renameLables_call(T, Label_t);
+//T Ssa_Transfer_renameLables_call(T, Label_t);
 T Ssa_Transfer_renameUse2Op(T, O (*f)(Id_t));
 Set_t Ssa_Transfer_getDefIds(T);
 void Ssa_Transfer_foreachDef(T, void (*f)(Id_t));
@@ -263,7 +259,7 @@ struct B {
 B Ssa_Block_new(Label_t, List_t, T);
 
 // whether this block can jump to label "l"
-int Ssa_Block_canJumpTo(B, Label_t l);
+//int Ssa_Block_canJumpTo(B, Label_t l);
 // apply "use" to each use in this block (including
 // transfer but excluding phi). apply def to each
 // definition, including phi.
@@ -280,7 +276,7 @@ Set_t Ssa_Block_getDefIds(B b);
 // get the property list from label in this block
 Plist_t Ssa_Block_plist(B b);
 int Ssa_Block_equals(B b1, B b2);
-int Ssa_Block_numSuccs(B b);
+//int Ssa_Block_numSuccs(B b);
 File_t Ssa_Block_print(File_t f, B);
 File_t Ssa_Block_printForDot(File_t f, B);
 
@@ -314,7 +310,7 @@ void Ssa_Fun_toDot(F, String_t figname);
 // convert a function to a directed graph
 Graph_t Ssa_Fun_toGraph(F f);
 // generating SSA-form
-F Ssa_Fun_toSsa(F f);
+//F Ssa_Fun_toSsa(F f);
 
 //////////////////////////////////////////////////////
 // programs
@@ -325,7 +321,7 @@ struct P {
 
 P Ssa_Prog_new(List_t classes, List_t funcs);
 File_t Ssa_Prog_print(File_t f, P x);
-void Ssa_Prog_toDot(P x, String_t fname);
+void Ssa_Prog_toDot(P x, String_t file_name);
 
 #undef B
 #undef F

@@ -1,8 +1,6 @@
 #include "construct-ssa.h"
 #include "../control/log.h"
 #include "../lib/error.h"
-#include "../lib/property.h"
-#include "../lib/set.h"
 #include "../lib/stack.h"
 #include "../lib/trace.h"
 #include "../lib/tuple.h"
@@ -29,7 +27,7 @@ static Property_t phiVarsProp = 0;
 
 static Set_t phiVarsPropInitFun(Ssa_Block_t b) {
     UNUSED(b);
-    
+
     return Set_new((Poly_tyEquals) Id_equals);
 }
 
@@ -56,8 +54,7 @@ static void markDf(Ssa_Block_t b, Set_t set) {
 
 
 // This function has two tasks:
-//   1. Calculate and mark definition blocks for each var,
-//      and
+//   1. Calculate and mark definition blocks for each var, and
 //   2. mark each block's orig var.
 static Ssa_Block_t markDefSitesOneTraced(Ssa_Block_t b) {
     Set_t defIdSet = Ssa_Block_getDefIds(b);
@@ -120,7 +117,7 @@ static void insertPhiOne(Dec_t dec) {
 
             dfList = dfList->next;
         }// end of inner while
-    }    // end of outer while
+    }// end of outer while
     //    return;
 }
 
@@ -140,7 +137,6 @@ static void printDefSites(Dec_t dec) {
         blockList = blockList->next;
     }
     Log_str("]");
-    //    return;
 }
 
 static void printOrigVars(Ssa_Block_t b) {
@@ -149,15 +145,12 @@ static void printOrigVars(Ssa_Block_t b) {
 
 
     Log_strs(Label_toString(b->label), " ===> [", 0);
-
     while (origVarsList) {
         Id_t id = (Id_t) origVarsList->data;
-
         Log_strs(Id_toString(id), ", ", 0);
         origVarsList = origVarsList->next;
     }
     Log_str("]");
-    //    return;
 }
 
 static void printPhiVars(Ssa_Block_t b) {
@@ -174,7 +167,6 @@ static void printPhiVars(Ssa_Block_t b) {
         v = v->next;
     }
     Log_str("]");
-    return;
 }
 
 static void printDf(Ssa_Block_t b) {
@@ -261,7 +253,7 @@ static Ssa_Fun_t insertPhiAndRename(Ssa_Fun_t f) {
     dfProp = Property_new((Poly_tyPlist) Ssa_Block_plist);
 
     g = Ssa_Fun_toGraph(f);
-    tree = Graph_df(g, (Poly_t) Ssa_Fun_searchLabel(f, f->entry), (void (*)(Poly_t, Set_t)) markDf);
+    Graph_df(g, (Poly_t) Ssa_Fun_searchLabel(f, f->entry), (void (*)(Poly_t, Set_t)) markDf);
 
     Log_str("checking dominance frontier starting:");
     List_foreach(blocks, (Poly_tyVoid) printDf);
@@ -370,7 +362,6 @@ static void callBackSubstPhiProp(Ssa_Block_t current, Ssa_Block_t pred, Id_t old
     Log_strs("record (", Id_toString(oldid), ", ", Label_toString(pred->label), ") ~~~~> ", Id_toString(new), " on ",
              Label_toString(current->label), "\n", 0);
     List_insertFirst(l, t);
-    return;
 }
 
 static Graph_t theg = 0;
@@ -391,7 +382,6 @@ static Id_t def(Id_t id) {
 static void popDef(Id_t id) {
     Stack_t stk = Property_get(stackProp, id);
     Stack_pop(stk);
-    return;
 }
 
 // the block "n" is new, whereas the graph "theg" and
@@ -430,9 +420,7 @@ static void renameVarDoit(Ssa_Block_t n) {
     // for each child
     {
         List_t children = Tree_children(thetree, n);
-
         children = List_getFirst(children);
-
         while (children) {
             Ssa_Block_t x = (Ssa_Block_t) children->data;
 
@@ -444,7 +432,6 @@ static void renameVarDoit(Ssa_Block_t n) {
     // for each statement (including phi and transfer)
     Ssa_Block_foreachDef(n, popDef);
     Log_str("renameVarEach finished");
-    return;
 }
 
 static void checkPhiArgs(Ssa_Block_t b, List_t l) {
@@ -599,21 +586,18 @@ static Ssa_Prog_t Ssa_constructSsaTraced(Ssa_Prog_t p) {
 static void printArg(Ssa_Prog_t p) {
     Ssa_Prog_toDot(p, "beforeConsSsa");
     File_saveToFile("consSsa.arg", (Poly_tyPrint) Ssa_Prog_print, p);
-    return;
 }
 
 static void printResult(Ssa_Prog_t p) {
     //Ssa_Prog_toDot (p, "afterConsSsa");
     // and also print it out
     File_saveToFile("consSsa.result", (Poly_tyPrint) Ssa_Prog_print, p);
-    return;
 }
 
 Ssa_Prog_t Ssa_constructSsa(Ssa_Prog_t p) {
     Ssa_Prog_t r;
 
     Log_POS();
-
     Trace_TRACE("Ssa_constructSsa", Ssa_constructSsaTraced, (p), printArg, r, printResult);
     return r;
 }

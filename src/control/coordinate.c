@@ -20,7 +20,7 @@ T Coordinate_new(String_t file, int line, int column) {
     return t;
 }
 
-T Coordinate_bogus() {
+T Coordinate_bogus(void) {
     return Coordinate_new("<bogus>",
                           -1,
                           -1);

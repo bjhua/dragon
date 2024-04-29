@@ -7,7 +7,7 @@
 
 #define T Type_t
 
-T Type_new_int() {
+T Type_new_int(void) {
     T t;
 
     Mem_NEW(t);
@@ -16,7 +16,7 @@ T Type_new_int() {
     return t;
 }
 
-T Type_new_string() {
+T Type_new_string(void) {
     T t;
 
     Mem_NEW(t);
@@ -25,7 +25,7 @@ T Type_new_string() {
     return t;
 }
 
-T Type_new_ns() {
+T Type_new_ns(void) {
     T t;
 
     Mem_NEW(t);
@@ -47,9 +47,8 @@ T Type_new_class(AstId_t name) {
 T Type_new_array(T t) {
     T p;
 
-    assert(t);
-
     Mem_NEW(p);
+    assert(t);
     p->kind = t->kind;
     p->isArray = 1;
     p->u = t->u;
@@ -59,20 +58,18 @@ T Type_new_array(T t) {
 
 void Type_set_array(T t) {
     assert(t);
-
     if (t->isArray)
         Error_impossible();
 
+    assert(t);
     t->isArray = 1;
-    return;
 }
 
 T Type_clearArray(T t) {
-    assert(t);
-
     T p;
     Mem_NEW(p);
 
+    assert(t);
     *p = *t;
     if (!p->isArray)
         Error_impossible();
@@ -124,12 +121,15 @@ int Type_equals(T t1, T t2) {
     assert(t1);
     assert(t2);
 
+    assert(t1 != NULL);
     if (t1->isArray) {
+        assert(t2);
         if (t2->isArray)
             ;
         else if (t2->kind == TYPE_A_NS)
             return 1;
     } else {
+        assert(t2);
         if (t2->isArray)
             return 0;
         else
@@ -153,7 +153,6 @@ int Type_equals(T t1, T t2) {
             }
         case TYPE_A_NS:
             Error_bug("impossible");
-            return 0;
         case TYPE_A_CLASS:
             switch (t2->kind) {
                 case TYPE_A_NS:
@@ -187,7 +186,6 @@ int Type_equals(T t1, T t2) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 int Type_equals_int(T t) {
@@ -246,7 +244,6 @@ String_t Type_toString(T t) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 Tuple_t Type_dest_fun(T t) {
@@ -259,7 +256,6 @@ Tuple_t Type_dest_fun(T t) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 #undef T

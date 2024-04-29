@@ -7,11 +7,11 @@
 // propogation pass and thus obsolete.
 
 
-// whether or not constant-folded in one pass.
+// whether constant-folded in one pass.
 static int flag = 0;
 int Changed_constFold = 0;
 
-static void mark() {
+static void mark(void) {
     flag = 1;
     Changed_constFold = 1;
 }
@@ -145,21 +145,18 @@ static void printArg(Ssa_Prog_t p) {
     File_t file = File_open("constFold.arg", "w+");
     Ssa_Prog_print(file, p);
     File_close(file);
-    return;
 }
 
 static void printResult(Ssa_Prog_t p) {
     File_t file = File_open("constFold.result", "w+");
     Ssa_Prog_print(file, p);
     File_close(file);
-    return;
 }
 
 Ssa_Prog_t Ssa_constFold(Ssa_Prog_t p) {
     Ssa_Prog_t r;
 
     Log_POS();
-
     Trace_TRACE("Ssa_constFold", Ssa_constFoldTraced, (p), printArg, r, printResult);
     return r;
 }

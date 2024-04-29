@@ -17,7 +17,7 @@ T Region_new(Coordinate_t from, Coordinate_t to) {
     return t;
 }
 
-T Region_bogus() {
+T Region_bogus(void) {
     Coordinate_t bogus = Coordinate_bogus();
     return Region_new(bogus, bogus);
 }
@@ -34,8 +34,10 @@ Coordinate_t Region_to(T t) {
 
 String_t Region_toString(T t) {
     assert(t);
-    return String_concat("from ", Coordinate_toString(t->from),
-                         ", to ", Coordinate_toString(t->to),
+    return String_concat("from ",
+                         Coordinate_toString(t->from),
+                         ", to ",
+                         Coordinate_toString(t->to),
                          0);
 }
 

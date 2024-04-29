@@ -1,8 +1,6 @@
 #include "control.h"
 #include "../lib/int.h"
 #include "../lib/mem.h"
-#include "../lib/poly.h"
-#include "../lib/string.h"
 #include "../lib/trace.h"
 #include "../lib/tuple.h"
 
@@ -40,7 +38,7 @@ static List_t allFlags = &allFlagsHead;
     List_insertLast(allFlags,             \
                     Flag_new(name,        \
                              f##ToString, \
-                             f##Reset));
+                             f##Reset))
 
 /* buffer size */
 long Control_bufferSize = 16;
@@ -115,10 +113,8 @@ static String_t Control_dumpFlagToString(Dump_t d) {
             return "x86";
         default:
             Error_bug("impossible");
-            return "<bogus>";
     }
     Error_impossible();
-    return "<bogus>";
 }
 
 static String_t Control_dumpToString2(void) {
@@ -141,7 +137,6 @@ void Control_dump_insert(Dump_t il) {
     if (!Control_dump)
         Control_dump = List_new();
     List_insertLast(Control_dump, (Poly_t) il);
-    return;
 }
 
 int Control_dump_lookup(Dump_t il) {
@@ -171,7 +166,6 @@ static String_t Control_expertToString2(void) {
             return "true";
         default:
             Error_bug("impossible");
-            return "<bogus>";
     }
 }
 
@@ -321,7 +315,6 @@ static String_t Control_verboseToString2(void) {
             return "3";
         default:
             Error_bug("impossible");
-            return "<bogus>";
     }
 }
 
@@ -350,7 +343,6 @@ void Control_init(void) {
     Flag_add("show type flag: ", Control_showType);
     Flag_add("trace flag: ", Control_trace);
     Flag_add("verbose flag: ", Control_verbose);
-    return;
 }
 
 void Control_printFlags(void) {
@@ -358,7 +350,7 @@ void Control_printFlags(void) {
     Flag_t f;
     Tuple_t tuple;
 
-    printf("Flag setttings:\n");
+    printf("Flag settings:\n");
     while (p) {
         f = (Flag_t) p->data;
         printf("   %s\n", f->name);

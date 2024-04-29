@@ -1,8 +1,5 @@
 #include "out-ssa.h"
 #include "../control/log.h"
-#include "../lib/error.h"
-#include "../lib/list.h"
-#include "../lib/property.h"
 #include "../lib/trace.h"
 #include "../lib/tuple.h"
 #include "../lib/unused.h"
@@ -46,7 +43,6 @@ static void analyzeOne(Ssa_Block_t b) {
 
         if (s->kind != SSA_STM_PHI)
             return;
-
         {
             Id_t dest = s->u.phi.dest;
             List_t args = List_getFirst(s->u.phi.args);
@@ -70,14 +66,13 @@ static void analyzeOne(Ssa_Block_t b) {
             oldhead = Property_get(headProp, b);
             List_insertLast(oldhead, Ssa_Stm_new_move(dest, Ssa_Operand_new_id(newdest)));
         }
-
         stms = stms->next;
     }
-    return;
 }
 
 static void analyze(List_t blocks) {
-    List_foreach(blocks, (Poly_tyVoid) analyzeOne);
+    List_foreach(blocks,
+                 (Poly_tyVoid) analyzeOne);
 }
 
 //////////////////////////////////////////////////////
@@ -106,7 +101,6 @@ static Ssa_Block_t rewriteOne(Ssa_Block_t b) {
     }
     if (tails)
         List_append(heads, tails);
-
     return Ssa_Block_new(b->label, heads, b->transfer);
 }
 
@@ -166,14 +160,17 @@ static Ssa_Fun_t transFunEach(Ssa_Fun_t f) {
 
     Log_str("analysis starting:");
     analyze(f->blocks);
-
     Log_str("analysis finished:");
-
     blocks = rewrite(f->blocks);
-
     decs = rewriteDecs(f->args, f->decs);
-
-    newf = Ssa_Fun_new(f->type, f->name, f->args, decs, blocks, f->retId, f->entry, f->exitt);
+    newf = Ssa_Fun_new(f->type,
+                       f->name,
+                       f->args,
+                       decs,
+                       blocks,
+                       f->retId,
+                       f->entry,
+                       f->exitt);
     return newf;
 }
 
@@ -201,30 +198,23 @@ static Ssa_Prog_t Ssa_outSsaTraced(Ssa_Prog_t p) {
 static void printArg(Ssa_Prog_t p) {
     //Ssa_Prog_toDot (p, "beforeOutSsa");
     // and also print it out
-    {
-        File_t file = File_open("outSsa.arg", "w+");
-        Ssa_Prog_print(file, p);
-        File_close(file);
-    }
-    return;
+    File_t file = File_open("outSsa.arg", "w+");
+    Ssa_Prog_print(file, p);
+    File_close(file);
 }
 
 static void printResult(Ssa_Prog_t p) {
     //Ssa_Prog_toDot (p, "afterOutSsa");
     // and also print it out
-    {
-        File_t file = File_open("outSsa.result", "w+");
-        Ssa_Prog_print(file, p);
-        File_close(file);
-    }
-    return;
+    File_t file = File_open("outSsa.result", "w+");
+    Ssa_Prog_print(file, p);
+    File_close(file);
 }
 
 Ssa_Prog_t Ssa_outSsa(Ssa_Prog_t p) {
     Ssa_Prog_t r;
 
     Log_POS();
-
     Trace_TRACE("Ssa_outSsa", Ssa_outSsaTraced, (p), printArg, r, printResult);
     return r;
 }

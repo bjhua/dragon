@@ -1,10 +1,8 @@
 #include "env.h"
 #include "../control/error-msg.h"
-#include "../control/region.h"
 #include "../lib/hash.h"
 #include "../lib/mem.h"
 #include "../lib/stack.h"
-#include "../lib/tuple.h"
 #include "../lib/unused.h"
 #include <assert.h>
 
@@ -62,7 +60,6 @@ void Cenv_init(void) {
     cenv = Hash_new((tyHashCode) AstId_hashCode,
                     (Poly_tyEquals) AstId_equals,
                     (tyDup) error_dupClassName);
-    return;
 }
 
 AstId_t Cenv_insert(AstId_t id, List_t fs) {
@@ -115,7 +112,6 @@ static void error_dupVar(AstId_t old, AstId_t cur) {
                         AstId_toString(cur),
                         0),
           AstId_dest(cur));
-    return;
 }
 
 void Venv_init(void) {
@@ -148,7 +144,6 @@ void Venv_init(void) {
                                     idIo_print));
         Stack_push(venv, h);
     }
-    return;
 }
 
 AstId_t Venv_insert(AstId_t id, Type_t ty) {

@@ -2,7 +2,6 @@
 #include "../lib/hash-set.h"
 #include "../lib/int.h"
 #include "../lib/mem.h"
-#include "../lib/set.h"
 #include "../lib/trace.h"
 #include "../lib/tuple.h"
 #include "../lib/unused.h"
@@ -84,7 +83,7 @@ static O Ssa_Operand_renameUse(O o, Id_t (*use)(Id_t)) {
     assert(o);
     switch (o->kind) {
         case SSA_OP_INT:
-            return o;
+            //            return o;
         case SSA_OP_STR:
             return o;
         case SSA_OP_ID:
@@ -94,7 +93,6 @@ static O Ssa_Operand_renameUse(O o, Id_t (*use)(Id_t)) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 // this function should be combined with the above one.
@@ -102,7 +100,7 @@ static O Ssa_Operand_renameUse2Op(O o, O (*f)(Id_t)) {
     assert(o);
     switch (o->kind) {
         case SSA_OP_INT:
-            return o;
+            //            return o;
         case SSA_OP_STR:
             return o;
         case SSA_OP_ID: {
@@ -118,14 +116,13 @@ static O Ssa_Operand_renameUse2Op(O o, O (*f)(Id_t)) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 static void Ssa_Operand_foreachUse(O o, void (*f)(Id_t)) {
     assert(o);
     switch (o->kind) {
         case SSA_OP_INT:
-            return;
+            //            return;
         case SSA_OP_STR:
             return;
         case SSA_OP_ID:
@@ -145,7 +142,7 @@ static O Ssa_Operand_renameUse2OpList(O o) {
     assert(o);
     switch (o->kind) {
         case SSA_OP_INT:
-            return o;
+            //            return o;
         case SSA_OP_STR:
             return o;
         case SSA_OP_ID: {
@@ -161,7 +158,6 @@ static O Ssa_Operand_renameUse2OpList(O o) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 //// Only useful when gud.use is effective.
@@ -187,7 +183,7 @@ long Ssa_Operand_isConst(O o) {
 
     switch (o->kind) {
         case SSA_OP_INT:
-            return 1;
+            //            return 1;
         case SSA_OP_STR:
             return 1;
         case SSA_OP_ID:
@@ -197,34 +193,34 @@ long Ssa_Operand_isConst(O o) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
-long Ssa_Operand_isSameConst(List_t os) {
-    Ssa_Operand_t first;
 
-    assert(os);
-
-    if (List_isEmpty(os))
-        Error_impossible();
-
-    os = List_getFirst(os);
-    first = os->data;
-    if (!Ssa_Operand_isConst(first))
-        return 0;
-
-    os = os->next;
-    while (os) {
-        Ssa_Operand_t current = os->data;
-
-        if (!Ssa_Operand_isConst(current))
-            return 0;
-        if (!Ssa_Operand_equals(first, current))
-            return 0;
-        os = os->next;
-    }
-    return 1;
-}
+//long Ssa_Operand_isSameConst(List_t os) {
+//    Ssa_Operand_t first;
+//
+//    assert(os);
+//
+//    if (List_isEmpty(os))
+//        Error_impossible();
+//
+//    os = List_getFirst(os);
+//    first = os->data;
+//    if (!Ssa_Operand_isConst(first))
+//        return 0;
+//
+//    os = os->next;
+//    while (os) {
+//        Ssa_Operand_t current = os->data;
+//
+//        if (!Ssa_Operand_isConst(current))
+//            return 0;
+//        if (!Ssa_Operand_equals(first, current))
+//            return 0;
+//        os = os->next;
+//    }
+//    return 1;
+//}
 
 long Ssa_Operand_equals(O o1, O o2) {
     assert(o1);
@@ -246,7 +242,6 @@ long Ssa_Operand_equals(O o1, O o2) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 File_t Ssa_Operand_print(File_t file, O o) {
@@ -284,7 +279,6 @@ String_t Ssa_Operand_toString(O o) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 ///////////////////////////////////////////////////////
@@ -321,7 +315,6 @@ static M Ssa_Mem_renameUse(M m, Id_t (*use)(Id_t)) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 static void Ssa_Mem_foreachUse(M m, void (*f)(Id_t)) {
@@ -340,7 +333,6 @@ static void Ssa_Mem_foreachUse(M m, void (*f)(Id_t)) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 static M Ssa_Mem_renameUse2Op(M m, O (*f)(Id_t)) {
@@ -359,7 +351,6 @@ static M Ssa_Mem_renameUse2Op(M m, O (*f)(Id_t)) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 File_t Ssa_Mem_print(File_t file, M m) {
@@ -401,7 +392,6 @@ int Ssa_Stm_PhiArg_equals(Ssa_Stm_PhiArg_t a1, Ssa_Stm_PhiArg_t a2) {
 
 static void Ssa_Stm_PhiArg_foreachUse(Ssa_Stm_PhiArg_t a, void (*f)(Id_t)) {
     Ssa_Operand_foreachUse(a->arg, f);
-    return;
 }
 
 int Ssa_Stm_PhiArg_isSameConst(List_t l) {
@@ -599,7 +589,6 @@ static Set_t Ssa_Stm_getDefIds(S s) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 void Ssa_Stm_foreachUse(S s, void (*f)(Id_t)) {
@@ -646,7 +635,6 @@ void Ssa_Stm_foreachUse(S s, void (*f)(Id_t)) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 static S Ssa_Stm_renameUseDefNoPhiUse(S s) {
@@ -688,7 +676,6 @@ static S Ssa_Stm_renameUseDefNoPhiUse(S s) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 // use in const propagation. can be combined with the
@@ -745,7 +732,6 @@ S Ssa_Stm_renameUse2Op(S s, O (*f)(Id_t)) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 static S Ssa_Stm_renamePhiArgs(S s) {
@@ -760,6 +746,8 @@ static S Ssa_Stm_renamePhiArgs(S s) {
         Ssa_Stm_PhiArg_t a = (Ssa_Stm_PhiArg_t) oldArgs->data;
         Id_t newid;
 
+        assert(a);
+        assert(a->arg);
         if (a->arg->kind != SSA_OP_ID)
             Error_impossible();
 
@@ -774,6 +762,7 @@ static S Ssa_Stm_renamePhiArgs(S s) {
         oldArgs = oldArgs->next;
     }
 
+    assert(s != NULL);
     return Ssa_Stm_new_phi(s->u.phi.dest, newArgs);
 }
 
@@ -805,7 +794,7 @@ static void Ssa_Stm_foreachDef(S s, void (*f)(Id_t)) {
             f(s->u.phi.dest);
             return;
         case SSA_STM_TRY:
-            return;
+            //            return;
         case SSA_STM_TRY_END:
             return;
         default:
@@ -814,7 +803,6 @@ static void Ssa_Stm_foreachDef(S s, void (*f)(Id_t)) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 static void spacetab(File_t file) {
@@ -970,50 +958,45 @@ T Ssa_Transfer_renameLabels_jump(T x, Label_t l) {
 //}
 
 // how many successors a transfer have
-static int Ssa_Transfer_numSuccs(T t) {
-    assert(t);
-    switch (t->kind) {
-        case SSA_TRANS_IF: {
-            if (Label_equals(t->u.iff.truee, t->u.iff.falsee)) {
-                Error_impossible();
-                return 0;
-            }
-            return 2;
-        }
-        case SSA_TRANS_JUMP:
-            return 1;
-        case SSA_TRANS_RETURN:
-            return 0;
-        case SSA_TRANS_THROW:
-            return 0;
-        case SSA_TRANS_CALL: {
-            if (t->u.call.leave)
-                return 2;
-            return 2;
-        }
-        default:
-            Error_impossible();
-            return 0;
-    }
-    Error_impossible();
-    return 0;
-}
+//static int Ssa_Transfer_numSuccs(T t) {
+//    assert(t);
+//    switch (t->kind) {
+//        case SSA_TRANS_IF: {
+//            if (Label_equals(t->u.iff.truee, t->u.iff.falsee)) {
+//                Error_impossible();
+//                return 0;
+//            }
+//            return 2;
+//        }
+//        case SSA_TRANS_JUMP:
+//            return 1;
+//        case SSA_TRANS_RETURN:
+//            //            return 0;
+//        case SSA_TRANS_THROW:
+//            return 0;
+//        case SSA_TRANS_CALL: {
+//            if (t->u.call.leave)
+//                return 2;
+//            return 2;
+//        }
+//        default:
+//            Error_impossible();
+//            return 0;
+//    }
+//    Error_impossible();
+//}
 
 Set_t Ssa_Transfer_getDefIds(T t) {
     assert(t);
     switch (t->kind) {
-        case SSA_TRANS_IF: {
+        case SSA_TRANS_IF:
+            //            return Set_new((Poly_tyEquals) Id_equals);
+        case SSA_TRANS_JUMP:
+            //            return Set_new((Poly_tyEquals) Id_equals);
+        case SSA_TRANS_RETURN:
+            //            return Set_new((Poly_tyEquals) Id_equals);
+        case SSA_TRANS_THROW:
             return Set_new((Poly_tyEquals) Id_equals);
-        }
-        case SSA_TRANS_JUMP: {
-            return Set_new((Poly_tyEquals) Id_equals);
-        }
-        case SSA_TRANS_RETURN: {
-            return Set_new((Poly_tyEquals) Id_equals);
-        }
-        case SSA_TRANS_THROW: {
-            return Set_new((Poly_tyEquals) Id_equals);
-        }
         case SSA_STM_CALL: {
             if (t->u.call.dest)
                 return Set_singleton((Poly_tyEquals) Id_equals, t->u.call.dest);
@@ -1024,32 +1007,30 @@ Set_t Ssa_Transfer_getDefIds(T t) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
-// whether or not the current transfer can jump to "l"
-int Ssa_Transfer_canJumpTo(T t, Label_t l) {
-    assert(t);
-    switch (t->kind) {
-        case SSA_TRANS_IF: {
-            return Label_equals(t->u.iff.truee, l) || Label_equals(t->u.iff.falsee, l);
-        }
-        case SSA_TRANS_JUMP:
-            return Label_equals(t->u.jump, l);
-        case SSA_TRANS_RETURN:
-            return 0;
-        case SSA_TRANS_THROW:
-            return 0;
-        case SSA_TRANS_CALL: {
-            return Label_equals(t->u.call.leave, l) || Label_equals(t->u.call.normal, l);
-        }
-        default:
-            Error_impossible();
-            return 0;
-    }
-    Error_impossible();
-    return 0;
-}
+// whether the current transfer can jump to "l"
+//int Ssa_Transfer_canJumpTo(T t, Label_t l) {
+//    assert(t);
+//    switch (t->kind) {
+//        case SSA_TRANS_IF: {
+//            return Label_equals(t->u.iff.truee, l) || Label_equals(t->u.iff.falsee, l);
+//        }
+//        case SSA_TRANS_JUMP:
+//            return Label_equals(t->u.jump, l);
+//        case SSA_TRANS_RETURN:
+//            //            return 0;
+//        case SSA_TRANS_THROW:
+//            return 0;
+//        case SSA_TRANS_CALL: {
+//            return Label_equals(t->u.call.leave, l) || Label_equals(t->u.call.normal, l);
+//        }
+//        default:
+//            Error_impossible();
+//            return 0;
+//    }
+//    Error_impossible();
+//}
 
 // rename the id
 //static T Ssa_Transfer_renameUsess(T t, Id_t (*use)(Id_t)) {
@@ -1119,7 +1100,6 @@ static T Ssa_Transfer_renameUseDefNoPhiUse(T t) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 static void Ssa_Transfer_foreachUse(T t, void (*f)(Id_t)) {
@@ -1149,7 +1129,6 @@ static void Ssa_Transfer_foreachUse(T t, void (*f)(Id_t)) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 void Ssa_Transfer_foreachDef(T t, void (*f)(Id_t)) {
@@ -1194,7 +1173,6 @@ T Ssa_Transfer_renameUse2Op(T t, O (*f)(Id_t)) {
             return 0;
     }
     Error_impossible();
-    return 0;
 }
 
 File_t Ssa_Transfer_print(File_t file, T t) {
@@ -1263,13 +1241,13 @@ int Ssa_Block_equals(B b1, B b2) {
 
     return Label_equals(b1->label, b2->label);
 }
-
-int Ssa_Block_canJumpTo(B b, Label_t l) {
-    assert(b);
-    assert(l);
-
-    return Ssa_Transfer_canJumpTo(b->transfer, l);
-}
+//
+//int Ssa_Block_canJumpTo(B b, Label_t l) {
+//    assert(b);
+//    assert(l);
+//
+//    return Ssa_Transfer_canJumpTo(b->transfer, l);
+//}
 
 File_t Ssa_Block_print(File_t file, B b) {
     assert(b);
@@ -1327,7 +1305,6 @@ void Ssa_Block_renamePhiArgPre(B current, B predessor, void (*f)(B, B, Id_t)) {
 
         stms = stms->next;
     }
-    return;
 }
 
 void Ssa_Block_foreachDef(B b, void (*f)(Id_t)) {
@@ -1341,7 +1318,6 @@ void Ssa_Block_foreachDef(B b, void (*f)(Id_t)) {
     }
     // transfer may also contain definitions
     Ssa_Transfer_foreachDef(b->transfer, f);
-    return;
 }
 
 void Ssa_Block_foreachUse(B b, void (*f)(Id_t)) {
@@ -1354,7 +1330,6 @@ void Ssa_Block_foreachUse(B b, void (*f)(Id_t)) {
         stms = stms->next;
     }
     Ssa_Transfer_foreachUse(b->transfer, f);
-    return;
 }
 
 
@@ -1433,11 +1408,11 @@ File_t Ssa_Block_printForDot(File_t file, B b) {
     return file;
 }
 
-int Ssa_Block_numSuccs(B b) {
-    assert(b);
-
-    return Ssa_Transfer_numSuccs(b->transfer);
-}
+//int Ssa_Block_numSuccs(B b) {
+//    assert(b);
+//
+//    return Ssa_Transfer_numSuccs(b->transfer);
+//}
 
 
 //////////////////////////////////////////////////////
@@ -1487,7 +1462,6 @@ void Ssa_Fun_toDot(F f, String_t name) {
         Error_impossible();
 
     Graph_toJpgWithName(g, (Poly_tyPrint) Ssa_Block_printForDot, name);
-    return;
 }
 
 Graph_t Ssa_Fun_toGraph(F f) {
@@ -1534,11 +1508,11 @@ Graph_t Ssa_Fun_toGraph(F f) {
                 break;
             }
             case SSA_TRANS_RETURN:
-                break;
+                //                break;
             case SSA_TRANS_THROW:
                 break;
             case SSA_TRANS_CALL: {
-                B leaveB = 0, normalB = 0;
+                B leaveB, normalB;
 
                 leaveB = Ssa_Fun_searchLabel(f, trans->u.call.leave);
                 normalB = Ssa_Fun_searchLabel(f, trans->u.call.normal);
@@ -1618,16 +1592,14 @@ static String_t gfname = 0;
 
 static void progToDotEach(F f) {
     Ssa_Fun_toDot(f, gfname);
-    return;
 }
 
-void Ssa_Prog_toDot(P x, String_t fname) {
+void Ssa_Prog_toDot(P x, String_t file_name) {
     assert(x);
-    assert(fname);
-    gfname = fname;
+    assert(file_name);
+    gfname = file_name;
     List_foreach(x->funcs, (Poly_tyVoid) progToDotEach);
     gfname = 0;
-    return;
 }
 
 

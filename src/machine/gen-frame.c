@@ -1,6 +1,5 @@
 #include "gen-frame.h"
 #include "../control/control.h"
-#include "../lib/list.h"
 #include "../lib/trace.h"
 
 // Generate frame information for each function.
@@ -32,7 +31,7 @@ static int genOffsets(List_t args, List_t decs) {
         Dec_t dec = (Dec_t) args->data;
         // increment the total frame size
         size++;
-        // if the arg is an reference variable, then record it
+        // if the arg is a reference variable, then record it
         if (Dec_maybeGc(dec)) {
             long offset = argindex * Control_Target_size;
             List_insertLast(offsets, (Poly_t) offset);

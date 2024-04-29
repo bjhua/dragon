@@ -20,8 +20,7 @@ static Label_t currentLabel = 0;
 
 //////////////////////////////////////////////////////
 // headers
-static void outputHeaders() {
-    return;
+static void outputHeaders(void) {
     //fprintf (file, "%s", "#include <main-header.h>");
 }
 
@@ -191,7 +190,7 @@ static void outputOperand(Machine_Operand_t o) {
     assert(o);
     switch (o->kind) {
         case MACHINE_OP_INT:
-            fprintf(file, "%ld", o->u.intlit);
+            fprintf(file, "%ld", o->u.int_lit);
             break;
         case MACHINE_OP_GLOBAL:
             fprintf(file, "%s", Id_toString(o->u.id));

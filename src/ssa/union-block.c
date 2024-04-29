@@ -50,7 +50,7 @@ static void analyzeOneBlock(Ssa_Block_t b) {
             return;
         }
         case SSA_TRANS_THROW:
-            return;
+            //            return;
         case SSA_TRANS_CALL:
             return;
         default:
@@ -58,7 +58,6 @@ static void analyzeOneBlock(Ssa_Block_t b) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 ///////////////////////////////////////////////////
@@ -83,9 +82,9 @@ static void markVictim(Ssa_Block_t b) {
             return;
         }
         case SSA_TRANS_RETURN:
-            return;
+            //            return;
         case SSA_TRANS_THROW:
-            return;
+            //            return;
         case SSA_TRANS_CALL:
             return;
         default:
@@ -93,7 +92,6 @@ static void markVictim(Ssa_Block_t b) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 //////////////////////////////////////////////////////
@@ -135,14 +133,16 @@ static void transOne(Ssa_Block_t b) {
 
             return;
         }
-        case SSA_TRANS_RETURN: {
-            emit(b);
-            return;
-        }
-        case SSA_TRANS_THROW: {
-            emit(b);
-            return;
-        }
+        case SSA_TRANS_RETURN:
+        //        {
+        //            //            emit(b);
+        //            //            return;
+        //        }
+        case SSA_TRANS_THROW:
+            //        {
+            //                //            //            emit(b);
+            //            //            return;
+            //        }
         case SSA_TRANS_CALL:
             emit(b);
             return;
@@ -151,7 +151,6 @@ static void transOne(Ssa_Block_t b) {
             return;
     }
     Error_impossible();
-    return;
 }
 
 //////////////////////////////////////////////////////
@@ -215,13 +214,11 @@ static Ssa_Prog_t Ssa_unionBlockTraced(Ssa_Prog_t p) {
 static void printArg(Ssa_Prog_t p) {
     Ssa_Prog_toDot(p, "beforeSsaUnionBlock");
     Ssa_Prog_print(stdout, p);
-    return;
 }
 
 static void printResult(Ssa_Prog_t p) {
     Ssa_Prog_toDot(p, "afterSsaUnionBlock");
     Ssa_Prog_print(stdout, p);
-    return;
 }
 
 Ssa_Prog_t Ssa_unionBlock(Ssa_Prog_t p) {
